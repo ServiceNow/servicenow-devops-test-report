@@ -1,0 +1,31 @@
+{
+  "name": "servicenow-devops-test-report",
+  "version": "1.0.0",
+  "description": "Register JUnit Test Summary Report Details",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:ServiceNow/servicenow-devops-test-report.git"
+  },
+  "keywords": [
+    "devops",
+    "servicenow",
+    "test",
+    "report"
+  ],
+  "author": "ServiceNow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ServiceNow/servicenow-devops-test-report/issues"
+  },
+  "homepage": "https://github.com/ServiceNow/servicenow-devops-test-report#readme",
+  "dependencies": {
+    "@actions/core": "^1.7.0",
+    "axios": "^0.25.0",
+    "follow-redirects": "^1.14.9",
+    "xml2js": "^0.4.23"
+  }
+}

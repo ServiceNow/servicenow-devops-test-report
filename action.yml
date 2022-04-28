@@ -1,0 +1,34 @@
+name: 'Register JUnit Test Report'
+description: 'Send JUnit Test Summaries to ServiceNow Devops'
+inputs:
+  devops-integration-user-name:
+    description: 'Devops Integration User Name'
+    required: true
+  devops-integration-user-password:
+    description: 'Devops Integration User Password'
+    required: true
+  instance-name: 
+    description: 'ServiceNow Instance Name'
+    required: true
+  tool-id:
+    description: 'Orchestration Tool Id'
+    required: true
+  job-name:
+    description: 'Job Name'
+    required: true
+  context-github:
+    description: 'Github Context'
+    required: true
+  xml-report-filename:
+    description: 'JUnit xml report file name with path'
+    required: true
+  test-type:
+    description: 'GitHub Custom Action'
+    required: false
+    default: 'JUnit'
+branding:
+  icon: 'refresh-ccw'
+  color: 'green'
+runs: 
+  using: 'node12'
+  main: 'dist/index.js'
