@@ -1,5 +1,5 @@
 name: 'Register JUnit Test Report'
-description: 'Send JUnit Test Summaries to ServiceNow Devops'
+description: 'Register JUnit Test Summaries in ServiceNow'
 inputs:
   devops-integration-user-name:
     description: 'Devops Integration User Name'
@@ -7,7 +7,7 @@ inputs:
   devops-integration-user-password:
     description: 'Devops Integration User Password'
     required: true
-  instance-name: 
+  instance-url: 
     description: 'ServiceNow Instance Name'
     required: true
   tool-id:
