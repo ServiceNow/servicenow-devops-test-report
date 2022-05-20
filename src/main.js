@@ -4,7 +4,7 @@ const xml2js = require('xml2js');
 const axios = require('axios');
 
 (async function main() {
-    const instanceUrl = core.getInput('instance-url', { required: true });
+    let instanceUrl = core.getInput('instance-url', { required: true });
     const toolId = core.getInput('tool-id', { required: true });
     const username = core.getInput('devops-integration-user-name', { required: true });
     const password = core.getInput('devops-integration-user-password', { required: true });
@@ -96,13 +96,15 @@ const axios = require('axios');
         return;
     }
 
-    const endpoint = `${instanceUrl}/api/sn_devops/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-
     let payload;
     
     try {
+        instanceUrl = instanceUrl.trim();
+        if (instanceUrl.endsWith('/'))
+            instanceUrl = instanceUrl.slice(0, -1);
+
         testSummaries = [{
-            name: packageName,
+            name: packageName + '-' + githubContext.run_number + '.' + githubContext.run_attempt,
             passedTests: passedTests,
             failedTests: failedTests,
             skippedTests: skippedTests,
@@ -135,6 +137,7 @@ const axios = require('axios');
     }
 
     let result;
+    const endpoint = `${instanceUrl}/api/sn_devops/devops/tool/test?toolId=${toolId}&testType=JUnit`;
 
     try {
         const token = `${username}:${password}`;
@@ -149,7 +152,13 @@ const axios = require('axios');
         let httpHeaders = { headers: defaultHeaders };
         result = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
     } catch (e) {
-        core.setFailed(`ServiceNow Test Summaries is not created. Please check ServiceNow logs for more details.`);
+        if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
+            core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
+        } else if (e.message.includes('401')) {
+            core.setFailed('Invalid Credentials. Please correct the credentials and try again.');
+        } else {
+            core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
+        }
     }
     
 })();
