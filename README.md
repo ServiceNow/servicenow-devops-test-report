@@ -1,4 +1,4 @@
-# ServiceNow Register Unit Test Summaries GitHub Action
+# ServiceNow DevOps Register Unit Test Summary GitHub Action
 
 This custom action needs to be added at step level in a job to register unit test summary details in ServiceNow.
 
