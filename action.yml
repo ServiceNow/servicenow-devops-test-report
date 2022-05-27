@@ -1,5 +1,5 @@
-name: 'Register JUnit Test Report'
-description: 'Register JUnit Test Summaries in ServiceNow'
+name: 'ServiceNow DevOps Unit Test Results'
+description: 'Register JUnit Test Results in ServiceNow'
 inputs:
   devops-integration-user-name:
     description: 'Devops Integration User Name'

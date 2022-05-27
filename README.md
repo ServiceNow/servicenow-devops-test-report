@@ -1,4 +1,4 @@
-# ServiceNow Register Unit Test Summaries GitHub Action
+# ServiceNow DevOps Register Unit Test Summary GitHub Action
 
 This custom action needs to be added at step level in a job to register unit test summary details in ServiceNow.
 
@@ -24,7 +24,7 @@ build:
     runs-on: ubuntu-latest
     steps:
       - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v1
+        uses: ServiceNow/servicenow-devops-test-report@v1.34.2
         with:
           devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
           devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
@@ -62,7 +62,7 @@ The Step Name should be **ServiceNow DevOps Unit Test Results**.
 
 ### `job-name`
 
-**Required**  Display name of the job given for attribute _name_ in which _steps_ have been added for ServiceNow test report custom action.
+**Required**  Display name of the job given for attribute _name_ in which _steps_ have been added for this custom action. For example, if display name of job is _Build_ then job-name value must be _'Build'_
 
 ### `xml-report-filename`
 
