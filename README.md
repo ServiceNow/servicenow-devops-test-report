@@ -21,6 +21,7 @@ For basic authentication , create secrets called
 - `SN_INSTANCE_URL` your ServiceNow instance URL, for example **https://test.service-now.com**
 - `SN_DEVOPS_USER`
 - `SN_DEVOPS_PASSWORD`
+- `SN_INSTANCE_URL` your ServiceNow instance URL, for example **https://test.service-now.com**
 - `SN_ORCHESTRATION_TOOL_ID` only the **sys_id** is required for the GitHub tool created in your ServiceNow instance
 
 ## Step 3: Configure the GitHub Action if need to adapt for your needs or workflows
