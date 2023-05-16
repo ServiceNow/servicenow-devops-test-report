@@ -3,10 +3,13 @@ description: 'Register JUnit Test Results in ServiceNow'
 inputs:
   devops-integration-user-name:
     description: 'Devops Integration User Name'
-    required: true
+    required: false
   devops-integration-user-password:
     description: 'Devops Integration User Password'
-    required: true
+    required: false
+  devops-integration-token:
+    description: 'Devops Security Token'
+    required: false
   instance-url: 
     description: 'ServiceNow Instance Name'
     required: true

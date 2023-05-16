@@ -6,8 +6,9 @@ const axios = require('axios');
 (async function main() {
     let instanceUrl = core.getInput('instance-url', { required: true });
     const toolId = core.getInput('tool-id', { required: true });
-    const username = core.getInput('devops-integration-user-name', { required: true });
-    const password = core.getInput('devops-integration-user-password', { required: true });
+    const username = core.getInput('devops-integration-user-name', { required: false });
+    const password = core.getInput('devops-integration-user-password', { required: false });
+    const devopsIntegrationToken = core.getInput('devops-integration-token', { required: false });
     const jobname = core.getInput('job-name', { required: true });
     const xmlReportFile = core.getInput('xml-report-filename', { required: true });
     
@@ -137,20 +138,41 @@ const axios = require('axios');
     }
 
     let result;
-    const endpoint = `${instanceUrl}/api/sn_devops/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    let snowResponse;
+    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
 
     try {
-        const token = `${username}:${password}`;
-        const encodedToken = Buffer.from(token).toString('base64');
-
-        const defaultHeaders = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Basic ' + `${encodedToken}`
-        };
-        
-        let httpHeaders = { headers: defaultHeaders };
-        result = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
+        if (!devopsIntegrationToken && !username && !password) {
+            core.setFailed('Either secret token or integration username, password is needed for integration user authentication');
+            return;
+        } else if (devopsIntegrationToken) {
+            const defaultHeadersv2 = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'sn_devops_token': `${devopsIntegrationToken}`
+            };
+            httpHeaders = {
+                headers: defaultHeadersv2
+            };
+            endpoint = endpointV2;
+        } else if (username && password) {
+            const token = `${username}:${password}`;
+            const encodedToken = Buffer.from(token).toString('base64');
+            const defaultHeadersv1 = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + `${encodedToken}`
+            };
+            httpHeaders = {
+                headers: defaultHeadersv1 
+            };
+            endpoint = endpointV1;
+        } else {
+            core.setFailed('For Basic Auth, Username and Password is mandatory for integration user authentication');
+            return;
+        }
+        snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
     } catch (e) {
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
             core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
