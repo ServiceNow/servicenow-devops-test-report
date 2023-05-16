@@ -15,11 +15,13 @@ For token based authentication which is available from v1.39.0, create secrets c
 - `SN_INSTANCE_URL` your ServiceNow instance URL, for example **https://test.service-now.com**
 - `SN_DEVOPS_INTEGRATION_TOKEN` required for token based authentication
 - `SN_ORCHESTRATION_TOOL_ID` only the **sys_id** is required for the GitHub tool created in your ServiceNow instance,required for token based authentication
+- `SN_ORCHESTRATION_TOOL_ID` only the **sys_id** is required for the GitHub tool created in your ServiceNow instance
 
 For basic authentication , create secrets called 
 - `SN_INSTANCE_URL` your ServiceNow instance URL, for example **https://test.service-now.com**
 - `SN_DEVOPS_USER`
 - `SN_DEVOPS_PASSWORD`
+- `SN_ORCHESTRATION_TOOL_ID` only the **sys_id** is required for the GitHub tool created in your ServiceNow instance
 
 ## Step 3: Configure the GitHub Action if need to adapt for your needs or workflows
 # For Token based Authentication which is available from v1.39.0 , at ServiceNow instance
