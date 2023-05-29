@@ -33,5 +33,5 @@ branding:
   icon: 'refresh-ccw'
   color: 'green'
 runs: 
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
