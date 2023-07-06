@@ -1,0 +1,34 @@
+name: workflowToken
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Setup JDK 11 for Sonar Cloud
+        uses: actions/setup-java@v1
+        with:
+            java-version: 11
+      
+      - name: Maven Build
+        run: mvn clean install
+        
+      - name: Run JUnit Tests
+        run: mvn test -Dmaven.test.failure.ignore=true surefire-report:report
+
+      - name: ServiceNow Test Action Report
+        uses: ServiceNow/servicenow-devops-test-report@v1.39.0
+        with:
+          devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'Build'
+          xml-report-filename: target/surefire-reports/testng-results.xml
