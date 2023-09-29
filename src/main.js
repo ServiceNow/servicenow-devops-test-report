@@ -63,6 +63,7 @@ const axios = require('axios');
                 }
             });
         } else {
+            console.log("\nIn else block, which means its a file directly");
             xmlData = fs.readFileSync(xmlReportFile, 'utf8');
             //convert xml to json
             xml2js.parseString(xmlData, (err, result) => {
@@ -74,6 +75,8 @@ const axios = require('axios');
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
                 let parsedresponse = parsedJson["testng-results"];
+                console.log("\n Parsed response of testng file --> "+ parsedresponse);
+                console.log("\n Stringify response of testng file --> "+ JSON.stringify(parsedresponse, null, 4));
                 let summaryObj = parsedresponse.$;
                 let suitesObj = parsedresponse.suite[0];
                 let suiteObj = suitesObj.$;
