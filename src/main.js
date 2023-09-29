@@ -76,7 +76,7 @@ const axios = require('axios');
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
                 // XUnit test format
-                if (data.includes('assemblies')){
+                if (xmlData.includes('assemblies')){
                     let parsedresponse = parsedJson["assemblies"];
                     passedTests = parseInt(parsedresponse.assembly[0].$.passed);
                     failedTests = parseInt(parsedresponse.assembly[0].$.failed);
@@ -89,8 +89,38 @@ const axios = require('axios');
                     totalDuration = parseInt(parsedresponse.assembly[0].$.time);
                     testType = 'XUnit';
                 }
+                // Nunit test format
+                else if(xmlData.includes('test-run')){
+                    let parsedresponse = parsedJson["test-run"]; 
+                    passedTests = parseInt(parsedresponse.$.passed);
+                    failedTests = parseInt(parsedresponse.$.failed);
+                    skippedTests = parseInt(parsedresponse.$.skipped);
+                    ignoredTests = 0;
+                    totalTests = parseInt(parsedresponse.$.total);
+                    startTime = parsedresponse.$["start-time"]; 
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = parsedresponse.$["end-time"];//endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = parseInt(parsedresponse.$.duration);
+                    testType = 'NUnit';
+                }
+                // UnitTest - MSTest
+                else if(xmlData.includes('TestRun')){
+                    console.log('MS tests - UnitTest');
+                    let parsedresponse = parsedJson["TestRun"]; 
+                    passedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.passed);
+                    failedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.failed);
+                    skippedTests = 0;
+                    ignoredTests = 0;
+                    totalTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.total);
+                    startTime = parsedresponse.Times[0].$.start; 
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = parsedresponse.Times[0].$.finish;//endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = 0;//calculate somehow later. parseInt(parsedresponse.$.duration);
+                    testType = 'UnitTest';
+
+                }
                 // TestNG test format
-                else if(data.includes('testng-results')){
+                else if(xmlData.includes('testng-results')){
                     let parsedresponse = parsedJson["testng-results"];
                     let summaryObj = parsedresponse.$;
                     let suitesObj = parsedresponse.suite[0];
