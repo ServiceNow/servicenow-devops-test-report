@@ -11965,7 +11965,7 @@ const axios = __nccwpck_require__(114);
             repository: `${githubContext.repository}`,
             testSummaries: testSummaries,
             fileContent: '',
-            testType: 'JUnit'
+            testType: testType //'JUnit'
         };
         console.log("original payload is : ", JSON.stringify(payload));
     } catch (e) {
