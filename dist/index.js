@@ -11802,6 +11802,7 @@ const axios = __nccwpck_require__(114);
     let xmlData, jsonData, testSummaries, packageName;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
+    let testType = 'JUnit';
 
     try {
       core.info('Entered try block!');
@@ -11950,7 +11951,7 @@ const axios = __nccwpck_require__(114);
             startTime: startTime,
             endTime: endTime,
             duration: totalDuration,
-            testType: 'JUnit',
+            testType: testType, //'JUnit',
             suites: []			
         }];
         console.log("test summaries payload is : ", JSON.stringify(testSummaries));
