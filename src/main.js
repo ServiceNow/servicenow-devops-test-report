@@ -28,6 +28,7 @@ const axios = require('axios');
 
     try {
         if (fs.statSync(xmlReportFile).isDirectory()) {
+            core.info('Considering it as directory.');
             let filenames = fs.readdirSync(xmlReportFile);
             console.log("\nTest Reports directory files:");
             filenames.forEach(file => {
@@ -64,8 +65,9 @@ const axios = require('axios');
                 }
             });
         } else {
-            console.log("\nIn else block, which means its a file directly");
+            core.info('In else block, which means its a file directly');
             xmlData = fs.readFileSync(xmlReportFile, 'utf8');
+            core.info('Successfully read xml data.');
             //convert xml to json
             xml2js.parseString(xmlData, (err, result) => {
                 if (err) {
@@ -73,10 +75,13 @@ const axios = require('axios');
                 }
                 // 'result' is a JavaScript object
                 // convert it to a JSON string
+                core.info('File converted from xml to json without any exception.');
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
+                core.info('We now have the parsed json.');
                 // XUnit test format
                 if (xmlData.includes('assemblies')){
+                    core.info('XUnit test format:');
                     let parsedresponse = parsedJson["assemblies"];
                     passedTests = parseInt(parsedresponse.assembly[0].$.passed);
                     failedTests = parseInt(parsedresponse.assembly[0].$.failed);
@@ -89,9 +94,11 @@ const axios = require('axios');
                     totalDuration = parseInt(parsedresponse.assembly[0].$.time);
                     testType = 'XUnit';
                 }
-                // Nunit test format
+                // NUnit test format
                 else if(xmlData.includes('test-run')){
+                    core.info('NUnit test format:');
                     let parsedresponse = parsedJson["test-run"]; 
+                    core.info('NUnit test format: paresed json successfully');
                     passedTests = parseInt(parsedresponse.$.passed);
                     failedTests = parseInt(parsedresponse.$.failed);
                     skippedTests = parseInt(parsedresponse.$.skipped);
@@ -105,7 +112,7 @@ const axios = require('axios');
                 }
                 // UnitTest - MSTest
                 else if(xmlData.includes('TestRun')){
-                    console.log('MS tests - UnitTest');
+                    core.info('MS tests - UnitTest:');
                     let parsedresponse = parsedJson["TestRun"]; 
                     passedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.passed);
                     failedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.failed);
@@ -121,6 +128,7 @@ const axios = require('axios');
                 }
                 // TestNG test format
                 else if(xmlData.includes('testng-results')){
+                    core.info('TestNG test format:');
                     let parsedresponse = parsedJson["testng-results"];
                     let summaryObj = parsedresponse.$;
                     let suitesObj = parsedresponse.suite[0];
