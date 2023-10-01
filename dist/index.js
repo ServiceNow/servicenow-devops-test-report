@@ -11804,7 +11804,9 @@ const axios = __nccwpck_require__(114);
     let startTime = '', endTime = '';
 
     try {
+      core.info('Entered try block!');
         if (fs.statSync(xmlReportFile).isDirectory()) {
+          core.info('In if block, which means its a file within a directory');
             let filenames = fs.readdirSync(xmlReportFile);
             console.log("\nTest Reports directory files:");
             filenames.forEach(file => {
@@ -11841,35 +11843,90 @@ const axios = __nccwpck_require__(114);
                 }
             });
         } else {
-            xmlData = fs.readFileSync(xmlReportFile, 'utf8');
-            //convert xml to json
-            xml2js.parseString(xmlData, (err, result) => {
-                if (err) {
-                    throw err;
-                }
-                // 'result' is a JavaScript object
-                // convert it to a JSON string
-                jsonData = JSON.stringify(result, null, 4);
-                let parsedJson = JSON.parse(jsonData);
-                let parsedresponse = parsedJson["testng-results"];
-                let summaryObj = parsedresponse.$;
-                let suitesObj = parsedresponse.suite[0];
-                let suiteObj = suitesObj.$;
-                let startTime = suiteObj["started-at"];
-                let endTime = suiteObj["finished-at"];
-                let package = suitesObj.test[0].class[0].$;
-                packageName = package.name.replace(/\.[^.]*$/g,'');
-                    
-                passedTests = parseInt(summaryObj.passed);
-                failedTests = parseInt(summaryObj.failed);
-                skippedTests = parseInt(summaryObj.skipped);
-                ignoredTests = parseInt(summaryObj.ignored);
-                totalTests = parseInt(summaryObj.total);
-                startTime = startTime.replace(/ +\S*$/ig, 'Z');
-                endTime = endTime.replace(/ +\S*$/ig, 'Z');
-                totalDuration = parseInt(suiteObj["duration-ms"]);
-            });
-        }
+          core.info('In else block, which means its a file directly');
+          xmlData = fs.readFileSync(xmlReportFile, 'utf8');
+          core.info('Successfully read xml data.');
+          //convert xml to json
+          xml2js.parseString(xmlData, (err, result) => {
+              if (err) {
+                  throw err;
+              }
+              // 'result' is a JavaScript object
+              // convert it to a JSON string
+              core.info('File converted from xml to json without any exception.');
+              jsonData = JSON.stringify(result, null, 4);
+              let parsedJson = JSON.parse(jsonData);
+              core.info('We now have the parsed json.');
+              // XUnit test format
+              if (xmlData.includes('assemblies')){
+                  core.info('XUnit test format:');
+                  let parsedresponse = parsedJson["assemblies"];
+                  passedTests = parseInt(parsedresponse.assembly[0].$.passed);
+                  failedTests = parseInt(parsedresponse.assembly[0].$.failed);
+                  skippedTests = parseInt(parsedresponse.assembly[0].$.skipped);
+                  ignoredTests = 0;
+                  totalTests = parseInt(parsedresponse.assembly[0].$.total);
+                  startTime = parsedresponse.$.timestamp; 
+                  startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                  endTime = parsedresponse.$.timestamp;//endTime.replace(/ +\S*$/ig, 'Z');
+                  totalDuration = parseInt(parsedresponse.assembly[0].$.time);
+                  testType = 'XUnit';
+              }
+              // NUnit test format
+              else if(xmlData.includes('test-run')){
+                  core.info('NUnit test format:');
+                  let parsedresponse = parsedJson["test-run"]; 
+                  core.info('NUnit test format: paresed json successfully');
+                  passedTests = parseInt(parsedresponse.$.passed);
+                  failedTests = parseInt(parsedresponse.$.failed);
+                  skippedTests = parseInt(parsedresponse.$.skipped);
+                  ignoredTests = 0;
+                  totalTests = parseInt(parsedresponse.$.total);
+                  startTime = parsedresponse.$["start-time"]; 
+                  startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                  endTime = parsedresponse.$["end-time"];//endTime.replace(/ +\S*$/ig, 'Z');
+                  totalDuration = parseInt(parsedresponse.$.duration);
+                  testType = 'NUnit';
+              }
+              // UnitTest - MSTest
+              else if(xmlData.includes('TestRun')){
+                  core.info('MS tests - UnitTest:');
+                  let parsedresponse = parsedJson["TestRun"]; 
+                  passedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.passed);
+                  failedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.failed);
+                  skippedTests = 0;
+                  ignoredTests = 0;
+                  totalTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.total);
+                  startTime = parsedresponse.Times[0].$.start; 
+                  startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                  endTime = parsedresponse.Times[0].$.finish;//endTime.replace(/ +\S*$/ig, 'Z');
+                  totalDuration = 0;//calculate somehow later. parseInt(parsedresponse.$.duration);
+                  testType = 'UnitTest';
+
+              }
+              // TestNG test format
+              else if(xmlData.includes('testng-results')){
+                  core.info('TestNG test format:');
+                  let parsedresponse = parsedJson["testng-results"];
+                  let summaryObj = parsedresponse.$;
+                  let suitesObj = parsedresponse.suite[0];
+                  let suiteObj = suitesObj.$;
+                  let startTime = suiteObj["started-at"];
+                  let endTime = suiteObj["finished-at"];
+                  let package = suitesObj.test[0].class[0].$;
+                  packageName = package.name.replace(/\.[^.]*$/g,'');
+                      
+                  passedTests = parseInt(summaryObj.passed);
+                  failedTests = parseInt(summaryObj.failed);
+                  skippedTests = parseInt(summaryObj.skipped);
+                  ignoredTests = parseInt(summaryObj.ignored);
+                  totalTests = parseInt(summaryObj.total);
+                  startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                  endTime = endTime.replace(/ +\S*$/ig, 'Z');
+                  totalDuration = parseInt(suiteObj["duration-ms"]);
+              }
+          });
+      }
     } catch (e) {
         core.setFailed(`Exception parsing and converting xml to json ${e}`);
         return;
