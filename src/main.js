@@ -47,9 +47,9 @@ const axios = require('axios');
                         // convert it to a JSON string
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
-                        let parsedresponse = parsedJson["testsuite"];
+                        let parsedresponse = parsedJson["testsuites"];
                         core.info('parsedresponse is --> '+ JSON.stringify(parsedresponse));
-                        let summaryObj = parsedresponse.$;
+                        let summaryObj = parsedresponse.testsuite[0].$;
                         packageName = summaryObj.name.replace(/\.[^.]*$/g,'');
 
                         let tests = parseInt(summaryObj.tests);
