@@ -42,10 +42,11 @@ const axios = require('axios');
                         // convert it to a JSON string
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
+                        let summaryObj;
                         if(xmlData.includes('testsuites')){
                             let parsedresponse = parsedJson["testsuites"];
                             for(var i = 0; i < parsedresponse.testsuite.length; i++){
-                                let summaryObj = parsedresponse.testsuite[i].$;
+                                summaryObj = parsedresponse.testsuite[i].$;
                                 totalTests = totalTests + parseInt(summaryObj.tests);
                                 failedTests = failedTests + parseInt(summaryObj.failures);
                                 ignoredTests = ignoredTests + parseInt(summaryObj.errors);
@@ -56,7 +57,7 @@ const axios = require('axios');
                         }
                         else if(xmlData.includes('testsuite')){
                             let parsedresponse = parsedJson["testsuite"];
-                            let summaryObj = parsedresponse.$;
+                            summaryObj = parsedresponse.$;
                             totalTests = totalTests + parseInt(summaryObj.tests);
                             failedTests = failedTests + parseInt(summaryObj.failures);
                             ignoredTests = ignoredTests + parseInt(summaryObj.errors);
