@@ -11806,44 +11806,48 @@ const axios = __nccwpck_require__(114);
 
     try {
       core.info('Entered try block!');
-        if (fs.statSync(xmlReportFile).isDirectory()) {
-          core.info('In if block, which means its a file within a directory');
-            let filenames = fs.readdirSync(xmlReportFile);
-            console.log("\nTest Reports directory files:");
-            filenames.forEach(file => {
-                let filePath = xmlReportFile + file;
-                if (file.endsWith('.xml')) {
-                    console.log('Parsing XML file path to prepare summaries payload: ' +filePath);
-                    xmlData = fs.readFileSync(filePath, 'utf8');
-                    xml2js.parseString(xmlData, (error, result) => {
-                        if (error) {
-                            throw error;
-                        }
-                        // 'result' is a JavaScript object
-                        // convert it to a JSON string
-                        jsonData = JSON.stringify(result, null, 4);
-                        let parsedJson = JSON.parse(jsonData);
-                        let parsedresponse = parsedJson["testsuite"];
-                        let summaryObj = parsedresponse.$;
-                        packageName = summaryObj.name.replace(/\.[^.]*$/g,'');
+      if (fs.statSync(xmlReportFile).isDirectory()) {
+        core.info('Considering it as directory.');
+        let filenames = fs.readdirSync(xmlReportFile);
+        console.log("\nTest Reports directory files:");
+        core.info('Test Reports directory files:' + filenames);
+        filenames.forEach(file => {
+            let filePath = xmlReportFile + file;
+            if (file.endsWith('.xml')) {
+                core.info('Found a file which ends with .xml --> '+ file);
+                console.log('Parsing XML file path to prepare summaries payload: ' +filePath);
+                xmlData = fs.readFileSync(filePath, 'utf8');
+                xml2js.parseString(xmlData, (error, result) => {
+                    if (error) {
+                        throw error;
+                    }
+                    core.info('done forming result!!');
+                    // 'result' is a JavaScript object
+                    // convert it to a JSON string
+                    jsonData = JSON.stringify(result, null, 4);
+                    let parsedJson = JSON.parse(jsonData);
+                    let parsedresponse = parsedJson["testsuite"];
+                    core.info('parsedresponse is --> '+ JSON.stringify(parsedresponse));
+                    let summaryObj = parsedresponse.$;
+                    packageName = summaryObj.name.replace(/\.[^.]*$/g,'');
 
-                        let tests = parseInt(summaryObj.tests);
-                        let failed = parseInt(summaryObj.failures);
-                        let ignored = parseInt(summaryObj.errors);
-                        let skipped = parseInt(summaryObj.skipped);
-                        let duration = parseInt(summaryObj.time);
-                        let passed = tests - (failed + ignored + skipped);
+                    let tests = parseInt(summaryObj.tests);
+                    let failed = parseInt(summaryObj.failures);
+                    let ignored = parseInt(summaryObj.errors);
+                    let skipped = parseInt(summaryObj.skipped);
+                    let duration = parseInt(summaryObj.time);
+                    let passed = tests - (failed + ignored + skipped);
 
-                        totalTests += tests;
-                        passedTests += passed;
-                        skippedTests += skipped;
-                        ignoredTests += ignored;
-                        failedTests += failed;
-                        totalDuration += duration;
-                    });
-                }
-            });
-        } else {
+                    totalTests += tests;
+                    passedTests += passed;
+                    skippedTests += skipped;
+                    ignoredTests += ignored;
+                    failedTests += failed;
+                    totalDuration += duration;
+                });
+            }
+        });
+    } else {
           core.info('In else block, which means its a file directly');
           xmlData = fs.readFileSync(xmlReportFile, 'utf8');
           core.info('Successfully read xml data.');
