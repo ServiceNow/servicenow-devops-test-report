@@ -31,20 +31,24 @@ const axios = require('axios');
             core.info('Considering it as directory.');
             let filenames = fs.readdirSync(xmlReportFile);
             console.log("\nTest Reports directory files:");
+            core.info('Test Reports directory files:' + filenames);
             filenames.forEach(file => {
                 let filePath = xmlReportFile + file;
                 if (file.endsWith('.xml')) {
+                    core.info('Found a file which ends with .xml --> '+ file);
                     console.log('Parsing XML file path to prepare summaries payload: ' +filePath);
                     xmlData = fs.readFileSync(filePath, 'utf8');
                     xml2js.parseString(xmlData, (error, result) => {
                         if (error) {
                             throw error;
                         }
+                        core.info('done forming result!!');
                         // 'result' is a JavaScript object
                         // convert it to a JSON string
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
                         let parsedresponse = parsedJson["testsuite"];
+                        core.info('parsedresponse is --> '+ JSON.stringify(parsedresponse));
                         let summaryObj = parsedresponse.$;
                         packageName = summaryObj.name.replace(/\.[^.]*$/g,'');
 
