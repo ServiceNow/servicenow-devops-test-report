@@ -30,7 +30,7 @@ const axios = require('axios');
             let filenames = fs.readdirSync(xmlReportFile);
             console.log("\nTest Reports directory files:");
             filenames.forEach(file => {
-                let filePath = xmlReportFile + file;
+                let filePath = xmlReportFile + '/' + file;
                 if (file.endsWith('.xml')) {
                     console.log('Parsing XML file path to prepare summaries payload: ' +filePath);
                     xmlData = fs.readFileSync(filePath, 'utf8');
@@ -42,8 +42,8 @@ const axios = require('axios');
                         // convert it to a JSON string
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
-                        let parsedresponse = parsedJson["testsuite"];
-                        let summaryObj = parsedresponse.$;
+                        let parsedresponse = parsedJson["testsuites"];
+                        let summaryObj = parsedresponse.testsuite[0].$;
                         packageName = summaryObj.name.replace(/\.[^.]*$/g,'');
 
                         let tests = parseInt(summaryObj.tests);
