@@ -42,23 +42,31 @@ const axios = require('axios');
                         // convert it to a JSON string
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
-                        let parsedresponse = parsedJson["testsuites"];
-                        let summaryObj = parsedresponse.testsuite[0].$;
-                        packageName = summaryObj.name.replace(/\.[^.]*$/g,'');
+                        if(xmlData.includes('testsuites')){
+                            let parsedresponse = parsedJson["testsuites"];
+                            for(var i = 0; i < parsedresponse.testsuite.length; i++){
+                                let summaryObj = parsedresponse.testsuite[i].$;
+                                totalTests = totalTests + parseInt(summaryObj.tests);
+                                failedTests = failedTests + parseInt(summaryObj.failures);
+                                ignoredTests = ignoredTests + parseInt(summaryObj.errors);
+                                skippedTests = skippedTests + parseInt(summaryObj.skipped);
+                                totalDuration = totalDuration + parseInt(summaryObj.time);
+                                passedTests = totalTests - (failedTests + ignoredTests + skippedTests);
+                            }
+                        }
+                        else if(xmlData.includes('testsuite')){
+                            let parsedresponse = parsedJson["testsuite"];
+                            let summaryObj = parsedresponse.$;
+                            totalTests = totalTests + parseInt(summaryObj.tests);
+                            failedTests = failedTests + parseInt(summaryObj.failures);
+                            ignoredTests = ignoredTests + parseInt(summaryObj.errors);
+                            skippedTests = skippedTests + parseInt(summaryObj.skipped);
+                            totalDuration = totalDuration + parseInt(summaryObj.time);
+                            passedTests = totalTests - (failedTests + ignoredTests + skippedTests);
+                            
+                        }
 
-                        let tests = parseInt(summaryObj.tests);
-                        let failed = parseInt(summaryObj.failures);
-                        let ignored = parseInt(summaryObj.errors);
-                        let skipped = parseInt(summaryObj.skipped);
-                        let duration = parseInt(summaryObj.time);
-                        let passed = tests - (failed + ignored + skipped);
-
-                        totalTests += tests;
-                        passedTests += passed;
-                        skippedTests += skipped;
-                        ignoredTests += ignored;
-                        failedTests += failed;
-                        totalDuration += duration;
+                        packageName = summaryObj.name.replace(/\.[^.]*$/g, '');
                     });
                 }
             });
