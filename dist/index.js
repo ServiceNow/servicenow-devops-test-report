@@ -11812,7 +11812,7 @@ const axios = __nccwpck_require__(114);
         console.log("\nTest Reports directory files:");
         core.info('Test Reports directory files:' + filenames);
         filenames.forEach(file => {
-            let filePath = xmlReportFile + file;
+          let filePath = xmlReportFile + '/' + file; 
             if (file.endsWith('.xml')) {
                 core.info('Found a file which ends with .xml --> '+ file);
                 console.log('Parsing XML file path to prepare summaries payload: ' +filePath);
