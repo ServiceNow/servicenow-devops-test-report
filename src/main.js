@@ -190,6 +190,7 @@ const axios = require('axios');
             repository: `${githubContext.repository}`,
             testSummaries: testSummaries,
             fileContent: '',
+            xmlContent: xmlData,
             testType: testType
         };
         console.log("original payload is : ", JSON.stringify(payload));
