@@ -24,26 +24,32 @@ const axios = require('axios');
     let xmlData, jsonData, testSummaries, packageName;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
+    let testType = 'JUnit';
 
     try {
         if (fs.statSync(xmlReportFile).isDirectory()) {
+            core.info('Considering it as directory.');
             let filenames = fs.readdirSync(xmlReportFile);
             console.log("\nTest Reports directory files:");
+            core.info('Test Reports directory files:' + filenames);
             filenames.forEach(file => {
-                let filePath = xmlReportFile + file;
+                let filePath = xmlReportFile + '/' + file; 
                 if (file.endsWith('.xml')) {
+                    core.info('Found a file which ends with .xml --> '+ file);
                     console.log('Parsing XML file path to prepare summaries payload: ' +filePath);
                     xmlData = fs.readFileSync(filePath, 'utf8');
                     xml2js.parseString(xmlData, (error, result) => {
                         if (error) {
                             throw error;
                         }
+                        core.info('done forming result!!');
                         // 'result' is a JavaScript object
                         // convert it to a JSON string
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
-                        let parsedresponse = parsedJson["testsuite"];
-                        let summaryObj = parsedresponse.$;
+                        let parsedresponse = parsedJson["testsuites"];
+                        core.info('parsedresponse is --> '+ JSON.stringify(parsedresponse));
+                        let summaryObj = parsedresponse.testsuite[0].$;
                         packageName = summaryObj.name.replace(/\.[^.]*$/g,'');
 
                         let tests = parseInt(summaryObj.tests);
@@ -63,7 +69,9 @@ const axios = require('axios');
                 }
             });
         } else {
+            core.info('In else block, which means its a file directly');
             xmlData = fs.readFileSync(xmlReportFile, 'utf8');
+            core.info('Successfully read xml data.');
             //convert xml to json
             xml2js.parseString(xmlData, (err, result) => {
                 if (err) {
@@ -71,25 +79,78 @@ const axios = require('axios');
                 }
                 // 'result' is a JavaScript object
                 // convert it to a JSON string
+                core.info('File converted from xml to json without any exception.');
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
-                let parsedresponse = parsedJson["testng-results"];
-                let summaryObj = parsedresponse.$;
-                let suitesObj = parsedresponse.suite[0];
-                let suiteObj = suitesObj.$;
-                let startTime = suiteObj["started-at"];
-                let endTime = suiteObj["finished-at"];
-                let package = suitesObj.test[0].class[0].$;
-                packageName = package.name.replace(/\.[^.]*$/g,'');
-                    
-                passedTests = parseInt(summaryObj.passed);
-                failedTests = parseInt(summaryObj.failed);
-                skippedTests = parseInt(summaryObj.skipped);
-                ignoredTests = parseInt(summaryObj.ignored);
-                totalTests = parseInt(summaryObj.total);
-                startTime = startTime.replace(/ +\S*$/ig, 'Z');
-                endTime = endTime.replace(/ +\S*$/ig, 'Z');
-                totalDuration = parseInt(suiteObj["duration-ms"]);
+                core.info('We now have the parsed json.');
+                // XUnit test format
+                if (xmlData.includes('assemblies')){
+                    core.info('XUnit test format:');
+                    let parsedresponse = parsedJson["assemblies"];
+                    passedTests = parseInt(parsedresponse.assembly[0].$.passed);
+                    failedTests = parseInt(parsedresponse.assembly[0].$.failed);
+                    skippedTests = parseInt(parsedresponse.assembly[0].$.skipped);
+                    ignoredTests = 0;
+                    totalTests = parseInt(parsedresponse.assembly[0].$.total);
+                    startTime = parsedresponse.$.timestamp; 
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = parsedresponse.$.timestamp;//endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = parseInt(parsedresponse.assembly[0].$.time);
+                    testType = 'XUnit';
+                }
+                // NUnit test format
+                else if(xmlData.includes('test-run')){
+                    core.info('NUnit test format:');
+                    let parsedresponse = parsedJson["test-run"]; 
+                    core.info('NUnit test format: paresed json successfully');
+                    passedTests = parseInt(parsedresponse.$.passed);
+                    failedTests = parseInt(parsedresponse.$.failed);
+                    skippedTests = parseInt(parsedresponse.$.skipped);
+                    ignoredTests = 0;
+                    totalTests = parseInt(parsedresponse.$.total);
+                    startTime = parsedresponse.$["start-time"]; 
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = parsedresponse.$["end-time"];//endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = parseInt(parsedresponse.$.duration);
+                    testType = 'NUnit';
+                }
+                // UnitTest - MSTest
+                else if(xmlData.includes('TestRun')){
+                    core.info('MS tests - UnitTest:');
+                    let parsedresponse = parsedJson["TestRun"]; 
+                    passedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.passed);
+                    failedTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.failed);
+                    skippedTests = 0;
+                    ignoredTests = 0;
+                    totalTests = parseInt(parsedresponse.ResultSummary[0].Counters[0].$.total);
+                    startTime = parsedresponse.Times[0].$.start; 
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = parsedresponse.Times[0].$.finish;//endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = 0;//calculate somehow later. parseInt(parsedresponse.$.duration);
+                    testType = 'UnitTest';
+
+                }
+                // TestNG test format
+                else if(xmlData.includes('testng-results')){
+                    core.info('TestNG test format:');
+                    let parsedresponse = parsedJson["testng-results"];
+                    let summaryObj = parsedresponse.$;
+                    let suitesObj = parsedresponse.suite[0];
+                    let suiteObj = suitesObj.$;
+                    let startTime = suiteObj["started-at"];
+                    let endTime = suiteObj["finished-at"];
+                    let package = suitesObj.test[0].class[0].$;
+                    packageName = package.name.replace(/\.[^.]*$/g,'');
+                        
+                    passedTests = parseInt(summaryObj.passed);
+                    failedTests = parseInt(summaryObj.failed);
+                    skippedTests = parseInt(summaryObj.skipped);
+                    ignoredTests = parseInt(summaryObj.ignored);
+                    totalTests = parseInt(summaryObj.total);
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = parseInt(suiteObj["duration-ms"]);
+                }
             });
         }
     } catch (e) {
@@ -115,7 +176,7 @@ const axios = require('axios');
             startTime: startTime,
             endTime: endTime,
             duration: totalDuration,
-            testType: 'JUnit',
+            testType: testType,//'JUnit',
             suites: []			
         }];
         console.log("test summaries payload is : ", JSON.stringify(testSummaries));
@@ -129,7 +190,8 @@ const axios = require('axios');
             repository: `${githubContext.repository}`,
             testSummaries: testSummaries,
             fileContent: '',
-            testType: 'JUnit'
+            xmlContent: xmlData,
+            testType: testType
         };
         console.log("original payload is : ", JSON.stringify(payload));
     } catch (e) {
