@@ -193,7 +193,7 @@ const axios = require('axios');
         }
         core.info('before test!');
         snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
-        core.info('Response from SN is --> '+ JSON.stringify(snowResponse));
+        core.info('Response from SN is --> '+ snowResponse.sysId);
         
     } catch (e) {
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
