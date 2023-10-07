@@ -11971,9 +11971,10 @@ const axios = __nccwpck_require__(2678);
         }
         core.info('before test!');
         snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
-        core.info('Response from SN is --> '+ snowResponse.sysId);
+        core.info('Response from SN is --> '+ snowResponse.result.sysId);
         
     } catch (e) {
+        core.info('error is -> '+ e);
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
             core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
         } else if (e.message.includes('401')) {
