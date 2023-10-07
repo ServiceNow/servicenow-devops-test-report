@@ -191,8 +191,9 @@ const axios = require('axios');
             core.setFailed('For Basic Auth, Username and Password is mandatory for integration user authentication');
             return;
         }
+        core.info('before test!');
         snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
-        core.info('Response from SN is --> '+ JSON.stringify(snowResponse));
+        //core.info('Response from SN is --> '+ JSON.stringify(snowResponse));
         
     } catch (e) {
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
