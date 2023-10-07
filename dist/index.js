@@ -11802,6 +11802,7 @@ const axios = __nccwpck_require__(2678);
     let xmlData, jsonData, testSummaries, packageName;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
+    let testType = 'JUnit';
 
     try {
         if (fs.statSync(xmlReportFile).isDirectory()) {
@@ -11860,23 +11861,29 @@ const axios = __nccwpck_require__(2678);
                 // convert it to a JSON string
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
-                let parsedresponse = parsedJson["testng-results"];
-                let summaryObj = parsedresponse.$;
-                let suitesObj = parsedresponse.suite[0];
-                let suiteObj = suitesObj.$;
-                let startTime = suiteObj["started-at"];
-                let endTime = suiteObj["finished-at"];
-                let package = suitesObj.test[0].class[0].$;
-                packageName = package.name.replace(/\.[^.]*$/g,'');
-                    
-                passedTests = parseInt(summaryObj.passed);
-                failedTests = parseInt(summaryObj.failed);
-                skippedTests = parseInt(summaryObj.skipped);
-                ignoredTests = parseInt(summaryObj.ignored);
-                totalTests = parseInt(summaryObj.total);
-                startTime = startTime.replace(/ +\S*$/ig, 'Z');
-                endTime = endTime.replace(/ +\S*$/ig, 'Z');
-                totalDuration = parseInt(suiteObj["duration-ms"]);
+                if(xmlData.includes("testng-results")){
+                    let parsedresponse = parsedJson["testng-results"];
+                    let summaryObj = parsedresponse.$;
+                    let suitesObj = parsedresponse.suite[0];
+                    let suiteObj = suitesObj.$;
+                    let startTime = suiteObj["started-at"];
+                    let endTime = suiteObj["finished-at"];
+                    let package = suitesObj.test[0].class[0].$;
+                    packageName = package.name.replace(/\.[^.]*$/g,'');
+                        
+                    passedTests = parseInt(summaryObj.passed);
+                    failedTests = parseInt(summaryObj.failed);
+                    skippedTests = parseInt(summaryObj.skipped);
+                    ignoredTests = parseInt(summaryObj.ignored);
+                    totalTests = parseInt(summaryObj.total);
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = parseInt(suiteObj["duration-ms"]);
+                }
+                // Send the attachment to servicenow.
+                else{
+                    testType = 'TBD';
+                }
             });
         }
     } catch (e) {
@@ -11902,7 +11909,7 @@ const axios = __nccwpck_require__(2678);
             startTime: startTime,
             endTime: endTime,
             duration: totalDuration,
-            testType: 'JUnit',
+            testType: testType,//'JUnit',
             suites: []			
         }];
         console.log("test summaries payload is : ", JSON.stringify(testSummaries));
@@ -11916,7 +11923,7 @@ const axios = __nccwpck_require__(2678);
             repository: `${githubContext.repository}`,
             testSummaries: testSummaries,
             fileContent: '',
-            testType: 'JUnit'
+            testType: testType//'JUnit'
         };
         console.log("original payload is : ", JSON.stringify(payload));
     } catch (e) {
@@ -11926,8 +11933,11 @@ const axios = __nccwpck_require__(2678);
 
     let result;
     let snowResponse;
-    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    // const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    // const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+
+    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=${testType}`;
+    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=${testType}`;
 
     try {
         if (!devopsIntegrationToken && !username && !password) {
@@ -11960,6 +11970,8 @@ const axios = __nccwpck_require__(2678);
             return;
         }
         snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
+        core.info('Response from SN is --> '+ JSON.stringify(snowResponse));
+        
     } catch (e) {
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
             core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
