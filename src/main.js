@@ -192,8 +192,16 @@ const axios = require('axios');
             return;
         }
         core.info('before test!');
-        snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
-        core.info('Response from SN is --> '+ snowResponse.result.sysId);
+        await axios.post(endpoint, JSON.stringify(payload), httpHeaders).then((response) => {
+            // Parse the response data received from ServiceNow
+            const data = response.data;
+            core.info('ServiceNow Response Data:', data);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+
+        core.info('success!');
         
     } catch (e) {
         core.info('error is -> '+ e);
