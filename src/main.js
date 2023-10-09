@@ -201,9 +201,13 @@ const axios = require('axios');
         const tableName = 'sn_devops_inbound_event';
         const recordSysID = testIBESysId;
 
-        // File information
-        const filePath = xmlReportFile; // Replace with the actual file path
-        const fileName = xmlReportFile; // Replace with the desired name for the attachment
+        // XML data
+        const xmlTestData = xmlData; // Replace with your XML data
+        const xmlFileName = 'testReport.xml'; // Replace with the desired name for the XML file
+
+        // Create a temporary XML file and write the XML data to it
+        const xmlFilePath = 'testReport.xml';
+        fs.writeFileSync(xmlFilePath, xmlTestData);
 
         // Set the REST API URL
         const apiUrl = `${instanceUrl}/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}`;
@@ -213,25 +217,25 @@ const axios = require('axios');
         const FormData = require('form-data');
         const formData = new FormData();
 
-        // Append the file to the FormData object
-        formData.append('file', fs.createReadStream(filePath), { filename: fileName });
-        core.info('file name is -> '+ fileName);
-        core.info('file path is -> '+ filePath);
+        // Append the XML file to the FormData object
+        formData.append('file', fs.createReadStream(xmlFilePath), { filename: xmlFileName });
 
-        try {
-            const response = await axios.post(apiUrl, formData, {
-            auth: {
-                username,
-                password,
-            },
-            headers: {
-                ...formData.getHeaders(), // Include FormData headers
-            },
-            });
-            console.log('File attached successfully:', response.data);
-        } catch (error) {
-            console.error('Error attaching file:', error);
-        }
+        // Make the POST request to attach the XML file
+        axios.post(apiUrl, formData, {
+        auth: {
+            username,
+            password,
+        },
+        headers: {
+            ...formData.getHeaders(), // Include FormData headers
+        },
+        })
+        .then((response) => {
+            console.log('XML file attached successfully:', response.data);
+        })
+        .catch((error) => {
+            console.error('Error attaching XML file:', error);
+        });
 
     } catch (e) {
         core.info('error is -> '+ e);
