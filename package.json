@@ -26,7 +26,6 @@
     "@actions/core": "^1.8.2",
     "axios": "^0.25.0",
     "follow-redirects": "^1.15.0",
-    "node-fetch": "^3.3.2",
     "xml2js": "^0.4.23"
   }
 }
