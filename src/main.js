@@ -195,7 +195,7 @@ const axios = require('axios');
         await axios.post(endpoint, JSON.stringify(payload), httpHeaders).then((response) => {
             // Parse the response data received from ServiceNow
             const responseData = response.data;
-            core.info('ServiceNow Response Data:', responseData);
+            core.info('ServiceNow Response Data:', response);
           })
           .catch((error) => {
             console.error('Error:', error);
