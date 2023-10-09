@@ -194,7 +194,44 @@ const axios = require('axios');
         core.info('before test!');
         var response = await axios.post(endpoint, JSON.stringify(payload), httpHeaders)
         core.info('sys id of ibe is -> '+ response.data.result.ibeSysId);
-        
+        const testIBESysId = response.data.result.ibeSysId;
+        // Call Attachment API
+
+        // ServiceNow instance information
+        const tableName = 'sn_devops_inbound_event';
+        const recordSysID = testIBESysId;
+        const username = username;
+        const password = password;
+
+        // File information
+        const filePath = xmlReportFile; // Replace with the actual file path
+        const fileName = xmlReportFile; // Replace with the desired name for the attachment
+
+        // Set the REST API URL
+        const apiUrl = `${instanceUrl}/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}`;
+
+        // Create a FormData object to handle the file upload
+        const FormData = require('form-data');
+        const formData = new FormData();
+
+        // Append the file to the FormData object
+        formData.append('file', fs.createReadStream(filePath), { filename: fileName });
+
+        try {
+            const response = await axios.post(apiUrl, formData, {
+            auth: {
+                username,
+                password,
+            },
+            headers: {
+                ...formData.getHeaders(), // Include FormData headers
+            },
+            });
+            console.log('File attached successfully:', response.data);
+        } catch (error) {
+            console.error('Error attaching file:', error);
+        }
+
     } catch (e) {
         core.info('error is -> '+ e);
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
