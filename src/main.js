@@ -200,8 +200,6 @@ const axios = require('axios');
         // ServiceNow instance information
         const tableName = 'sn_devops_inbound_event';
         const recordSysID = testIBESysId;
-        const username = username;
-        const password = password;
 
         // File information
         const filePath = xmlReportFile; // Replace with the actual file path
@@ -209,6 +207,7 @@ const axios = require('axios');
 
         // Set the REST API URL
         const apiUrl = `${instanceUrl}/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}`;
+        core.info('api url is -> '+ apiUrl);
 
         // Create a FormData object to handle the file upload
         const FormData = require('form-data');
@@ -216,6 +215,8 @@ const axios = require('axios');
 
         // Append the file to the FormData object
         formData.append('file', fs.createReadStream(filePath), { filename: fileName });
+        core.info('file name is -> '+ fileName);
+        core.info('file path is -> '+ filePath);
 
         try {
             const response = await axios.post(apiUrl, formData, {
