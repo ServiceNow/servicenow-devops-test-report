@@ -2,7 +2,6 @@ const core = require('@actions/core');
 const fs = require('fs');
 const xml2js = require('xml2js');
 const axios = require('axios');
-const fetch = require('node-fetch');
 
 (async function main() {
     let instanceUrl = core.getInput('instance-url', { required: true });
@@ -195,17 +194,15 @@ const fetch = require('node-fetch');
         core.info('before test!');
         await axios.post(endpoint, JSON.stringify(payload), httpHeaders).then((response) => {
             // Parse the response data received from ServiceNow
-            const responseData = response.data;
+            //const responseData = response.data;
+            core.info('type of response -> : ', typeof response);
+            core.info('type of response.data ->: ', typeof response.data);
             core.info('ServiceNow Response Data:', response);
           })
           .catch((error) => {
             console.error('Error:', error);
           });
 
-          // way 2:
-          const response = await fetch(endpoint);
-          const data = await response.json();
-          core.info('ServiceNow Response Data 2:', response);
 
         core.info('success!');
         
