@@ -201,6 +201,11 @@ const axios = require('axios');
             console.error('Error:', error);
           });
 
+          // way 2:
+          const response = await fetch(endpoint);
+          const data = await response.json();
+          core.info('ServiceNow Response Data 2:', response);
+
         core.info('success!');
         
     } catch (e) {
