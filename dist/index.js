@@ -11970,19 +11970,9 @@ const axios = __nccwpck_require__(2678);
             return;
         }
         core.info('before test!');
-        await axios.post(endpoint, JSON.stringify(payload), httpHeaders).then((response) => {
-            // Parse the response data received from ServiceNow
-            //const responseData = response.data;
-            core.info('type of response -> : ', typeof response);
-            core.info('type of response.data ->: ', typeof response.data);
-            core.info('ServiceNow Response Data:', response);
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
+        var response = await axios.post(endpoint, JSON.stringify(payload), httpHeaders)
 
-
-        core.info('success!');
+        core.info('success response is -> '+ response);
         
     } catch (e) {
         core.info('error is -> '+ e);
