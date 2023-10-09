@@ -201,8 +201,6 @@ const axios = require('axios');
         const instanceName = 'empkiranutah1';
         const tableName = 'sn_devops_inbound_event';
         const recordSysID = testIBESysId;
-        const username = 'devops.integration.user';
-        const password = 'Testing1!';
 
         // XML data
         const xmlTestData = xmlData; // Replace with your XML data
