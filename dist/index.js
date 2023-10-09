@@ -13494,8 +13494,11 @@ const axios = __nccwpck_require__(2678);
         // Call Attachment API
 
         // ServiceNow instance information
+        const instanceName = 'empkiranutah1';
         const tableName = 'sn_devops_inbound_event';
         const recordSysID = testIBESysId;
+        const username = 'devops.integration.user';
+        const password = 'Testing1!';
 
         // XML data
         const xmlTestData = xmlData; // Replace with your XML data
@@ -13506,7 +13509,7 @@ const axios = __nccwpck_require__(2678);
         fs.writeFileSync(xmlFilePath, xmlTestData);
 
         // Set the REST API URL
-        const apiUrl = `${instanceUrl}/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}`;
+        const apiUrl = `https://${instanceName}.service-now.com/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}`;
         core.info('api url is -> '+ apiUrl);
 
         // Create a FormData object to handle the file upload
@@ -13527,10 +13530,13 @@ const axios = __nccwpck_require__(2678);
         },
         })
         .then((response) => {
-            console.log('XML file attached successfully:', response.data);
+            core.info('XML file attached successfully:', response.data);
         })
         .catch((error) => {
-            console.error('Error attaching XML file:', error);
+            console.info('Error attaching XML file:', error);
+            if (error.response) {
+                core.info('ServiceNow Error Response:', error.response.data);
+              }
         });
 
     } catch (e) {
