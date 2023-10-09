@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const fs = require('fs');
 const xml2js = require('xml2js');
 const axios = require('axios');
+const fetch = require('node-fetch');
 
 (async function main() {
     let instanceUrl = core.getInput('instance-url', { required: true });
