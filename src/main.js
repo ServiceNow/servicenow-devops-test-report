@@ -193,8 +193,8 @@ const axios = require('axios');
         }
         core.info('before test!');
         var response = await axios.post(endpoint, JSON.stringify(payload), httpHeaders)
-
-        core.info('success response is -> '+ response);
+        core.info('success response is -> '+ response.data);
+        core.info('success response is -> '+ JSON.stringify(response));
         
     } catch (e) {
         core.info('error is -> '+ e);
