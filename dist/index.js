@@ -11971,7 +11971,7 @@ const axios = __nccwpck_require__(2678);
         }
         core.info('before test!');
         var response = await axios.post(endpoint, JSON.stringify(payload), httpHeaders)
-        core.info('success response is -> '+ response.data.result);
+        core.info('sys id of ibe is -> '+ response.data.result.ibeSysId);
         
     } catch (e) {
         core.info('error is -> '+ e);
