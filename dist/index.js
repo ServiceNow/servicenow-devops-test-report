@@ -13518,7 +13518,7 @@ const FormData = __nccwpck_require__(4538);
           method: 'post',
           url: apiUrl,
           headers: {
-            'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
+            'Content-Type': 'text/xml',
             'Authorization': 'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
           },
           data: form,
