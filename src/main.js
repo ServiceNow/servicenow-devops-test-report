@@ -235,10 +235,8 @@ const axios = require('axios');
 
         // Make the POST request to attach the XML file
         try{
-            var attachmentResponse = axios.post(apiUrl, formData, httpFormHeaders);
+            var attachmentResponse = await axios.post(apiUrl, formData, httpFormHeaders);
             core.info('attachment api was successful! ' + attachmentResponse);
-            //core.info('attachment api response data -> '+ response.data);
-            //core.info('attachment api response data -> '+ response.data.result);
         } catch (err){
             core.info('attachement api ended in error -> '+ err);
             core.info('attachement api ended in error 2 -> '+ err.response);
