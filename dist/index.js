@@ -13298,6 +13298,7 @@ const core = __nccwpck_require__(844);
 const fs = __nccwpck_require__(7147);
 const xml2js = __nccwpck_require__(6660);
 const axios = __nccwpck_require__(2678);
+const FormData = __nccwpck_require__(4538);
 
 (async function main() {
     let instanceUrl = core.getInput('instance-url', { required: true });
@@ -13491,53 +13492,45 @@ const axios = __nccwpck_require__(2678);
         var response = await axios.post(endpoint, JSON.stringify(payload), httpHeaders)
         core.info('sys id of ibe is -> '+ response.data.result.ibeSysId);
         const testIBESysId = response.data.result.ibeSysId;
-        // Call Attachment API
 
-        // ServiceNow instance information
+        // Call Attachment API
+        // ServiceNow instance information and authentication credentials
         const instanceName = 'empkiranutah1';
         const tableName = 'sn_devops_inbound_event';
         const recordSysID = testIBESysId;
-
-        //form the headers 
-        if (username && password) {
-            const defaultFormHeadersv1 = {
-                'Content-Type': 'multipart/form-data; boundary=${form._boundary}',
-                'Authorization': 'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
-            };
-            httpFormHeaders = {
-                headers: defaultFormHeadersv1 
-            };
-            //endpoint = endpointV1;
-        }
-
-        // XML data
-        const xmlTestData = xmlData; // Replace with your XML data
-        const xmlFileName = 'testReport.xml'; // Replace with the desired name for the XML file
-
-        // Create a temporary XML file and write the XML data to it
-        const xmlFilePath = 'testReport.xml';
-        fs.writeFileSync(xmlFilePath, xmlTestData);
-
+        
+        // File information
+        const xmlFilePath = xmlReportFile; // Path to your XML file
+        const xmlFileName = 'testReport.xml'; // Desired filename with the ".xml" extension
+        
         // Set the REST API URL
         const apiUrl = `https://${instanceName}.service-now.com/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}`;
-        core.info('api url is -> '+ apiUrl);
-
-        // Create a FormData object to handle the file upload
-        const FormData = __nccwpck_require__(4538);
-        const formData = new FormData();
-
-        // Append the XML file to the FormData object
-        formData.append('file', fs.createReadStream(xmlFilePath), { filename: xmlFileName });
-
-        // Make the POST request to attach the XML file
-        try{
-            var attachmentResponse = await axios.post(apiUrl, formData, httpFormHeaders);
-            core.info('attachment api was successful! ' + attachmentResponse);
-        } catch (err){
-            core.info('attachement api ended in error -> '+ err);
-            core.info('attachement api ended in error 2 -> '+ err.response);
-            core.info('attachement api ended in error 3 -> '+ err.response.data);
-        }
+        
+        // Create a new FormData instance
+        const form = new FormData();
+        
+        // Append the XML file to the FormData object with the desired filename
+        const xmlFileStream = fs.createReadStream(xmlFilePath);
+        form.append('file', xmlFileStream, { filename: xmlFileName });
+        
+        // Make the POST request with headers
+        axios({
+          method: 'post',
+          url: apiUrl,
+          headers: {
+            'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
+            'Authorization': 'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
+          },
+          data: form,
+        })
+          .then((response) => {
+            console.log('File attached successfully:', response.data);
+          })
+          .catch((error) => {
+            console.error('Error attaching file:', error);
+            console.error('Error attaching file 2:', error.response);
+            console.error('Error attaching file 3:', error.response.data);
+          });
         
 
     } catch (e) {
