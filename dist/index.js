@@ -13504,7 +13504,7 @@ const FormData = __nccwpck_require__(4538);
         const xmlFileName = 'testReport.xml'; // Desired filename with the ".xml" extension
         
         // Set the REST API URL
-        const apiUrl = `https://${instanceName}.service-now.com/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}`;
+        const apiUrl = `https://${instanceName}.service-now.com/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}&file_name=${xmlFileName}`;
         
         // Create a new FormData instance
         const form = new FormData();
