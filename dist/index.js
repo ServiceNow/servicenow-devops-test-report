@@ -13498,6 +13498,18 @@ const axios = __nccwpck_require__(2678);
         const tableName = 'sn_devops_inbound_event';
         const recordSysID = testIBESysId;
 
+        //form the headers 
+        if (username && password) {
+            const defaultFormHeadersv1 = {
+                'Content-Type': 'multipart/form-data; boundary=${form._boundary}',
+                'Authorization': 'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
+            };
+            httpFormHeaders = {
+                headers: defaultFormHeadersv1 
+            };
+            //endpoint = endpointV1;
+        }
+
         // XML data
         const xmlTestData = xmlData; // Replace with your XML data
         const xmlFileName = 'testReport.xml'; // Replace with the desired name for the XML file
@@ -13518,24 +13530,17 @@ const axios = __nccwpck_require__(2678);
         formData.append('file', fs.createReadStream(xmlFilePath), { filename: xmlFileName });
 
         // Make the POST request to attach the XML file
-        axios.post(apiUrl, formData, {
-        auth: {
-            username,
-            password,
-        },
-        headers: {
-            ...formData.getHeaders(), // Include FormData headers
-        },
-        })
-        .then((response) => {
-            core.info('XML file attached successfully:', response.data);
-        })
-        .catch((error) => {
-            console.info('Error attaching XML file:', error);
-            if (error.response) {
-                core.info('ServiceNow Error Response:', error.response.data);
-              }
-        });
+        try{
+            var attachmentResponse = axios.post(apiUrl, formData, httpFormHeaders);
+            core.info('attachment api was successful! ' + attachmentResponse);
+            //core.info('attachment api response data -> '+ response.data);
+            //core.info('attachment api response data -> '+ response.data.result);
+        } catch (err){
+            core.info('attachement api ended in error -> '+ err);
+            core.info('attachement api ended in error 2 -> '+ err.response);
+            core.info('attachement api ended in error 3 -> '+ err.response.data);
+        }
+        
 
     } catch (e) {
         core.info('error is -> '+ e);
