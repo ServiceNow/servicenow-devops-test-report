@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const fs = require('fs');
 const xml2js = require('xml2js');
 const axios = require('axios');
+const FormData = require('form-data');
 
 (async function main() {
     let instanceUrl = core.getInput('instance-url', { required: true });
@@ -24,6 +25,7 @@ const axios = require('axios');
     let xmlData, jsonData, testSummaries, packageName;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
+    let testType = 'JUnit';
 
     try {
         if (fs.statSync(xmlReportFile).isDirectory()) {
@@ -82,23 +84,29 @@ const axios = require('axios');
                 // convert it to a JSON string
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
-                let parsedresponse = parsedJson["testng-results"];
-                let summaryObj = parsedresponse.$;
-                let suitesObj = parsedresponse.suite[0];
-                let suiteObj = suitesObj.$;
-                let startTime = suiteObj["started-at"];
-                let endTime = suiteObj["finished-at"];
-                let package = suitesObj.test[0].class[0].$;
-                packageName = package.name.replace(/\.[^.]*$/g,'');
-                    
-                passedTests = parseInt(summaryObj.passed);
-                failedTests = parseInt(summaryObj.failed);
-                skippedTests = parseInt(summaryObj.skipped);
-                ignoredTests = parseInt(summaryObj.ignored);
-                totalTests = parseInt(summaryObj.total);
-                startTime = startTime.replace(/ +\S*$/ig, 'Z');
-                endTime = endTime.replace(/ +\S*$/ig, 'Z');
-                totalDuration = parseInt(suiteObj["duration-ms"]);
+                if(xmlData.includes("testng-results")){
+                    let parsedresponse = parsedJson["testng-results"];
+                    let summaryObj = parsedresponse.$;
+                    let suitesObj = parsedresponse.suite[0];
+                    let suiteObj = suitesObj.$;
+                    let startTime = suiteObj["started-at"];
+                    let endTime = suiteObj["finished-at"];
+                    let package = suitesObj.test[0].class[0].$;
+                    packageName = package.name.replace(/\.[^.]*$/g,'');
+                        
+                    passedTests = parseInt(summaryObj.passed);
+                    failedTests = parseInt(summaryObj.failed);
+                    skippedTests = parseInt(summaryObj.skipped);
+                    ignoredTests = parseInt(summaryObj.ignored);
+                    totalTests = parseInt(summaryObj.total);
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = parseInt(suiteObj["duration-ms"]);
+                }
+                // Send the attachment to servicenow.
+                else{
+                    testType = 'TBD';
+                }
             });
         }
     } catch (e) {
@@ -124,7 +132,7 @@ const axios = require('axios');
             startTime: startTime,
             endTime: endTime,
             duration: totalDuration,
-            testType: 'JUnit',
+            testType: testType,//'JUnit',
             suites: []			
         }];
         console.log("test summaries payload is : ", JSON.stringify(testSummaries));
@@ -138,7 +146,7 @@ const axios = require('axios');
             repository: `${githubContext.repository}`,
             testSummaries: testSummaries,
             fileContent: '',
-            testType: 'JUnit'
+            testType: testType//'JUnit'
         };
         console.log("original payload is : ", JSON.stringify(payload));
     } catch (e) {
@@ -148,8 +156,11 @@ const axios = require('axios');
 
     let result;
     let snowResponse;
-    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    // const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    // const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+
+    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=${testType}`;
+    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=${testType}`;
 
     try {
         if (!devopsIntegrationToken && !username && !password) {
@@ -181,8 +192,53 @@ const axios = require('axios');
             core.setFailed('For Basic Auth, Username and Password is mandatory for integration user authentication');
             return;
         }
-        snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
+        core.info('before test!');
+        var response = await axios.post(endpoint, JSON.stringify(payload), httpHeaders)
+        core.info('sys id of ibe is -> '+ response.data.result.ibeSysId);
+        const testIBESysId = response.data.result.ibeSysId;
+
+        // Call Attachment API
+        // ServiceNow instance information and authentication credentials
+        const instanceName = 'empkiranutah1';
+        const tableName = 'sn_devops_inbound_event';
+        const recordSysID = testIBESysId;
+        
+        // File information
+        const xmlFilePath = xmlReportFile; // Path to your XML file
+        const xmlFileName = 'testReport.xml'; // Desired filename with the ".xml" extension
+        
+        // Set the REST API URL
+        const apiUrl = `https://${instanceName}.service-now.com/api/now/attachment/file?table_name=${tableName}&table_sys_id=${recordSysID}&file_name=${xmlFileName}`;
+        
+        // Create a new FormData instance
+        const form = new FormData();
+        
+        // Append the XML file to the FormData object with the desired filename
+        const xmlFileStream = fs.createReadStream(xmlFilePath);
+        form.append('file', xmlFileStream, { filename: xmlFileName });
+        
+        // Make the POST request with headers
+        axios({
+          method: 'post',
+          url: apiUrl,
+          headers: {
+            'Content-Type': 'text/xml',
+            'Authorization': 'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
+          },
+          data: form,
+        })
+          .then((response) => {
+            console.log('File attached successfully:', response.data);
+          })
+          .catch((error) => {
+            console.error('Error attaching file:', error);
+            console.error('Error attaching file 2:', error.response);
+            console.error('Error attaching file 3:', error.response.data);
+          });
+        
+
     } catch (e) {
+        core.info('error is -> '+ e);
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
             core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
         } else if (e.message.includes('401')) {
