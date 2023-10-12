@@ -11945,8 +11945,7 @@ const axios = __nccwpck_require__(2678);
                 core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
             }
         }
-    
-
+        
     } catch (e) {
         core.setFailed(`Exception parsing and converting xml to json ${e}`);
         return;

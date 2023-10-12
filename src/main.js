@@ -167,8 +167,7 @@ const axios = require('axios');
                 core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
             }
         }
-    
-
+        
     } catch (e) {
         core.setFailed(`Exception parsing and converting xml to json ${e}`);
         return;
