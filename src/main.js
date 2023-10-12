@@ -117,14 +117,18 @@ const axios = require('axios');
         }
        
         // API call to send test data as json to servicenow.
+        let responseData;
         try{
             responseData = await axios.post(restEndpointUploadFile, testDataJSONStr, httpHeaders);
         }
-        catch(error){
-            core.info('api call failed with error - '+ error);
-            core.info('api call failed with error2 - '+ error.response);
-            core.info('api call failed with error3 - '+ error.response.data);
-        }
+        catch (error) {
+            if (error.response) {
+              core.info('Error Status:', error.response.status);
+              core.info('Error Data:', JSON.stringify(error.response.data, null, 2));
+            } else {
+              core.info('Request failed:', error.message);
+            }
+          }
 
     } catch (e) {
         core.setFailed(`Exception parsing and converting xml to json ${e}`);
