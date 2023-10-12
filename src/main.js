@@ -123,10 +123,6 @@ const axios = require('axios');
         // API call to send test data as json to servicenow.
         try{
             responseData = await axios.post(restEndpointUploadFile, testDataJSONStr, httpHeaders);
-            core.info('ressss1 -> '+ responseData);
-            core.info('ressss2 -> '+ responseData.data);
-            core.info('ressss3 -> '+ responseData.data.result);
-            core.info('ressss4 -> '+ responseData.data.result.attachmentSysId);
             if (responseData.data && responseData.data.result && responseData.data.result.attachmentSysId){
                     devopsAttachmentRecSysId = responseData.data.result.attachmentSysId; // devopsAttachmentRecSysId refers to record in 'sn_devops_attachment' where TestReport.json is attached.
                     core.info('Test report successfully added to DevOps Attachment table in servicenow');
@@ -159,7 +155,6 @@ const axios = require('axios');
             attachmentRecordSysId: devopsAttachmentRecSysId
         };
         try {
-            core.info('hit test api now');
             snowResponse = await axios.post(testEndPoint, JSON.stringify(payload), httpHeaders);
             core.info('IBE is all set for processing!');
         } catch (e) {
