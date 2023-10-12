@@ -11801,6 +11801,7 @@ const axios = __nccwpck_require__(2678);
     }
 
     let xmlData, testDataJSONStr, httpHeaders;
+    let responseData, devopsAttachmentRecSysId;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
 
@@ -11863,6 +11864,7 @@ const axios = __nccwpck_require__(2678);
                 //core.info('testDataJSONStr is --> '+ testDataJSONStr);
             });
         }
+        
         // Preparing headers and endpoint Urls
         if (!devopsIntegrationToken && !username && !password) {
             core.setFailed('Either secret token or integration username, password is needed for integration user authentication');
@@ -11877,6 +11879,7 @@ const axios = __nccwpck_require__(2678);
                 headers: defaultHeadersv2
             };
             restEndpointUploadFile = `${instanceUrl}/api/sn_devops/v2/devops/upload?toolId=${toolId}`;
+            testEndPoint = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=${testType}`;
         } else if (username && password) {
             const token = `${username}:${password}`;
             const encodedToken = Buffer.from(token).toString('base64');
@@ -11889,51 +11892,64 @@ const axios = __nccwpck_require__(2678);
                 headers: defaultHeadersv1 
             };
             restEndpointUploadFile = `${instanceUrl}/api/sn_devops/v1/devops/upload?toolId=${toolId}`;
+            testEndPoint = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=${testType}`;
         } else {
             core.setFailed('For Basic Auth, Username and Password is mandatory for integration user authentication');
             return;
         }
        
         // API call to send test data as json to servicenow.
-        let responseData;
         try{
-            core.info('restEndpointUploadFile is --> '+ restEndpointUploadFile);
-            core.info('testDataJSONStr is --> '+ testDataJSONStr);
-            core.info('httpHeaders is --> '+ httpHeaders);
             responseData = await axios.post(restEndpointUploadFile, testDataJSONStr, httpHeaders);
-        }
-        catch (error) {
+            if (responseData.data && responseData.data.result && responseData.data.result.devopsAttachmentRecSysId){
+                    devopsAttachmentRecSysId = responseData.data.result.devopsAttachmentRecSysId; // devopsAttachmentRecSysId refers to record in 'sn_devops_attachment' where TestReport.json is attached.
+                    core.info('Test report successfully added to DevOps Attachment table in servicenow');
+            }else{
+                core.setFailed('Failed to attach Test report to DevOps Attachment table in servicenow');
+            }
+        } catch (error) {
             if (error.response) {
               core.info('Error Status:', error.response.status);
               core.info('Error Data:', JSON.stringify(error.response.data, null, 2));
             } else {
               core.info('Request failed:', error.message);
             }
-          }
+        }
+
+        // API call to hit 'test' capability endpoint url. This creates IBE in servicenow with 'test' capability.
+        let snowResponse;
+        let payload;
+        payload = {
+            toolId: toolId,
+            buildNumber: githubContext.run_number,
+            buildId: githubContext.run_id,
+            attemptNumber: githubContext.run_attempt,
+            stageName: jobname,
+            workflow: `${githubContext.workflow}`,
+            repository: `${githubContext.repository}`,
+            testSummaries: [],
+            fileContent: '',
+            testType: testType,
+            attachmentRecordSysId: devopsAttachmentRecSysId
+        };
+        try {
+            core.info('hit test api now');
+            snowResponse = await axios.post(testEndPoint, JSON.stringify(payload), httpHeaders);
+            core.info('IBE is all set for processing!');
+        } catch (e) {
+            if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
+                core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
+            } else if (e.message.includes('401')) {
+                core.setFailed('Invalid Credentials. Please correct the credentials and try again.');
+            } else {
+                core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
+            }
+        }
+    
 
     } catch (e) {
         core.setFailed(`Exception parsing and converting xml to json ${e}`);
         return;
-    }
-
-    
-    // let result;
-    // let snowResponse;
-    // const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-    // const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-
-    try {
-        core.info('hit test api now');
-        
-        //snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
-    } catch (e) {
-        if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
-            core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
-        } else if (e.message.includes('401')) {
-            core.setFailed('Invalid Credentials. Please correct the credentials and try again.');
-        } else {
-            core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
-        }
     }
     
 })();
