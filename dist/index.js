@@ -11800,7 +11800,7 @@ const axios = __nccwpck_require__(2678);
         return;
     }
 
-    let xmlData, testDataJSONStr, testSummaries, packageName;
+    let xmlData, testDataJSONStr, httpHeaders;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
 
@@ -11860,7 +11860,7 @@ const axios = __nccwpck_require__(2678);
                 // 'result' is a JavaScript object
                 // convert it to a JSON string
                 testDataJSONStr = JSON.stringify(result, null, 4);
-                core.info('testDataJSONStr is --> '+ testDataJSONStr);
+                //core.info('testDataJSONStr is --> '+ testDataJSONStr);
             });
         }
         // Preparing headers and endpoint Urls
