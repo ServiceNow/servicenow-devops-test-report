@@ -11904,9 +11904,9 @@ const axios = __nccwpck_require__(2678);
             core.info('ressss1 -> '+ responseData);
             core.info('ressss2 -> '+ responseData.data);
             core.info('ressss3 -> '+ responseData.data.result);
-            core.info('ressss4 -> '+ responseData.data.result.devopsAttachmentRecSysId);
-            if (responseData.data && responseData.data.result && responseData.data.result.devopsAttachmentRecSysId){
-                    devopsAttachmentRecSysId = responseData.data.result.devopsAttachmentRecSysId; // devopsAttachmentRecSysId refers to record in 'sn_devops_attachment' where TestReport.json is attached.
+            core.info('ressss4 -> '+ responseData.data.result.attachmentSysId);
+            if (responseData.data && responseData.data.result && responseData.data.result.attachmentSysId){
+                    devopsAttachmentRecSysId = responseData.data.result.attachmentSysId; // devopsAttachmentRecSysId refers to record in 'sn_devops_attachment' where TestReport.json is attached.
                     core.info('Test report successfully added to DevOps Attachment table in servicenow');
             }else{
                 core.setFailed('Failed to attach Test report to DevOps Attachment table in servicenow');
