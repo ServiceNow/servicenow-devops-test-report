@@ -11,6 +11,7 @@ const axios = require('axios');
     const devopsIntegrationToken = core.getInput('devops-integration-token', { required: false });
     const jobname = core.getInput('job-name', { required: true });
     const xmlReportFile = core.getInput('xml-report-filename', { required: true });
+    const testType = core.getInput('test-type', { required: true });
     
     let githubContext = core.getInput('context-github', { required: true });
 
@@ -21,7 +22,7 @@ const axios = require('axios');
         return;
     }
 
-    let xmlData, jsonData, testSummaries, packageName;
+    let xmlData, testDataJSONStr, testSummaries, packageName;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
 
@@ -40,8 +41,8 @@ const axios = require('axios');
                         }
                         // 'result' is a JavaScript object
                         // convert it to a JSON string
-                        jsonData = JSON.stringify(result, null, 4);
-                        let parsedJson = JSON.parse(jsonData);
+                        testDataJSONStr = JSON.stringify(result, null, 4);
+                        let parsedJson = JSON.parse(testDataJSONStr);
                         let summaryObj;
                         if(xmlData.includes('testsuites')){
                             let parsedresponse = parsedJson["testsuites"];
@@ -80,78 +81,11 @@ const axios = require('axios');
                 }
                 // 'result' is a JavaScript object
                 // convert it to a JSON string
-                jsonData = JSON.stringify(result, null, 4);
-                let parsedJson = JSON.parse(jsonData);
-                let parsedresponse = parsedJson["testng-results"];
-                let summaryObj = parsedresponse.$;
-                let suitesObj = parsedresponse.suite[0];
-                let suiteObj = suitesObj.$;
-                let startTime = suiteObj["started-at"];
-                let endTime = suiteObj["finished-at"];
-                let package = suitesObj.test[0].class[0].$;
-                packageName = package.name.replace(/\.[^.]*$/g,'');
-                    
-                passedTests = parseInt(summaryObj.passed);
-                failedTests = parseInt(summaryObj.failed);
-                skippedTests = parseInt(summaryObj.skipped);
-                ignoredTests = parseInt(summaryObj.ignored);
-                totalTests = parseInt(summaryObj.total);
-                startTime = startTime.replace(/ +\S*$/ig, 'Z');
-                endTime = endTime.replace(/ +\S*$/ig, 'Z');
-                totalDuration = parseInt(suiteObj["duration-ms"]);
+                testDataJSONStr = JSON.stringify(result, null, 4);
+                core.info('testDataJSONStr is --> '+ testDataJSONStr);
             });
         }
-    } catch (e) {
-        core.setFailed(`Exception parsing and converting xml to json ${e}`);
-        return;
-    }
-
-    let payload;
-    
-    try {
-        instanceUrl = instanceUrl.trim();
-        if (instanceUrl.endsWith('/'))
-            instanceUrl = instanceUrl.slice(0, -1);
-
-        testSummaries = [{
-            name: packageName + '-' + githubContext.run_number + '.' + githubContext.run_attempt,
-            passedTests: passedTests,
-            failedTests: failedTests,
-            skippedTests: skippedTests,
-            ignoredTests: ignoredTests,
-            blockedTests: 0,
-            totalTests: totalTests,
-            startTime: startTime,
-            endTime: endTime,
-            duration: totalDuration,
-            testType: 'JUnit',
-            suites: []			
-        }];
-        console.log("test summaries payload is : ", JSON.stringify(testSummaries));
-        payload = {
-            toolId: toolId,
-            buildNumber: githubContext.run_number,
-            buildId: githubContext.run_id,
-            attemptNumber: githubContext.run_attempt,
-            stageName: jobname,
-            workflow: `${githubContext.workflow}`,
-            repository: `${githubContext.repository}`,
-            testSummaries: testSummaries,
-            fileContent: '',
-            testType: 'JUnit'
-        };
-        console.log("original payload is : ", JSON.stringify(payload));
-    } catch (e) {
-        core.setFailed(`Exception setting the payload ${e}`);
-        return;
-    }
-
-    let result;
-    let snowResponse;
-    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-
-    try {
+        // Preparing headers and endpoint Urls
         if (!devopsIntegrationToken && !username && !password) {
             core.setFailed('Either secret token or integration username, password is needed for integration user authentication');
             return;
@@ -164,7 +98,7 @@ const axios = require('axios');
             httpHeaders = {
                 headers: defaultHeadersv2
             };
-            endpoint = endpointV2;
+            restEndpointUploadFile = `${instanceUrl}/api/sn_devops/v2/devops/upload?toolId=${toolId}`;
         } else if (username && password) {
             const token = `${username}:${password}`;
             const encodedToken = Buffer.from(token).toString('base64');
@@ -176,12 +110,37 @@ const axios = require('axios');
             httpHeaders = {
                 headers: defaultHeadersv1 
             };
-            endpoint = endpointV1;
+            restEndpointUploadFile = `${instanceUrl}/api/sn_devops/v1/devops/upload?toolId=${toolId}`;
         } else {
             core.setFailed('For Basic Auth, Username and Password is mandatory for integration user authentication');
             return;
         }
-        snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
+       
+        // API call to send test data as json to servicenow.
+        try{
+            responseData = await axios.post(restEndpointUploadFile, testDataJSONStr, httpHeaders);
+        }
+        catch(error){
+            core.info('api call failed with error - '+ error);
+            core.info('api call failed with error2 - '+ error.response);
+            core.info('api call failed with error3 - '+ error.response.data);
+        }
+
+    } catch (e) {
+        core.setFailed(`Exception parsing and converting xml to json ${e}`);
+        return;
+    }
+
+    
+    // let result;
+    // let snowResponse;
+    // const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    // const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+
+    try {
+        core.info('hit test api now');
+        
+        //snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
     } catch (e) {
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
             core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
