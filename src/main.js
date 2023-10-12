@@ -119,6 +119,9 @@ const axios = require('axios');
         // API call to send test data as json to servicenow.
         let responseData;
         try{
+            core.info('restEndpointUploadFile is --> '+ restEndpointUploadFile);
+            core.info('testDataJSONStr is --> '+ testDataJSONStr);
+            core.info('httpHeaders is --> '+ httpHeaders);
             responseData = await axios.post(restEndpointUploadFile, testDataJSONStr, httpHeaders);
         }
         catch (error) {
