@@ -11901,6 +11901,10 @@ const axios = __nccwpck_require__(2678);
         // API call to send test data as json to servicenow.
         try{
             responseData = await axios.post(restEndpointUploadFile, testDataJSONStr, httpHeaders);
+            core.info('ressss1 -> '+ responseData);
+            core.info('ressss2 -> '+ responseData.data);
+            core.info('ressss3 -> '+ responseData.data.result);
+            core.info('ressss4 -> '+ responseData.data.result.devopsAttachmentRecSysId);
             if (responseData.data && responseData.data.result && responseData.data.result.devopsAttachmentRecSysId){
                     devopsAttachmentRecSysId = responseData.data.result.devopsAttachmentRecSysId; // devopsAttachmentRecSysId refers to record in 'sn_devops_attachment' where TestReport.json is attached.
                     core.info('Test report successfully added to DevOps Attachment table in servicenow');
@@ -11945,7 +11949,7 @@ const axios = __nccwpck_require__(2678);
                 core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
             }
         }
-        
+
     } catch (e) {
         core.setFailed(`Exception parsing and converting xml to json ${e}`);
         return;
