@@ -11858,7 +11858,7 @@ const axios = __nccwpck_require__(2678);
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
                 // Consider TestNG as JUnit.
-                if(parsedJson?.testng){
+                if(parsedJson?.['testng-results']){
                     let parsedresponse = parsedJson["testng-results"];
                     let summaryObj = parsedresponse.$;
                     let suitesObj = parsedresponse.suite[0];
@@ -11893,6 +11893,22 @@ const axios = __nccwpck_require__(2678);
                     totalDuration = (parsedresponse?.assembly[0]?.$?.time) ? parseInt(parsedresponse.assembly[0].$.time) : 0;
                     packageName = (parsedresponse?.assembly[0]?.$?.name) ? parsedresponse.assembly[0].$.name : xmlReportFile;
                     testType = 'XUnit';
+                }
+                // Process NUnit test format.
+                else if(parsedJson?.['test-run']){
+                    let parsedresponse = parsedJson["test-run"]; 
+                    passedTests = (parsedresponse?.$?.passed) ? parseInt(parsedresponse.$.passed) : 0;
+                    failedTests = (parsedresponse?.$?.failed) ? parseInt(parsedresponse.$.failed) : 0;
+                    skippedTests = (parsedresponse?.$?.skipped) ? parseInt(parsedresponse.$.skipped) : 0;
+                    totalTests = (parsedresponse?.$?.total) ? parseInt(parsedresponse.$.total) : 0;
+                    ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
+                    startTime = (parsedresponse?.$["start-time"]) ? parsedresponse.$["start-time"] : "";
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = (parsedresponse?.$["end-time"]) ? parsedresponse.$["end-time"] : "";
+                    endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = (parsedresponse?.$?.duration) ? parseInt(parsedresponse.$.duration) : 0;
+                    packageName = (parsedresponse?.['test-suite'][0]?.$?.name) ? parsedresponse["test-suite"][0].$.name : xmlReportFile;
+                    testType = 'NUnit';
                 }
 
             });
