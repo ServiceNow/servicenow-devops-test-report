@@ -24,7 +24,16 @@ const axios = require('axios');
     let xmlData, jsonData, testSummaries, packageName;
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
-    let testType = 'JUnit'
+    let testType = 'JUnit';
+    const assignJUnitValues = function(summaryObj) {
+        totalTests = totalTests + parseInt(summaryObj.tests);
+        failedTests = failedTests + parseInt(summaryObj.failures);
+        ignoredTests = ignoredTests + parseInt(summaryObj.errors);
+        skippedTests = skippedTests + parseInt(summaryObj.skipped);
+        totalDuration = totalDuration + parseInt(summaryObj.time);
+        passedTests = totalTests - (failedTests + ignoredTests + skippedTests);
+        packageName = summaryObj.name.replace(/\.[^.]*$/g, '');
+};
 
     try {
         if (fs.statSync(xmlReportFile).isDirectory()) {
@@ -44,14 +53,6 @@ const axios = require('axios');
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
                         let summaryObj;
-                        const assignJUnitValues = function(summaryObj) {
-                                totalTests = totalTests + parseInt(summaryObj.tests);
-                                failedTests = failedTests + parseInt(summaryObj.failures);
-                                ignoredTests = ignoredTests + parseInt(summaryObj.errors);
-                                skippedTests = skippedTests + parseInt(summaryObj.skipped);
-                                totalDuration = totalDuration + parseInt(summaryObj.time);
-                                passedTests = totalTests - (failedTests + ignoredTests + skippedTests);
-                        }
                         if(parsedJson?.testsuites){
                             let parsedresponse = parsedJson["testsuites"];
                             for(var i = 0; i < parsedresponse.testsuite.length; i++){
@@ -64,7 +65,10 @@ const axios = require('axios');
                             summaryObj = parsedresponse.$;
                             assignJUnitValues(summaryObj); 
                         }
-                        packageName = summaryObj.name.replace(/\.[^.]*$/g, '');
+                        // Unsupported test type for directory support.
+                        else{
+                            core.setFailed('This test type does not have directory support. Either the file path should include the whole path to the test (.xml) file, or this test type is currently not supported.');
+                        }
                     });
                 }
             });
@@ -148,6 +152,26 @@ const axios = require('axios');
                     packageName = (parsedresponse?.TestDefinitions[0]?.UnitTest[0]?.TestMethod[0]?.$?.className) ? parsedresponse.TestDefinitions[0].UnitTest[0].TestMethod[0].$.className : xmlReportFile;
                     testType = 'UnitTest';
                 }
+                // Support JUnit via file path as well
+                // Process pytest / jest test format.
+                else if(parsedJson?.testsuites){
+                    let summaryObj;
+                    let parsedresponse = parsedJson["testsuites"];
+                    for(var i = 0; i < parsedresponse.testsuite.length; i++){
+                        summaryObj = parsedresponse.testsuite[i].$;
+                        assignJUnitValues(summaryObj);
+                    }
+                }
+                else if(parsedJson?.testsuite){
+                    let summaryObj;
+                    let parsedresponse = parsedJson["testsuite"];
+                    summaryObj = parsedresponse.$;
+                    assignJUnitValues(summaryObj); 
+                }
+                // Unsupported test type.
+                else{
+                    core.setFailed('This test type is currently not supported.');
+                }
 
             });
         }
@@ -198,8 +222,8 @@ const axios = require('axios');
 
     let result;
     let snowResponse;
-    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=JUnit`;
-    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=JUnit`;
+    const endpointV1 = `${instanceUrl}/api/sn_devops/v1/devops/tool/test?toolId=${toolId}&testType=${testType}`;
+    const endpointV2 = `${instanceUrl}/api/sn_devops/v2/devops/tool/test?toolId=${toolId}&testType=${testType}`;
 
     try {
         if (!devopsIntegrationToken && !username && !password) {
