@@ -132,6 +132,22 @@ const axios = require('axios');
                     packageName = (parsedresponse?.['test-suite'][0]?.$?.name) ? parsedresponse["test-suite"][0].$.name : xmlReportFile;
                     testType = 'NUnit';
                 }
+                // Process UnitTest (i.e MSTest) test format.
+                else if(parsedJson?.TestRun){
+                    let parsedresponse = parsedJson["TestRun"]; 
+                    passedTests = (parsedresponse?.ResultSummary[0]?.Counters[0]?.$?.passed) ? parseInt(parsedresponse.ResultSummary[0].Counters[0].$.passed) : 0;
+                    failedTests = (parsedresponse?.ResultSummary[0]?.Counters[0]?.$?.failed) ? parseInt(parsedresponse.ResultSummary[0].Counters[0].$.failed) : 0;
+                    totalTests = (parsedresponse?.ResultSummary[0]?.Counters[0]?.$?.total) ? parseInt(parsedresponse.ResultSummary[0].Counters[0].$.total) : 0;
+                    startTime = (parsedresponse?.Times[0]?.$?.start) ? parsedresponse.Times[0].$.start : "";
+                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
+                    endTime = (parsedresponse?.Times[0]?.$?.finish) ? parsedresponse.Times[0].$.finish : "";
+                    endTime.replace(/ +\S*$/ig, 'Z');
+                    totalDuration = 0; // #TO-DO: Check if we can do start time - end time.
+                    skippedTests = 0; // skipped and ignored tests are not present for MSTest.
+                    ignoredTests = 0;
+                    packageName = (parsedresponse?.TestDefinitions[0]?.UnitTest[0]?.TestMethod[0]?.$?.className) ? parsedresponse.TestDefinitions[0].UnitTest[0].TestMethod[0].$.className : xmlReportFile;
+                    testType = 'UnitTest';
+                }
 
             });
         }
