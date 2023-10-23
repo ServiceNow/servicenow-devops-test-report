@@ -11803,6 +11803,7 @@ const axios = __nccwpck_require__(2678);
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
     let testType = 'JUnit';
+
     const assignJUnitValues = function(summaryObj) {
         totalTests = (totalTests + parseInt(summaryObj.tests)) || 0;
         failedTests = (failedTests + parseInt(summaryObj.failures)) || 0;
@@ -11811,7 +11812,33 @@ const axios = __nccwpck_require__(2678);
         totalDuration = (totalDuration + parseFloat(summaryObj.time)) || 0;
         passedTests = totalTests - (failedTests + ignoredTests + skippedTests);
         packageName = summaryObj.name.replace(/\.[^.]*$/g, '') || xmlReportFile;
-};
+    };
+    function convertDateFormatForXUnit(inputDate) {
+       const [datePart, timePart] = inputDate.split(' ');
+       const [month, day, year] = datePart.split('/');
+       const [hours, minutes, seconds] = timePart.split(':');
+       const outputDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours}:${minutes}:${seconds}Z`;
+       return outputDate;
+    }
+    function convertDateTimeFormatForMSTest(inputDateTime){
+        const [datePart, timePart] = inputDateTime.split('T'); 
+        const [year, month, day] = datePart.split('-');
+        const timeWithoutOffset = timePart.replace(/\+\d+:\d+$/, '');
+        const [hours, minutes, seconds] = timeWithoutOffset.split(':');
+        const outputDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+        return outputDateTime;
+    }
+    function durationBetweenDateTime(startTime, endTime){
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        const timeDiffInSeconds = Math.abs((start - end) / 1000);
+        return timeDiffInSeconds;
+    }
+    function addSecondsToDateTime(startTime, secondsToAdd) {
+        const dateTime = new Date(startTime);
+        dateTime.setSeconds(dateTime.getSeconds() + secondsToAdd);
+        return dateTime.toISOString();
+    }
 
     try {
         if (fs.statSync(xmlReportFile).isDirectory()) {
@@ -11852,7 +11879,7 @@ const axios = __nccwpck_require__(2678);
                         // Unsupported test type for directory support.
                         else{
                             core.setFailed('This test type does not have directory support. Either the file path should include the whole path to the test (.xml) file, or this test type is currently not supported.');
-                            return;
+                            process.exit(1);
                         }
                     });
                 }
@@ -11875,8 +11902,10 @@ const axios = __nccwpck_require__(2678);
                     let suitesObj = parsedresponse.suite[0];
                     let suiteObj = suitesObj.$;
                     if(summaryObj && suitesObj && suiteObj){
-                        let startTime = suiteObj["started-at"];
-                        let endTime = suiteObj["finished-at"];
+                        startTime = suiteObj["started-at"];
+                        endTime = suiteObj["finished-at"];
+                        startTime = startTime.replace(" IST", "Z");
+                        endTime = endTime.replace(" IST", "Z");
                         let package = suitesObj.test[0].class[0].$;
                         packageName = package.name.replace(/\.[^.]*$/g,'');  
                         passedTests = parseInt(summaryObj.passed) || 0 ;
@@ -11901,8 +11930,9 @@ const axios = __nccwpck_require__(2678);
                         totalDuration = parseFloat(testSummaryObj.time) || parseFloat(collectionObj.time) || 0 ;
                         packageName = testSummaryObj.name || collectionObj.name || xmlReportFile;
                         startTime = (parsedresponse?.$?.timestamp) ? parsedresponse.$.timestamp : "";
-                        // end time is not mentioned in this type of xml.
-                        endTime = "";
+                        startTime = convertDateFormatForXUnit(startTime);
+                        // end time is not mentioned in this type of xml. So calcute by adding startTime + totalDuration.
+                        endTime = addSecondsToDateTime(startTime, totalDuration);
                         testType = 'XUnit';
                     }
                 }
@@ -11918,7 +11948,9 @@ const axios = __nccwpck_require__(2678);
                         ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
                         totalDuration = parseFloat(testSummaryObj.duration) || 0 ;
                         startTime = testSummaryObj["start-time"] || "";
+                        startTime = startTime.replace(/\s+/g, ''); // convert to isoDateTime Format
                         endTime = testSummaryObj["end-time"] || "";
+                        endTime.replace(/\s+/g, '');
                     }
                     packageName = (parsedresponse?.['test-suite'][0]?.$?.name) ? parsedresponse["test-suite"][0].$.name : xmlReportFile;
                     testType = 'NUnit';
@@ -11933,8 +11965,10 @@ const axios = __nccwpck_require__(2678);
                         totalTests = parseInt(testSummaryObj.total) || 0 ;
                     }
                     startTime = (parsedresponse?.Times[0]?.$?.start) ? parsedresponse.Times[0].$.start : "";
+                    startTime = convertDateTimeFormatForMSTest(startTime);
                     endTime = (parsedresponse?.Times[0]?.$?.finish) ? parsedresponse.Times[0].$.finish : "";
-                    totalDuration = 0; // #TO-DO: Check if we can do start time - end time.
+                    endTime = convertDateTimeFormatForMSTest(endTime);
+                    totalDuration = durationBetweenDateTime(startTime, endTime); // calculate from start and end time.
                     skippedTests = 0; // skipped and ignored tests are not present for MSTest.
                     ignoredTests = 0;
                     packageName = (parsedresponse?.TestDefinitions[0]?.UnitTest[0]?.TestMethod[0]?.$?.className) ? parsedresponse.TestDefinitions[0].UnitTest[0].TestMethod[0].$.className : xmlReportFile;
@@ -11961,7 +11995,7 @@ const axios = __nccwpck_require__(2678);
                 // Unsupported test type.
                 else{
                     core.setFailed('This test type is currently not supported.');
-                    return;
+                    process.exit(1);
                 }
 
             });
