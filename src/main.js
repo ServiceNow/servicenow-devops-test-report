@@ -30,7 +30,7 @@ const axios = require('axios');
         failedTests = (failedTests + parseInt(summaryObj.failures)) || 0;
         ignoredTests = (ignoredTests + parseInt(summaryObj.errors)) || 0;
         skippedTests = (skippedTests + parseInt(summaryObj.skipped)) || 0;
-        totalDuration = (totalDuration + parseInt(summaryObj.time)) || 0;
+        totalDuration = (totalDuration + parseFloat(summaryObj.time)) || 0;
         passedTests = totalTests - (failedTests + ignoredTests + skippedTests);
         packageName = summaryObj.name.replace(/\.[^.]*$/g, '') || xmlReportFile;
 };
@@ -74,6 +74,7 @@ const axios = require('axios');
                         // Unsupported test type for directory support.
                         else{
                             core.setFailed('This test type does not have directory support. Either the file path should include the whole path to the test (.xml) file, or this test type is currently not supported.');
+                            return;
                         }
                     });
                 }
@@ -105,9 +106,7 @@ const axios = require('axios');
                         skippedTests = parseInt(summaryObj.skipped) || 0 ;
                         ignoredTests = parseInt(summaryObj.ignored) || 0 ;
                         totalTests = parseInt(summaryObj.total) || 0 ;
-                        startTime = startTime.replace(/ +\S*$/ig, 'Z');
-                        endTime = endTime.replace(/ +\S*$/ig, 'Z');
-                        totalDuration = parseInt(suiteObj["duration-ms"]);
+                        totalDuration = parseFloat(suiteObj["duration-ms"]);
                     }
                 }
                 // Process XUnit test format.
@@ -121,10 +120,9 @@ const axios = require('axios');
                         skippedTests = parseInt(testSummaryObj.skipped) || parseInt(collectionObj.skipped) || 0 ;
                         totalTests = parseInt(testSummaryObj.total) || parseInt(collectionObj.total) || 0 ;
                         ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
-                        totalDuration = parseInt(testSummaryObj.time) || parseInt(collectionObj.time) || 0 ;
+                        totalDuration = parseFloat(testSummaryObj.time) || parseFloat(collectionObj.time) || 0 ;
                         packageName = testSummaryObj.name || collectionObj.name || xmlReportFile;
                         startTime = (parsedresponse?.$?.timestamp) ? parsedresponse.$.timestamp : "";
-                        startTime = startTime.replace(/ +\S*$/ig, 'Z');
                         // end time is not mentioned in this type of xml.
                         endTime = "";
                         testType = 'XUnit';
@@ -140,11 +138,9 @@ const axios = require('axios');
                         skippedTests = parseInt(testSummaryObj.skipped) || 0 ;
                         totalTests = parseInt(testSummaryObj.total) || 0 ;
                         ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
-                        totalDuration = parseInt(testSummaryObj.duration) || 0 ;
+                        totalDuration = parseFloat(testSummaryObj.duration) || 0 ;
                         startTime = testSummaryObj["start-time"] || "";
-                        startTime = startTime.replace(/ +\S*$/ig, 'Z');
                         endTime = testSummaryObj["end-time"] || "";
-                        endTime.replace(/ +\S*$/ig, 'Z');
                     }
                     packageName = (parsedresponse?.['test-suite'][0]?.$?.name) ? parsedresponse["test-suite"][0].$.name : xmlReportFile;
                     testType = 'NUnit';
@@ -159,9 +155,7 @@ const axios = require('axios');
                         totalTests = parseInt(testSummaryObj.total) || 0 ;
                     }
                     startTime = (parsedresponse?.Times[0]?.$?.start) ? parsedresponse.Times[0].$.start : "";
-                    startTime = startTime.replace(/ +\S*$/ig, 'Z');
                     endTime = (parsedresponse?.Times[0]?.$?.finish) ? parsedresponse.Times[0].$.finish : "";
-                    endTime.replace(/ +\S*$/ig, 'Z');
                     totalDuration = 0; // #TO-DO: Check if we can do start time - end time.
                     skippedTests = 0; // skipped and ignored tests are not present for MSTest.
                     ignoredTests = 0;
@@ -189,6 +183,7 @@ const axios = require('axios');
                 // Unsupported test type.
                 else{
                     core.setFailed('This test type is currently not supported.');
+                    return;
                 }
 
             });
