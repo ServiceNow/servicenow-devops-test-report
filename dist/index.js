@@ -11898,9 +11898,9 @@ const axios = __nccwpck_require__(2678);
                 // Consider TestNG as JUnit.
                 if(parsedJson?.['testng-results']){
                     let parsedresponse = parsedJson["testng-results"];
-                    let summaryObj = parsedresponse.$;
-                    let suitesObj = parsedresponse.suite[0];
-                    let suiteObj = suitesObj.$;
+                    let summaryObj = parsedresponse?.$;
+                    let suitesObj = parsedresponse?.suite[0];
+                    let suiteObj = suitesObj?.$;
                     if(summaryObj && suitesObj && suiteObj){
                         startTime = suiteObj["started-at"];
                         endTime = suiteObj["finished-at"];
