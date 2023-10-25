@@ -11803,6 +11803,8 @@ const axios = __nccwpck_require__(2678);
     let totalTests = 0, passedTests = 0, failedTests = 0, skippedTests = 0, ignoredTests = 0, totalDuration = 0;
     let startTime = '', endTime = '';
     let testType = 'JUnit';
+    let isError = false;
+    let errorMessage = '';
 
     const assignJUnitValues = function(summaryObj) {
         totalTests = (totalTests + parseInt(summaryObj.tests)) || 0;
@@ -11858,29 +11860,37 @@ const axios = __nccwpck_require__(2678);
                         jsonData = JSON.stringify(result, null, 4);
                         let parsedJson = JSON.parse(jsonData);
                         let summaryObj;
-                        if(parsedJson?.testsuites){
-                            let parsedresponse = parsedJson["testsuites"];
-                            if(parsedresponse?.testsuite){
-                                for(var i = 0; i < parsedresponse.testsuite.length; i++){
-                                    summaryObj = parsedresponse.testsuite[i].$;
-                                    if(summaryObj){
-                                        assignJUnitValues(summaryObj);
+                        if(parsedJson){
+                            if(parsedJson?.testsuites){
+                                let parsedresponse = parsedJson["testsuites"];
+                                if(parsedresponse?.testsuite){
+                                    for(var i = 0; i < parsedresponse.testsuite.length; i++){
+                                        summaryObj = parsedresponse.testsuite[i].$;
+                                        if(summaryObj){
+                                            assignJUnitValues(summaryObj);
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else if(parsedJson?.testsuite){
-                            let parsedresponse = parsedJson["testsuite"];
-                            summaryObj = parsedresponse?.$;
-                            if(summaryObj){
-                                assignJUnitValues(summaryObj); 
+                            else if(parsedJson?.testsuite){
+                                let parsedresponse = parsedJson["testsuite"];
+                                summaryObj = parsedresponse?.$;
+                                if(summaryObj){
+                                    assignJUnitValues(summaryObj); 
+                                }
+                            }
+                            // Unsupported test type for directory support.
+                            else{
+                                isError = true;
+                                errorMessage = 'This test type with root node as ' + Object.keys(parsedJson)[0] + ' does not have directory support. Either the file path should include the whole path to the test (.xml) file, or this test type is currently not supported.';
+                                core.setFailed(errorMessage);
                             }
                         }
-                        // Unsupported test type for directory support.
-                        else{
-                            core.setFailed('This test type does not have directory support. Either the file path should include the whole path to the test (.xml) file, or this test type is currently not supported.');
-                            process.exit(1);
-                        }
+                        else {
+                            isError = true;
+                            errorMessage = 'Test xml cannot be parsed into valid JSON.';
+                            core.setFailed(errorMessage);
+                        }   
                     });
                 }
             });
@@ -11895,107 +11905,115 @@ const axios = __nccwpck_require__(2678);
                 // convert it to a JSON string
                 jsonData = JSON.stringify(result, null, 4);
                 let parsedJson = JSON.parse(jsonData);
-                // Consider TestNG as JUnit.
-                if(parsedJson?.['testng-results']){
-                    let parsedresponse = parsedJson["testng-results"];
-                    let summaryObj = parsedresponse?.$;
-                    let suitesObj = parsedresponse?.suite[0];
-                    let suiteObj = suitesObj?.$;
-                    if(summaryObj && suitesObj && suiteObj){
-                        startTime = suiteObj["started-at"];
-                        endTime = suiteObj["finished-at"];
-                        startTime = startTime.replace(" IST", "Z");
-                        endTime = endTime.replace(" IST", "Z");
-                        let package = suitesObj.test[0].class[0].$;
-                        packageName = package.name.replace(/\.[^.]*$/g,'');  
-                        passedTests = parseInt(summaryObj.passed) || 0 ;
-                        failedTests = parseInt(summaryObj.failed) || 0 ;
-                        skippedTests = parseInt(summaryObj.skipped) || 0 ;
-                        ignoredTests = parseInt(summaryObj.ignored) || 0 ;
-                        totalTests = parseInt(summaryObj.total) || 0 ;
-                        totalDuration = parseFloat(suiteObj["duration-ms"]);
-                    }
-                }
-                // Process XUnit test format.
-                else if(parsedJson?.assemblies){
-                    let parsedresponse = parsedJson["assemblies"];
-                    let testSummaryObj = (parsedresponse?.assembly[0]?.$) ? parsedresponse.assembly[0].$ : null;
-                    let collectionObj = (parsedresponse?.assembly[0]?.collection[0]?.$) ? parsedresponse.assembly[0].collection[0].$ : null;
-                    if(testSummaryObj || collectionObj){
-                        passedTests = parseInt(testSummaryObj.passed) || parseInt(collectionObj.passed) || 0 ;
-                        failedTests = parseInt(testSummaryObj.failed) || parseInt(collectionObj.failed) || 0 ;
-                        skippedTests = parseInt(testSummaryObj.skipped) || parseInt(collectionObj.skipped) || 0 ;
-                        totalTests = parseInt(testSummaryObj.total) || parseInt(collectionObj.total) || 0 ;
-                        ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
-                        totalDuration = parseFloat(testSummaryObj.time) || parseFloat(collectionObj.time) || 0 ;
-                        packageName = testSummaryObj.name || collectionObj.name || xmlReportFile;
-                        startTime = (parsedresponse?.$?.timestamp) ? parsedresponse.$.timestamp : "";
-                        startTime = convertDateFormatForXUnit(startTime);
-                        // end time is not mentioned in this type of xml. So calcute by adding startTime + totalDuration.
-                        endTime = addSecondsToDateTime(startTime, totalDuration);
-                        testType = 'XUnit';
-                    }
-                }
-                // Process NUnit test format.
-                else if(parsedJson?.['test-run']){
-                    let parsedresponse = parsedJson["test-run"]; 
-                    let testSummaryObj = parsedresponse?.$;
-                    if(testSummaryObj){
-                        passedTests = parseInt(testSummaryObj.passed) || 0 ;
-                        failedTests = parseInt(testSummaryObj.failed) || 0 ;
-                        skippedTests = parseInt(testSummaryObj.skipped) || 0 ;
-                        totalTests = parseInt(testSummaryObj.total) || 0 ;
-                        ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
-                        totalDuration = parseFloat(testSummaryObj.duration) || 0 ;
-                        startTime = testSummaryObj["start-time"] || "";
-                        startTime = startTime.replace(/\s+/g, ''); // convert to isoDateTime Format
-                        endTime = testSummaryObj["end-time"] || "";
-                        endTime = endTime.replace(/\s+/g, '');
-                    }
-                    packageName = (parsedresponse?.['test-suite'][0]?.$?.name) ? parsedresponse["test-suite"][0].$.name : xmlReportFile;
-                    testType = 'NUnit';
-                }
-                // Process UnitTest (i.e MSTest) test format.
-                else if(parsedJson?.TestRun){
-                    let parsedresponse = parsedJson["TestRun"]; 
-                    let testSummaryObj = parsedresponse?.ResultSummary[0]?.Counters[0]?.$ || null;
-                    if(testSummaryObj){
-                        passedTests = parseInt(testSummaryObj.passed) || 0 ;
-                        failedTests = parseInt(testSummaryObj.failed) || 0 ;
-                        totalTests = parseInt(testSummaryObj.total) || 0 ;
-                    }
-                    startTime = (parsedresponse?.Times[0]?.$?.start) ? parsedresponse.Times[0].$.start : "";
-                    startTime = convertDateTimeFormatForMSTest(startTime);
-                    endTime = (parsedresponse?.Times[0]?.$?.finish) ? parsedresponse.Times[0].$.finish : "";
-                    endTime = convertDateTimeFormatForMSTest(endTime);
-                    totalDuration = durationBetweenDateTime(startTime, endTime); // calculate from start and end time.
-                    skippedTests = 0; // skipped and ignored tests are not present for MSTest.
-                    ignoredTests = 0;
-                    packageName = (parsedresponse?.TestDefinitions[0]?.UnitTest[0]?.TestMethod[0]?.$?.className) ? parsedresponse.TestDefinitions[0].UnitTest[0].TestMethod[0].$.className : xmlReportFile;
-                    testType = 'UnitTest';
-                }
-                // Support JUnit via file path as well
-                // Process pytest / jest test format.
-                else if(parsedJson?.testsuites){
-                    let summaryObj;
-                    let parsedresponse = parsedJson["testsuites"];
-                    if(parsedresponse?.testsuite){
-                        for(var i = 0; i < parsedresponse.testsuite.length; i++){
-                            summaryObj = parsedresponse.testsuite[i].$;
-                            assignJUnitValues(summaryObj);
+                if(parsedJson){
+                    // Consider TestNG as JUnit.
+                    if(parsedJson?.['testng-results']){
+                        let parsedresponse = parsedJson["testng-results"];
+                        let summaryObj = parsedresponse?.$;
+                        let suitesObj = parsedresponse?.suite[0];
+                        let suiteObj = suitesObj?.$;
+                        if(summaryObj && suitesObj && suiteObj){
+                            startTime = suiteObj["started-at"];
+                            endTime = suiteObj["finished-at"];
+                            startTime = startTime.replace(" IST", "Z");
+                            endTime = endTime.replace(" IST", "Z");
+                            let package = suitesObj.test[0].class[0].$;
+                            packageName = package.name.replace(/\.[^.]*$/g,'');  
+                            passedTests = parseInt(summaryObj.passed) || 0 ;
+                            failedTests = parseInt(summaryObj.failed) || 0 ;
+                            skippedTests = parseInt(summaryObj.skipped) || 0 ;
+                            ignoredTests = parseInt(summaryObj.ignored) || 0 ;
+                            totalTests = parseInt(summaryObj.total) || 0 ;
+                            totalDuration = parseFloat(suiteObj["duration-ms"]);
                         }
                     }
+                    // Process XUnit test format.
+                    else if(parsedJson?.assemblies){
+                        let parsedresponse = parsedJson["assemblies"];
+                        let testSummaryObj = (parsedresponse?.assembly[0]?.$) ? parsedresponse.assembly[0].$ : null;
+                        let collectionObj = (parsedresponse?.assembly[0]?.collection[0]?.$) ? parsedresponse.assembly[0].collection[0].$ : null;
+                        if(testSummaryObj || collectionObj){
+                            passedTests = parseInt(testSummaryObj.passed) || parseInt(collectionObj.passed) || 0 ;
+                            failedTests = parseInt(testSummaryObj.failed) || parseInt(collectionObj.failed) || 0 ;
+                            skippedTests = parseInt(testSummaryObj.skipped) || parseInt(collectionObj.skipped) || 0 ;
+                            totalTests = parseInt(testSummaryObj.total) || parseInt(collectionObj.total) || 0 ;
+                            ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
+                            totalDuration = parseFloat(testSummaryObj.time) || parseFloat(collectionObj.time) || 0 ;
+                            packageName = testSummaryObj.name || collectionObj.name || xmlReportFile;
+                            startTime = (parsedresponse?.$?.timestamp) ? parsedresponse.$.timestamp : "";
+                            startTime = convertDateFormatForXUnit(startTime);
+                            // end time is not mentioned in this type of xml. So calcute by adding startTime + totalDuration.
+                            endTime = addSecondsToDateTime(startTime, totalDuration);
+                            testType = 'XUnit';
+                        }
+                    }
+                    // Process NUnit test format.
+                    else if(parsedJson?.['test-run']){
+                        let parsedresponse = parsedJson["test-run"]; 
+                        let testSummaryObj = parsedresponse?.$;
+                        if(testSummaryObj){
+                            passedTests = parseInt(testSummaryObj.passed) || 0 ;
+                            failedTests = parseInt(testSummaryObj.failed) || 0 ;
+                            skippedTests = parseInt(testSummaryObj.skipped) || 0 ;
+                            totalTests = parseInt(testSummaryObj.total) || 0 ;
+                            ignoredTests = parseInt(totalTests - (failedTests + passedTests + skippedTests));
+                            totalDuration = parseFloat(testSummaryObj.duration) || 0 ;
+                            startTime = testSummaryObj["start-time"] || "";
+                            startTime = startTime.replace(/\s+/g, ''); // convert to isoDateTime Format
+                            endTime = testSummaryObj["end-time"] || "";
+                            endTime = endTime.replace(/\s+/g, '');
+                        }
+                        packageName = (parsedresponse?.['test-suite'][0]?.$?.name) ? parsedresponse["test-suite"][0].$.name : xmlReportFile;
+                        testType = 'NUnit';
+                    }
+                    // Process UnitTest (i.e MSTest) test format.
+                    else if(parsedJson?.TestRun){
+                        let parsedresponse = parsedJson["TestRun"]; 
+                        let testSummaryObj = parsedresponse?.ResultSummary[0]?.Counters[0]?.$ || null;
+                        if(testSummaryObj){
+                            passedTests = parseInt(testSummaryObj.passed) || 0 ;
+                            failedTests = parseInt(testSummaryObj.failed) || 0 ;
+                            totalTests = parseInt(testSummaryObj.total) || 0 ;
+                        }
+                        startTime = (parsedresponse?.Times[0]?.$?.start) ? parsedresponse.Times[0].$.start : "";
+                        startTime = convertDateTimeFormatForMSTest(startTime);
+                        endTime = (parsedresponse?.Times[0]?.$?.finish) ? parsedresponse.Times[0].$.finish : "";
+                        endTime = convertDateTimeFormatForMSTest(endTime);
+                        totalDuration = durationBetweenDateTime(startTime, endTime); // calculate from start and end time.
+                        skippedTests = 0; // skipped and ignored tests are not present for MSTest.
+                        ignoredTests = 0;
+                        packageName = (parsedresponse?.TestDefinitions[0]?.UnitTest[0]?.TestMethod[0]?.$?.className) ? parsedresponse.TestDefinitions[0].UnitTest[0].TestMethod[0].$.className : xmlReportFile;
+                        testType = 'UnitTest';
+                    }
+                    // Support JUnit via file path as well
+                    // Process pytest / jest test format.
+                    else if(parsedJson?.testsuites){
+                        let summaryObj;
+                        let parsedresponse = parsedJson["testsuites"];
+                        if(parsedresponse?.testsuite){
+                            for(var i = 0; i < parsedresponse.testsuite.length; i++){
+                                summaryObj = parsedresponse.testsuite[i].$;
+                                assignJUnitValues(summaryObj);
+                            }
+                        }
+                    }
+                    else if(parsedJson?.testsuite){
+                        let summaryObj;
+                        let parsedresponse = parsedJson["testsuite"];
+                        summaryObj = parsedresponse?.$;
+                        assignJUnitValues(summaryObj); 
+                    }
+                    // Unsupported test type.
+                    else{
+                        isError = true;
+                        errorMessage = 'This test type with root node as ' + Object.keys(parsedJson)[0] + ' is currently not supported.';
+                        core.setFailed(errorMessage);
+                    }
                 }
-                else if(parsedJson?.testsuite){
-                    let summaryObj;
-                    let parsedresponse = parsedJson["testsuite"];
-                    summaryObj = parsedresponse?.$;
-                    assignJUnitValues(summaryObj); 
-                }
-                // Unsupported test type.
                 else{
-                    core.setFailed('This test type is currently not supported.');
-                    process.exit(1);
+                    isError = true
+                    errorMessage = 'Test xml cannot be parsed into valid JSON.';
+                    core.setFailed(errorMessage);
                 }
 
             });
@@ -12012,20 +12030,27 @@ const axios = __nccwpck_require__(2678);
         if (instanceUrl.endsWith('/'))
             instanceUrl = instanceUrl.slice(0, -1);
 
-        testSummaries = [{
-            name: packageName + '-' + githubContext.run_number + '.' + githubContext.run_attempt,
-            passedTests: passedTests,
-            failedTests: failedTests,
-            skippedTests: skippedTests,
-            ignoredTests: ignoredTests,
-            blockedTests: 0,
-            totalTests: totalTests,
-            startTime: startTime,
-            endTime: endTime,
-            duration: totalDuration,
-            testType: testType,
-            suites: []			
-        }];
+        // In case of any errors, propagate errors back to servicenow but do not process test summary. 
+        if(isError === true){
+            testSummaries = [];
+            errorMessage = errorMessage;
+        }
+        else {
+            testSummaries = [{
+                name: packageName + '-' + githubContext.run_number + '.' + githubContext.run_attempt,
+                passedTests: passedTests,
+                failedTests: failedTests,
+                skippedTests: skippedTests,
+                ignoredTests: ignoredTests,
+                blockedTests: 0,
+                totalTests: totalTests,
+                startTime: startTime,
+                endTime: endTime,
+                duration: totalDuration,
+                testType: testType,
+                suites: []			
+            }];
+        }
         console.log("test summaries payload is : ", JSON.stringify(testSummaries));
         payload = {
             toolId: toolId,
@@ -12037,6 +12062,7 @@ const axios = __nccwpck_require__(2678);
             repository: `${githubContext.repository}`,
             testSummaries: testSummaries,
             fileContent: '',
+            errorMessage: errorMessage,
             testType: testType
         };
         console.log("original payload is : ", JSON.stringify(payload));
