@@ -172,7 +172,7 @@ const axios = require('axios');
                         startTime = testSummaryObj["start-time"] || "";
                         startTime = startTime.replace(/\s+/g, ''); // convert to isoDateTime Format
                         endTime = testSummaryObj["end-time"] || "";
-                        endTime.replace(/\s+/g, '');
+                        endTime = endTime.replace(/\s+/g, '');
                     }
                     packageName = (parsedresponse?.['test-suite'][0]?.$?.name) ? parsedresponse["test-suite"][0].$.name : xmlReportFile;
                     testType = 'NUnit';
