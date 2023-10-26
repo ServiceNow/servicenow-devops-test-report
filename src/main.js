@@ -104,7 +104,8 @@ const axios = require('axios');
                             // Unsupported test type for directory support.
                             else{
                                 isError = true;
-                                errorMessage = 'This test type with root node as ' + Object.keys(parsedJson)[0] + ' does not have directory support. Either the file path should include the whole path to the test (.xml) file, or this test type is currently not supported.';
+                                testType = 'Unsupported test type';
+                                errorMessage = 'This test type with root node as ' + "'" + Object.keys(parsedJson)[0] + "'" + ' does not have directory support. Either the file path should include the whole path to the test (.xml) file, or this test type is currently not supported.';
                                 core.setFailed(errorMessage);
                             }
                         }
@@ -228,7 +229,8 @@ const axios = require('axios');
                     // Unsupported test type.
                     else{
                         isError = true;
-                        errorMessage = 'This test type with root node as ' + Object.keys(parsedJson)[0] + ' is currently not supported.';
+                        testType = 'Unsupported test type';
+                        errorMessage = 'This test type with root node as ' + "'" + Object.keys(parsedJson)[0] + "'" + ' is currently not supported.';
                         core.setFailed(errorMessage);
                     }
                 }
