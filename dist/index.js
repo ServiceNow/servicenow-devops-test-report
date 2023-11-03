@@ -11968,6 +11968,7 @@ const axios = __nccwpck_require__(992);
         } else {
             core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
             core.setFailed(`[ServiceNow DevOps] Test Results, Error message :${e.message}`);
+            core.setFailed(`[ServiceNow DevOps] Test Results, Error message :${e}`);
         }
     }
     
