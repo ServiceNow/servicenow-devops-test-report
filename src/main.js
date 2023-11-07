@@ -3,6 +3,19 @@ const fs = require('fs');
 const xml2js = require('xml2js');
 const axios = require('axios');
 
+function circularSafeStringify(obj) {
+    const seen = new WeakSet();
+    return JSON.stringify(obj, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return '[Circular]';
+        }
+        seen.add(value);
+      }
+      return value;
+    });
+}
+
 (async function main() {
     let instanceUrl = core.getInput('instance-url', { required: true });
     const toolId = core.getInput('tool-id', { required: true });
@@ -332,10 +345,31 @@ const axios = require('axios');
         }
         snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
     } catch (e) {
+        core.debug('[ServiceNow DevOps] Test Results, Error: '+JSON.stringify(e));
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
             core.setFailed('ServiceNow Instance URL is NOT valid. Please correct the URL and try again.');
         } else if (e.message.includes('401')) {
-            core.setFailed('Invalid Credentials. Please correct the credentials and try again.');
+            core.setFailed('Invalid username and password or Invalid token and toolid. Please correct the input parameters and try again.');
+            if(e.response && e.response.data) 
+            {
+                var responseObject=circularSafeStringify(e.response.data);
+                core.debug('[ServiceNow DevOps] Test Results, Response data :'+responseObject);          
+            }
+        } else if(e.message.includes('400') || e.message.includes('404')){
+            let errMsg = '[ServiceNow DevOps] Test Results are not Successful. ';
+            let errMsgSuffix = ' Please provide valid inputs.';
+            let responseData = e.response.data;
+            if (responseData && responseData.result && responseData.result.errorMessage) {
+                errMsg = errMsg + responseData.result.errorMessage + errMsgSuffix;
+                core.setFailed(errMsg);
+            }
+            else if (responseData && responseData.result && responseData.result.details && responseData.result.details.errors) {
+                let errors = responseData.result.details.errors;
+                for (var index in errors) {
+                    errMsg = errMsg + errors[index].message + errMsgSuffix;
+                }
+                core.setFailed(errMsg);
+            }
         } else {
             core.setFailed(`ServiceNow Test Results are NOT created. Please check ServiceNow logs for more details.`);
         }
