@@ -11829,30 +11829,50 @@ function circularSafeStringify(obj) {
         packageName = summaryObj.name.replace(/\.[^.]*$/g, '') || xmlReportFile;
     };
     function convertDateFormatForXUnit(inputDate) {
-       const [datePart, timePart] = inputDate.split(' ');
-       const [month, day, year] = datePart.split('/');
-       const [hours, minutes, seconds] = timePart.split(':');
-       const outputDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours}:${minutes}:${seconds}Z`;
-       return outputDate;
+        try{
+            const [datePart, timePart] = inputDate.split(' ');
+            const [month, day, year] = datePart.split('/');
+            const [hours, minutes, seconds] = timePart.split(':');
+            const outputDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours}:${minutes}:${seconds}Z`;
+            return outputDate;
+        }catch(exception){
+            core.debug(`convertDateFormatForXUnit, Failed :${exception}`);
+            return '';
+        }
     }
     function convertDateTimeFormatForMSTest(inputDateTime){
-        const [datePart, timePart] = inputDateTime.split('T'); 
-        const [year, month, day] = datePart.split('-');
-        const timeWithoutOffset = timePart.replace(/\+\d+:\d+$/, '');
-        const [hours, minutes, seconds] = timeWithoutOffset.split(':');
-        const outputDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
-        return outputDateTime;
+        try{
+            const [datePart, timePart] = inputDateTime.split('T'); 
+            const [year, month, day] = datePart.split('-');
+            const timeWithoutOffset = timePart.replace(/\+\d+:\d+$/, '');
+            const [hours, minutes, seconds] = timeWithoutOffset.split(':');
+            const outputDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+            return outputDateTime;
+        }catch(exception){
+            core.debug(`convertDateTimeFormatForMSTest, Failed :${exception}`);
+            return '';
+        }
     }
     function durationBetweenDateTime(startTime, endTime){
-        const start = new Date(startTime);
-        const end = new Date(endTime);
-        const timeDiffInSeconds = Math.abs((start - end) / 1000);
-        return timeDiffInSeconds;
+        try{
+            const start = new Date(startTime);
+            const end = new Date(endTime);
+            const timeDiffInSeconds = Math.abs((start - end) / 1000);
+            return timeDiffInSeconds;
+        }catch(exception){
+            core.debug(`durationBetweenDateTime, Failed :${exception}`);
+            return '';
+        }
     }
     function addSecondsToDateTime(startTime, secondsToAdd) {
-        const dateTime = new Date(startTime);
-        dateTime.setSeconds(dateTime.getSeconds() + secondsToAdd);
-        return dateTime.toISOString();
+        try{
+            const dateTime = new Date(startTime);
+            dateTime.setSeconds(dateTime.getSeconds() + secondsToAdd);
+            return dateTime.toISOString();
+        }catch(exception){
+            core.debug(`addSecondsToDateTime, Failed :${exception}`);
+            return '';
+        }
     }
 
     try {
@@ -12126,7 +12146,7 @@ function circularSafeStringify(obj) {
         core.debug('[ServiceNow DevOps] Test Results, Error: '+JSON.stringify(e));
         if(e.response && e.response.data) {
             var responseObject=circularSafeStringify(e.response.data);
-            core.debug('[ServiceNow DevOps] Test Results, Status code :'+e.response.statusCode+', Response data :'+responseObject);          
+            core.debug('[ServiceNow DevOps] Test Results, Response data :'+responseObject);          
         }
 
         if (e.message.includes('ECONNREFUSED') || e.message.includes('ENOTFOUND') || e.message.includes('405')) {
