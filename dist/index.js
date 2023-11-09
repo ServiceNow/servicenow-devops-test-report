@@ -11861,7 +11861,7 @@ function circularSafeStringify(obj) {
             return timeDiffInSeconds;
         }catch(exception){
             core.debug(`durationBetweenDateTime, Failed :${exception}`);
-            return '';
+            return 0;
         }
     }
     function addSecondsToDateTime(startTime, secondsToAdd) {
