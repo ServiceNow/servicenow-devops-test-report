@@ -12141,7 +12141,9 @@ function circularSafeStringify(obj) {
             core.setFailed('For Basic Auth, Username and Password is mandatory for integration user authentication');
             return;
         }
+        core.debug("[ServiceNow DevOps], Sending Request for Test Report, Request options :"+JSON.stringify(httpHeaders)+", Payload :"+JSON.stringify(payload));
         snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
+        core.debug("[ServiceNow DevOps], Receiving response for Test Report, Response :"+snowResponse);
     } catch (e) {
         core.debug('[ServiceNow DevOps] Test Results, Error: '+JSON.stringify(e));
         if(e.response && e.response.data) {
