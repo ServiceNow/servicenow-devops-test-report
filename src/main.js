@@ -6,7 +6,8 @@ const axios = require('axios');
 function circularSafeStringify(obj) {
     const seen = new WeakSet();
     return JSON.stringify(obj, (key, value) => {
-      if (typeof value === 'object' && value !== null) {
+        if (key === '_sessionCache') return undefined;
+        if (typeof value === 'object' && value !== null) {
         if (seen.has(value)) {
           return '[Circular]';
         }
@@ -365,7 +366,7 @@ function circularSafeStringify(obj) {
         }
         core.debug("[ServiceNow DevOps], Sending Request for Test Report, Request options :"+JSON.stringify(httpHeaders)+", Payload :"+JSON.stringify(payload)+"\n");
         snowResponse = await axios.post(endpoint, JSON.stringify(payload), httpHeaders);
-        core.debug("[ServiceNow DevOps], Receiving response for Test Report, Response :"+snowResponse+"\n");
+        core.debug("[ServiceNow DevOps], Receiving response for Test Report, Response :"+circularSafeStringify(snowResponse)+"\n");
     } catch (e) {
         core.debug('[ServiceNow DevOps] Test Results, Error: '+JSON.stringify(e)+"\n");
         if(e.response && e.response.data) {
