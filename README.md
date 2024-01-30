@@ -32,7 +32,7 @@ build:
     runs-on: ubuntu-latest
     steps:     
       - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v2.0.0
+        uses: ServiceNow/servicenow-devops-test-report@v3.1.0
         with:
           devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
           instance-url: ${{ secrets.SN_INSTANCE_URL }}
@@ -48,7 +48,7 @@ build:
     runs-on: ubuntu-latest
     steps:
       - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v2.0.0
+        uses: ServiceNow/servicenow-devops-test-report@v3.1.0
         with:
           devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
           devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
