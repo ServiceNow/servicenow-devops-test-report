@@ -7,3 +7,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - CHANGELOG can be parsed by the github action.
 - Extended support for "testsuites" for JUnit test-type.
+- Extended support for NUnit, XUnit and MSTest (UnitTest) test types.
