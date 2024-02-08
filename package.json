@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/ServiceNow/servicenow-devops-test-report#readme",
   "dependencies": {
-    "@actions/core": "^1.8.2",
+    "@actions/core": "^1.9.1",
     "axios": "^0.25.0",
     "follow-redirects": "^1.15.0",
     "xml2js": "^0.4.23"
