@@ -102,13 +102,15 @@ function circularSafeStringify(obj) {
     function toZuluFormat(inputDateTime) {
         let zuluTime = inputDateTime;
         const [dateTimePart, timeZone] = inputDateTime.split(' '); 
-        
+        let initialDateTime = new Date(dateTimePart);
+
+        console.log("timeZone = " + timeZone);
         if(timeZone == "UTC") {
-           zuluTime = dateTimePart + 'Z';
+            console.log("Inside UTC");
+            zuluTime = initialDateTime;
 
         } else if(timeZone == "IST") {
-            let initialDateTime = new Date(dateTimePart);
-
+            console.log("Inside IST");
             // Define the amount of time to add
             let hoursToAdd = 5;
             let minutesToAdd = 30;
@@ -119,6 +121,7 @@ function circularSafeStringify(obj) {
             zuluTime = initialDateTime;
         }
         
+        console.log("Zulutime = " + zuluTime);
         return zuluTime;
     }
 
