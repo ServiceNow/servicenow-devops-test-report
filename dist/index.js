@@ -11979,8 +11979,6 @@ function circularSafeStringify(obj) {
                         if(summaryObj && suitesObj && suiteObj){
                             startTime = suiteObj["started-at"];
                             endTime = suiteObj["finished-at"];
-                            // startTime = startTime.replace(" IST", "Z");
-                            // endTime = endTime.replace(" IST", "Z");
                             startTime = toZuluFormat(startTime);
                             endTime = toZuluFormat(endTime);
                             let package = suitesObj.test[0].class[0].$;
