@@ -11879,7 +11879,7 @@ function circularSafeStringify(obj) {
     //Currently only applicable for UTC and IST date format
     function toZuluFormat(inputDateTime) {
         try{
-            let zuluTime = inputDateTime;
+            let zuluTime = inputDateTime; //If timezone doesnot fall under UTC or IST, the original format will be preserved for now.
             const [dateTimePart, timeZone] = inputDateTime.split(' '); 
             let initialDateTime = new Date(dateTimePart);
 
