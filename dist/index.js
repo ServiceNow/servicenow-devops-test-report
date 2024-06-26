@@ -11878,29 +11878,31 @@ function circularSafeStringify(obj) {
 
     //Currently only applicable for UTC and IST date format
     function toZuluFormat(inputDateTime) {
-        let zuluTime = inputDateTime;
-        const [dateTimePart, timeZone] = inputDateTime.split(' '); 
-        let initialDateTime = new Date(dateTimePart);
+        try{
+            let zuluTime = inputDateTime;
+            const [dateTimePart, timeZone] = inputDateTime.split(' '); 
+            let initialDateTime = new Date(dateTimePart);
 
-        console.log("timeZone = " + timeZone);
-        if(timeZone == "UTC") {
-            console.log("Inside UTC");
-            zuluTime = initialDateTime;
+            if(timeZone == "UTC") {
+                zuluTime = initialDateTime;
 
-        } else if(timeZone == "IST") {
-            console.log("Inside IST");
-            // Define the amount of time to add
-            let hoursToAdd = 5;
-            let minutesToAdd = 30;
-    
-            // Add the hours and minutes to the initial date and time
-            initialDateTime.setHours(initialDateTime.getHours() + hoursToAdd);
-            initialDateTime.setMinutes(initialDateTime.getMinutes() + minutesToAdd);
-            zuluTime = initialDateTime;
-        }
+            } else if(timeZone == "IST") {
+                // Define the amount of time to add
+                let hoursToAdd = 5;
+                let minutesToAdd = 30;
         
-        console.log("Zulutime = " + zuluTime);
-        return zuluTime;
+                // Add the hours and minutes to the initial date and time
+                initialDateTime.setHours(initialDateTime.getHours() + hoursToAdd);
+                initialDateTime.setMinutes(initialDateTime.getMinutes() + minutesToAdd);
+                zuluTime = initialDateTime;
+            }
+
+            return zuluTime;
+        }
+        catch(exception){
+            core.debug(`toZuluFormat, Failed :${exception}`);
+            return '';
+        }
     }
 
     try {
