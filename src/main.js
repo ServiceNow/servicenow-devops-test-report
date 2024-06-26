@@ -98,6 +98,30 @@ function circularSafeStringify(obj) {
         }
     }
 
+    //Currently only applicable for UTC and IST date format
+    function toZuluFormat(inputDateTime) {
+        let zuluTime = inputDateTime;
+        const [dateTimePart, timeZone] = inputDateTime.split(' '); 
+        
+        if(timeZone == "UTC") {
+           zuluTime = dateTimePart + 'Z';
+
+        } else if(timeZone == "IST") {
+            let initialDateTime = new Date(dateTimePart);
+
+            // Define the amount of time to add
+            let hoursToAdd = 5;
+            let minutesToAdd = 30;
+    
+            // Add the hours and minutes to the initial date and time
+            initialDateTime.setHours(initialDateTime.getHours() + hoursToAdd);
+            initialDateTime.setMinutes(initialDateTime.getMinutes() + minutesToAdd);
+            zuluTime = initialDateTime;
+        }
+        
+        return zuluTime;
+    }
+
     try {
         if (fs.statSync(xmlReportFile).isDirectory()) {
             let filenames = fs.readdirSync(xmlReportFile);
@@ -172,8 +196,10 @@ function circularSafeStringify(obj) {
                         if(summaryObj && suitesObj && suiteObj){
                             startTime = suiteObj["started-at"];
                             endTime = suiteObj["finished-at"];
-                            startTime = startTime.replace(" IST", "Z");
-                            endTime = endTime.replace(" IST", "Z");
+                            // startTime = startTime.replace(" IST", "Z");
+                            // endTime = endTime.replace(" IST", "Z");
+                            startTime = toZuluFormat(startTime);
+                            endTime = toZuluFormat(endTime);
                             let package = suitesObj.test[0].class[0].$;
                             packageName = package.name.replace(/\.[^.]*$/g,'');  
                             passedTests = parseInt(summaryObj.passed) || 0 ;
