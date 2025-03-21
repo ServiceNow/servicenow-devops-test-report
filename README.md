@@ -98,6 +98,10 @@ Note: The value should only contain one (.xml) file if it is a directory path.
 
 For NUnit, XUnit and MSTest test types - path to test(.xml) file should be passed.
 
+### `test-summary-name`
+
+**Optional** Custom the test summary name.
+
 ## Outputs
 No outputs produced.
 
