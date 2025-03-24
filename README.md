@@ -100,7 +100,7 @@ For NUnit, XUnit and MSTest test types - path to test(.xml) file should be passe
 
 ### `test-summary-name`
 
-**Optional** Custom the test summary name.
+**Optional** Name of the test summary results. If this parameter is not specified, the latest test summary results name within the xml-report-filename will be used. If that is also unavailable, the xml-report-filename parameter value itself will serve as the test summary name.
 
 ## Outputs
 No outputs produced.
