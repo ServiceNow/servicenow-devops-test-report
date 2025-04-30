@@ -25,7 +25,7 @@ For basic authentication , create secrets called
 - `SN_ORCHESTRATION_TOOL_ID` only the **sys_id** is required for the GitHub tool created in your ServiceNow instance
 
 ## Step 3: Configure the GitHub Action if need to adapt for your needs or workflows
-# For Token based Authentication which is available from v6.0.0 , at ServiceNow instance
+# For Token based Authentication which is available from v3.0.0 , at ServiceNow instance
 ```yaml
 build:
     name: Build
@@ -40,7 +40,7 @@ build:
           context-github: ${{ toJSON(github) }}
           job-name: 'Build'
           xml-report-filename: target/surefire-reports/testng-results.xml
-          test-summary-name: 'TestSummaryNameOptional'
+          test-summary-name: 'TestSummary'
 
 ```
 ## For Basic Authentication at ServiceNow instance
@@ -59,7 +59,7 @@ build:
           context-github: ${{ toJSON(github) }}
           job-name: 'Build'
           xml-report-filename: target/surefire-reports/testng-results.xml
-          test-summary-name: 'TestSummaryNameOptional'
+          test-summary-name: 'TestSummary'
          
 ```
 The values for secrets should be setup in Step 1. Secrets should be created in Step 2.
