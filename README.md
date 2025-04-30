@@ -40,6 +40,8 @@ build:
           context-github: ${{ toJSON(github) }}
           job-name: 'Build'
           xml-report-filename: target/surefire-reports/testng-results.xml
+          test-summary-name: 'TestSummaryNameOptional'
+
 ```
 ## For Basic Authentication at ServiceNow instance
 ```yaml
@@ -57,6 +59,7 @@ build:
           context-github: ${{ toJSON(github) }}
           job-name: 'Build'
           xml-report-filename: target/surefire-reports/testng-results.xml
+          test-summary-name: 'TestSummaryNameOptional'
          
 ```
 The values for secrets should be setup in Step 1. Secrets should be created in Step 2.

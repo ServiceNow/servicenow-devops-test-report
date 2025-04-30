@@ -32,3 +32,4 @@ jobs:
           context-github: ${{ toJSON(github) }}
           job-name: 'Build'
           xml-report-filename: target/surefire-reports/testng-results.xml
+          test-summary-name: 'TestSummaryNameOptional'
