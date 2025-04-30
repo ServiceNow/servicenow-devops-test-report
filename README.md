@@ -25,14 +25,14 @@ For basic authentication , create secrets called
 - `SN_ORCHESTRATION_TOOL_ID` only the **sys_id** is required for the GitHub tool created in your ServiceNow instance
 
 ## Step 3: Configure the GitHub Action if need to adapt for your needs or workflows
-# For Token based Authentication which is available from v3.0.0 , at ServiceNow instance
+# For Token based Authentication which is available from v6.0.0 , at ServiceNow instance
 ```yaml
 build:
     name: Build
     runs-on: ubuntu-latest
     steps:     
       - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v3.1.0
+        uses: ServiceNow/servicenow-devops-test-report@v6.0.0
         with:
           devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
           instance-url: ${{ secrets.SN_INSTANCE_URL }}
@@ -50,7 +50,7 @@ build:
     runs-on: ubuntu-latest
     steps:
       - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v3.1.0
+        uses: ServiceNow/servicenow-devops-test-report@v6.0.0
         with:
           devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
           devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
