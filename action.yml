@@ -29,6 +29,9 @@ inputs:
     description: 'GitHub Custom Action'
     required: false
     default: 'JUnit'
+  test-summary-name:
+    description: 'Test summary name'
+    required: false
 branding:
   icon: 'refresh-ccw'
   color: 'green'

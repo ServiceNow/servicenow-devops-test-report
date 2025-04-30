@@ -25,6 +25,7 @@ function circularSafeStringify(obj) {
     const devopsIntegrationToken = core.getInput('devops-integration-token', { required: false });
     const jobname = core.getInput('job-name', { required: true });
     const xmlReportFile = core.getInput('xml-report-filename', { required: true });
+    const testSummariesName = core.getInput('test-summary-name', { required: false });
     
     let githubContext = core.getInput('context-github', { required: true });
 
@@ -324,7 +325,7 @@ function circularSafeStringify(obj) {
         }
         else {
             testSummaries = [{
-                name: packageName + '-' + githubContext.run_number + '.' + githubContext.run_attempt,
+                name: testSummariesName || packageName + '-' + githubContext.run_number + '.' + githubContext.run_attempt,
                 passedTests: passedTests,
                 failedTests: failedTests,
                 skippedTests: skippedTests,
