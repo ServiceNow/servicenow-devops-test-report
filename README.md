@@ -32,7 +32,7 @@ build:
     runs-on: ubuntu-latest
     steps:     
       - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v3.1.0
+        uses: ServiceNow/servicenow-devops-test-report@v6.0.0
         with:
           devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
           instance-url: ${{ secrets.SN_INSTANCE_URL }}
@@ -40,6 +40,8 @@ build:
           context-github: ${{ toJSON(github) }}
           job-name: 'Build'
           xml-report-filename: target/surefire-reports/testng-results.xml
+          test-summary-name: 'TestSummary'
+
 ```
 ## For Basic Authentication at ServiceNow instance
 ```yaml
@@ -48,7 +50,7 @@ build:
     runs-on: ubuntu-latest
     steps:
       - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v3.1.0
+        uses: ServiceNow/servicenow-devops-test-report@v6.0.0
         with:
           devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
           devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
@@ -57,6 +59,7 @@ build:
           context-github: ${{ toJSON(github) }}
           job-name: 'Build'
           xml-report-filename: target/surefire-reports/testng-results.xml
+          test-summary-name: 'TestSummary'
          
 ```
 The values for secrets should be setup in Step 1. Secrets should be created in Step 2.
@@ -97,6 +100,10 @@ The Step Name should be **ServiceNow DevOps Unit Test Results**.
 Note: The value should only contain one (.xml) file if it is a directory path.
 
 For NUnit, XUnit and MSTest test types - path to test(.xml) file should be passed.
+
+### `test-summary-name`
+
+**Optional** Name of the test summary results. If this parameter is not specified, the latest test summary results name within the xml-report-filename will be used. If that is also unavailable, the xml-report-filename parameter value itself will serve as the test summary name.
 
 ## Outputs
 No outputs produced.
