@@ -3636,6 +3636,83 @@ function descending(a, b)
 
 /***/ }),
 
+/***/ 2639:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var bind = __nccwpck_require__(7564);
+
+var $apply = __nccwpck_require__(3945);
+var $call = __nccwpck_require__(8093);
+var $reflectApply = __nccwpck_require__(1330);
+
+/** @type {import('./actualApply')} */
+module.exports = $reflectApply || bind.call($call, $apply);
+
+
+/***/ }),
+
+/***/ 3945:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./functionApply')} */
+module.exports = Function.prototype.apply;
+
+
+/***/ }),
+
+/***/ 8093:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./functionCall')} */
+module.exports = Function.prototype.call;
+
+
+/***/ }),
+
+/***/ 8705:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var bind = __nccwpck_require__(7564);
+var $TypeError = __nccwpck_require__(3314);
+
+var $call = __nccwpck_require__(8093);
+var $actualApply = __nccwpck_require__(2639);
+
+/** @type {(args: [Function, thisArg?: unknown, ...args: unknown[]]) => Function} TODO FIXME, find a way to use import('.') */
+module.exports = function callBindBasic(args) {
+	if (args.length < 1 || typeof args[0] !== 'function') {
+		throw new $TypeError('a function is required');
+	}
+	return $actualApply(bind, $call, args);
+};
+
+
+/***/ }),
+
+/***/ 1330:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./reflectApply')} */
+module.exports = typeof Reflect !== 'undefined' && Reflect && Reflect.apply;
+
+
+/***/ }),
+
 /***/ 5630:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -3960,6 +4037,205 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
   var message =
     'DelayedStream#maxDataSize of ' + this.maxDataSize + ' bytes exceeded.'
   this.emit('error', new Error(message));
+};
+
+
+/***/ }),
+
+/***/ 6669:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var callBind = __nccwpck_require__(8705);
+var gOPD = __nccwpck_require__(3170);
+
+var hasProtoAccessor;
+try {
+	// eslint-disable-next-line no-extra-parens, no-proto
+	hasProtoAccessor = /** @type {{ __proto__?: typeof Array.prototype }} */ ([]).__proto__ === Array.prototype;
+} catch (e) {
+	if (!e || typeof e !== 'object' || !('code' in e) || e.code !== 'ERR_PROTO_ACCESS') {
+		throw e;
+	}
+}
+
+// eslint-disable-next-line no-extra-parens
+var desc = !!hasProtoAccessor && gOPD && gOPD(Object.prototype, /** @type {keyof typeof Object.prototype} */ ('__proto__'));
+
+var $Object = Object;
+var $getPrototypeOf = $Object.getPrototypeOf;
+
+/** @type {import('./get')} */
+module.exports = desc && typeof desc.get === 'function'
+	? callBind([desc.get])
+	: typeof $getPrototypeOf === 'function'
+		? /** @type {import('./get')} */ function getDunder(value) {
+			// eslint-disable-next-line eqeqeq
+			return $getPrototypeOf(value == null ? value : $Object(value));
+		}
+		: false;
+
+
+/***/ }),
+
+/***/ 9094:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+var $defineProperty = Object.defineProperty || false;
+if ($defineProperty) {
+	try {
+		$defineProperty({}, 'a', { value: 1 });
+	} catch (e) {
+		// IE 8 has a broken defineProperty
+		$defineProperty = false;
+	}
+}
+
+module.exports = $defineProperty;
+
+
+/***/ }),
+
+/***/ 3056:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./eval')} */
+module.exports = EvalError;
+
+
+/***/ }),
+
+/***/ 1620:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+module.exports = Error;
+
+
+/***/ }),
+
+/***/ 4585:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./range')} */
+module.exports = RangeError;
+
+
+/***/ }),
+
+/***/ 6905:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./ref')} */
+module.exports = ReferenceError;
+
+
+/***/ }),
+
+/***/ 105:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./syntax')} */
+module.exports = SyntaxError;
+
+
+/***/ }),
+
+/***/ 3314:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./type')} */
+module.exports = TypeError;
+
+
+/***/ }),
+
+/***/ 2578:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./uri')} */
+module.exports = URIError;
+
+
+/***/ }),
+
+/***/ 5399:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+module.exports = Object;
+
+
+/***/ }),
+
+/***/ 8700:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var GetIntrinsic = __nccwpck_require__(470);
+
+var $defineProperty = GetIntrinsic('%Object.defineProperty%', true);
+
+var hasToStringTag = __nccwpck_require__(5479)();
+var hasOwn = __nccwpck_require__(4076);
+var $TypeError = __nccwpck_require__(3314);
+
+var toStringTag = hasToStringTag ? Symbol.toStringTag : null;
+
+/** @type {import('.')} */
+module.exports = function setToStringTag(object, value) {
+	var overrideIfSet = arguments.length > 2 && !!arguments[2] && arguments[2].force;
+	var nonConfigurable = arguments.length > 2 && !!arguments[2] && arguments[2].nonConfigurable;
+	if (
+		(typeof overrideIfSet !== 'undefined' && typeof overrideIfSet !== 'boolean')
+		|| (typeof nonConfigurable !== 'undefined' && typeof nonConfigurable !== 'boolean')
+	) {
+		throw new $TypeError('if provided, the `overrideIfSet` and `nonConfigurable` options must be booleans');
+	}
+	if (toStringTag && (overrideIfSet || !hasOwn(object, toStringTag))) {
+		if ($defineProperty) {
+			$defineProperty(object, toStringTag, {
+				configurable: !nonConfigurable,
+				enumerable: false,
+				value: value,
+				writable: false
+			});
+		} else {
+			object[toStringTag] = value; // eslint-disable-line no-param-reassign
+		}
+	}
 };
 
 
@@ -4683,6 +4959,9 @@ module.exports.wrap = wrap;
 /***/ 6454:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 var CombinedStream = __nccwpck_require__(5630);
 var util = __nccwpck_require__(9023);
 var path = __nccwpck_require__(6928);
@@ -4691,15 +4970,12 @@ var https = __nccwpck_require__(5692);
 var parseUrl = (__nccwpck_require__(7016).parse);
 var fs = __nccwpck_require__(9896);
 var Stream = (__nccwpck_require__(2203).Stream);
+var crypto = __nccwpck_require__(6982);
 var mime = __nccwpck_require__(4096);
 var asynckit = __nccwpck_require__(1324);
+var setToStringTag = __nccwpck_require__(8700);
+var hasOwn = __nccwpck_require__(4076);
 var populate = __nccwpck_require__(1835);
-
-// Public API
-module.exports = FormData;
-
-// make it a Stream
-util.inherits(FormData, CombinedStream);
 
 /**
  * Create readable "multipart/form-data" streams.
@@ -4707,7 +4983,7 @@ util.inherits(FormData, CombinedStream);
  * and file uploads to other web applications.
  *
  * @constructor
- * @param {Object} options - Properties to be added/overriden for FormData and CombinedStream
+ * @param {object} options - Properties to be added/overriden for FormData and CombinedStream
  */
 function FormData(options) {
   if (!(this instanceof FormData)) {
@@ -4720,35 +4996,39 @@ function FormData(options) {
 
   CombinedStream.call(this);
 
-  options = options || {};
-  for (var option in options) {
+  options = options || {}; // eslint-disable-line no-param-reassign
+  for (var option in options) { // eslint-disable-line no-restricted-syntax
     this[option] = options[option];
   }
 }
 
+// make it a Stream
+util.inherits(FormData, CombinedStream);
+
 FormData.LINE_BREAK = '\r\n';
 FormData.DEFAULT_CONTENT_TYPE = 'application/octet-stream';
 
-FormData.prototype.append = function(field, value, options) {
-
-  options = options || {};
+FormData.prototype.append = function (field, value, options) {
+  options = options || {}; // eslint-disable-line no-param-reassign
 
   // allow filename as single option
-  if (typeof options == 'string') {
-    options = {filename: options};
+  if (typeof options === 'string') {
+    options = { filename: options }; // eslint-disable-line no-param-reassign
   }
 
   var append = CombinedStream.prototype.append.bind(this);
 
   // all that streamy business can't handle numbers
-  if (typeof value == 'number') {
-    value = '' + value;
+  if (typeof value === 'number' || value == null) {
+    value = String(value); // eslint-disable-line no-param-reassign
   }
 
   // https://github.com/felixge/node-form-data/issues/38
   if (Array.isArray(value)) {
-    // Please convert your array into string
-    // the way web server expects it
+    /*
+     * Please convert your array into string
+     * the way web server expects it
+     */
     this._error(new Error('Arrays are not supported.'));
     return;
   }
@@ -4764,15 +5044,17 @@ FormData.prototype.append = function(field, value, options) {
   this._trackLength(header, value, options);
 };
 
-FormData.prototype._trackLength = function(header, value, options) {
+FormData.prototype._trackLength = function (header, value, options) {
   var valueLength = 0;
 
-  // used w/ getLengthSync(), when length is known.
-  // e.g. for streaming directly from a remote server,
-  // w/ a known file a size, and not wanting to wait for
-  // incoming file to finish to get its size.
+  /*
+   * used w/ getLengthSync(), when length is known.
+   * e.g. for streaming directly from a remote server,
+   * w/ a known file a size, and not wanting to wait for
+   * incoming file to finish to get its size.
+   */
   if (options.knownLength != null) {
-    valueLength += +options.knownLength;
+    valueLength += Number(options.knownLength);
   } else if (Buffer.isBuffer(value)) {
     valueLength = value.length;
   } else if (typeof value === 'string') {
@@ -4782,12 +5064,10 @@ FormData.prototype._trackLength = function(header, value, options) {
   this._valueLength += valueLength;
 
   // @check why add CRLF? does this account for custom/multiple CRLFs?
-  this._overheadLength +=
-    Buffer.byteLength(header) +
-    FormData.LINE_BREAK.length;
+  this._overheadLength += Buffer.byteLength(header) + FormData.LINE_BREAK.length;
 
   // empty or either doesn't have path or not an http response or not a stream
-  if (!value || ( !value.path && !(value.readable && value.hasOwnProperty('httpVersion')) && !(value instanceof Stream))) {
+  if (!value || (!value.path && !(value.readable && hasOwn(value, 'httpVersion')) && !(value instanceof Stream))) {
     return;
   }
 
@@ -4797,10 +5077,8 @@ FormData.prototype._trackLength = function(header, value, options) {
   }
 };
 
-FormData.prototype._lengthRetriever = function(value, callback) {
-
-  if (value.hasOwnProperty('fd')) {
-
+FormData.prototype._lengthRetriever = function (value, callback) {
+  if (hasOwn(value, 'fd')) {
     // take read range into a account
     // `end` = Infinity –> read file till the end
     //
@@ -4809,54 +5087,52 @@ FormData.prototype._lengthRetriever = function(value, callback) {
     // Fix it when node fixes it.
     // https://github.com/joyent/node/issues/7819
     if (value.end != undefined && value.end != Infinity && value.start != undefined) {
-
       // when end specified
       // no need to calculate range
       // inclusive, starts with 0
-      callback(null, value.end + 1 - (value.start ? value.start : 0));
+      callback(null, value.end + 1 - (value.start ? value.start : 0)); // eslint-disable-line callback-return
 
-    // not that fast snoopy
+      // not that fast snoopy
     } else {
       // still need to fetch file size from fs
-      fs.stat(value.path, function(err, stat) {
-
-        var fileSize;
-
+      fs.stat(value.path, function (err, stat) {
         if (err) {
           callback(err);
           return;
         }
 
         // update final size based on the range options
-        fileSize = stat.size - (value.start ? value.start : 0);
+        var fileSize = stat.size - (value.start ? value.start : 0);
         callback(null, fileSize);
       });
     }
 
-  // or http response
-  } else if (value.hasOwnProperty('httpVersion')) {
-    callback(null, +value.headers['content-length']);
+    // or http response
+  } else if (hasOwn(value, 'httpVersion')) {
+    callback(null, Number(value.headers['content-length'])); // eslint-disable-line callback-return
 
-  // or request stream http://github.com/mikeal/request
-  } else if (value.hasOwnProperty('httpModule')) {
+    // or request stream http://github.com/mikeal/request
+  } else if (hasOwn(value, 'httpModule')) {
     // wait till response come back
-    value.on('response', function(response) {
+    value.on('response', function (response) {
       value.pause();
-      callback(null, +response.headers['content-length']);
+      callback(null, Number(response.headers['content-length']));
     });
     value.resume();
 
-  // something else
+    // something else
   } else {
-    callback('Unknown stream');
+    callback('Unknown stream'); // eslint-disable-line callback-return
   }
 };
 
-FormData.prototype._multiPartHeader = function(field, value, options) {
-  // custom header specified (as string)?
-  // it becomes responsible for boundary
-  // (e.g. to handle extra CRLFs on .NET servers)
-  if (typeof options.header == 'string') {
+FormData.prototype._multiPartHeader = function (field, value, options) {
+  /*
+   * custom header specified (as string)?
+   * it becomes responsible for boundary
+   * (e.g. to handle extra CRLFs on .NET servers)
+   */
+  if (typeof options.header === 'string') {
     return options.header;
   }
 
@@ -4864,7 +5140,7 @@ FormData.prototype._multiPartHeader = function(field, value, options) {
   var contentType = this._getContentType(value, options);
 
   var contents = '';
-  var headers  = {
+  var headers = {
     // add custom disposition as third element or keep it two elements if not
     'Content-Disposition': ['form-data', 'name="' + field + '"'].concat(contentDisposition || []),
     // if no content type. allow it to be empty array
@@ -4872,77 +5148,74 @@ FormData.prototype._multiPartHeader = function(field, value, options) {
   };
 
   // allow custom headers.
-  if (typeof options.header == 'object') {
+  if (typeof options.header === 'object') {
     populate(headers, options.header);
   }
 
   var header;
-  for (var prop in headers) {
-    if (!headers.hasOwnProperty(prop)) continue;
-    header = headers[prop];
+  for (var prop in headers) { // eslint-disable-line no-restricted-syntax
+    if (hasOwn(headers, prop)) {
+      header = headers[prop];
 
-    // skip nullish headers.
-    if (header == null) {
-      continue;
-    }
+      // skip nullish headers.
+      if (header == null) {
+        continue; // eslint-disable-line no-restricted-syntax, no-continue
+      }
 
-    // convert all headers to arrays.
-    if (!Array.isArray(header)) {
-      header = [header];
-    }
+      // convert all headers to arrays.
+      if (!Array.isArray(header)) {
+        header = [header];
+      }
 
-    // add non-empty headers.
-    if (header.length) {
-      contents += prop + ': ' + header.join('; ') + FormData.LINE_BREAK;
+      // add non-empty headers.
+      if (header.length) {
+        contents += prop + ': ' + header.join('; ') + FormData.LINE_BREAK;
+      }
     }
   }
 
   return '--' + this.getBoundary() + FormData.LINE_BREAK + contents + FormData.LINE_BREAK;
 };
 
-FormData.prototype._getContentDisposition = function(value, options) {
-
-  var filename
-    , contentDisposition
-    ;
+FormData.prototype._getContentDisposition = function (value, options) { // eslint-disable-line consistent-return
+  var filename;
 
   if (typeof options.filepath === 'string') {
     // custom filepath for relative paths
     filename = path.normalize(options.filepath).replace(/\\/g, '/');
-  } else if (options.filename || value.name || value.path) {
-    // custom filename take precedence
-    // formidable and the browser add a name property
-    // fs- and request- streams have path property
-    filename = path.basename(options.filename || value.name || value.path);
-  } else if (value.readable && value.hasOwnProperty('httpVersion')) {
+  } else if (options.filename || (value && (value.name || value.path))) {
+    /*
+     * custom filename take precedence
+     * formidable and the browser add a name property
+     * fs- and request- streams have path property
+     */
+    filename = path.basename(options.filename || (value && (value.name || value.path)));
+  } else if (value && value.readable && hasOwn(value, 'httpVersion')) {
     // or try http response
     filename = path.basename(value.client._httpMessage.path || '');
   }
 
   if (filename) {
-    contentDisposition = 'filename="' + filename + '"';
+    return 'filename="' + filename + '"';
   }
-
-  return contentDisposition;
 };
 
-FormData.prototype._getContentType = function(value, options) {
-
+FormData.prototype._getContentType = function (value, options) {
   // use custom content-type above all
   var contentType = options.contentType;
 
   // or try `name` from formidable, browser
-  if (!contentType && value.name) {
+  if (!contentType && value && value.name) {
     contentType = mime.lookup(value.name);
   }
 
   // or try `path` from fs-, request- streams
-  if (!contentType && value.path) {
+  if (!contentType && value && value.path) {
     contentType = mime.lookup(value.path);
   }
 
   // or if it's http-reponse
-  if (!contentType && value.readable && value.hasOwnProperty('httpVersion')) {
+  if (!contentType && value && value.readable && hasOwn(value, 'httpVersion')) {
     contentType = value.headers['content-type'];
   }
 
@@ -4952,18 +5225,18 @@ FormData.prototype._getContentType = function(value, options) {
   }
 
   // fallback to the default content type if `value` is not simple value
-  if (!contentType && typeof value == 'object') {
+  if (!contentType && value && typeof value === 'object') {
     contentType = FormData.DEFAULT_CONTENT_TYPE;
   }
 
   return contentType;
 };
 
-FormData.prototype._multiPartFooter = function() {
-  return function(next) {
+FormData.prototype._multiPartFooter = function () {
+  return function (next) {
     var footer = FormData.LINE_BREAK;
 
-    var lastPart = (this._streams.length === 0);
+    var lastPart = this._streams.length === 0;
     if (lastPart) {
       footer += this._lastBoundary();
     }
@@ -4972,18 +5245,18 @@ FormData.prototype._multiPartFooter = function() {
   }.bind(this);
 };
 
-FormData.prototype._lastBoundary = function() {
+FormData.prototype._lastBoundary = function () {
   return '--' + this.getBoundary() + '--' + FormData.LINE_BREAK;
 };
 
-FormData.prototype.getHeaders = function(userHeaders) {
+FormData.prototype.getHeaders = function (userHeaders) {
   var header;
   var formHeaders = {
     'content-type': 'multipart/form-data; boundary=' + this.getBoundary()
   };
 
-  for (header in userHeaders) {
-    if (userHeaders.hasOwnProperty(header)) {
+  for (header in userHeaders) { // eslint-disable-line no-restricted-syntax
+    if (hasOwn(userHeaders, header)) {
       formHeaders[header.toLowerCase()] = userHeaders[header];
     }
   }
@@ -4991,11 +5264,14 @@ FormData.prototype.getHeaders = function(userHeaders) {
   return formHeaders;
 };
 
-FormData.prototype.setBoundary = function(boundary) {
+FormData.prototype.setBoundary = function (boundary) {
+  if (typeof boundary !== 'string') {
+    throw new TypeError('FormData boundary must be a string');
+  }
   this._boundary = boundary;
 };
 
-FormData.prototype.getBoundary = function() {
+FormData.prototype.getBoundary = function () {
   if (!this._boundary) {
     this._generateBoundary();
   }
@@ -5003,60 +5279,55 @@ FormData.prototype.getBoundary = function() {
   return this._boundary;
 };
 
-FormData.prototype.getBuffer = function() {
-  var dataBuffer = new Buffer.alloc( 0 );
+FormData.prototype.getBuffer = function () {
+  var dataBuffer = new Buffer.alloc(0); // eslint-disable-line new-cap
   var boundary = this.getBoundary();
 
   // Create the form content. Add Line breaks to the end of data.
   for (var i = 0, len = this._streams.length; i < len; i++) {
     if (typeof this._streams[i] !== 'function') {
-
       // Add content to the buffer.
-      if(Buffer.isBuffer(this._streams[i])) {
-        dataBuffer = Buffer.concat( [dataBuffer, this._streams[i]]);
-      }else {
-        dataBuffer = Buffer.concat( [dataBuffer, Buffer.from(this._streams[i])]);
+      if (Buffer.isBuffer(this._streams[i])) {
+        dataBuffer = Buffer.concat([dataBuffer, this._streams[i]]);
+      } else {
+        dataBuffer = Buffer.concat([dataBuffer, Buffer.from(this._streams[i])]);
       }
 
       // Add break after content.
-      if (typeof this._streams[i] !== 'string' || this._streams[i].substring( 2, boundary.length + 2 ) !== boundary) {
-        dataBuffer = Buffer.concat( [dataBuffer, Buffer.from(FormData.LINE_BREAK)] );
+      if (typeof this._streams[i] !== 'string' || this._streams[i].substring(2, boundary.length + 2) !== boundary) {
+        dataBuffer = Buffer.concat([dataBuffer, Buffer.from(FormData.LINE_BREAK)]);
       }
     }
   }
 
   // Add the footer and return the Buffer object.
-  return Buffer.concat( [dataBuffer, Buffer.from(this._lastBoundary())] );
+  return Buffer.concat([dataBuffer, Buffer.from(this._lastBoundary())]);
 };
 
-FormData.prototype._generateBoundary = function() {
+FormData.prototype._generateBoundary = function () {
   // This generates a 50 character boundary similar to those used by Firefox.
-  // They are optimized for boyer-moore parsing.
-  var boundary = '--------------------------';
-  for (var i = 0; i < 24; i++) {
-    boundary += Math.floor(Math.random() * 10).toString(16);
-  }
 
-  this._boundary = boundary;
+  // They are optimized for boyer-moore parsing.
+  this._boundary = '--------------------------' + crypto.randomBytes(12).toString('hex');
 };
 
 // Note: getLengthSync DOESN'T calculate streams length
-// As workaround one can calculate file size manually
-// and add it as knownLength option
-FormData.prototype.getLengthSync = function() {
+// As workaround one can calculate file size manually and add it as knownLength option
+FormData.prototype.getLengthSync = function () {
   var knownLength = this._overheadLength + this._valueLength;
 
-  // Don't get confused, there are 3 "internal" streams for each keyval pair
-  // so it basically checks if there is any value added to the form
+  // Don't get confused, there are 3 "internal" streams for each keyval pair so it basically checks if there is any value added to the form
   if (this._streams.length) {
     knownLength += this._lastBoundary().length;
   }
 
   // https://github.com/form-data/form-data/issues/40
   if (!this.hasKnownLength()) {
-    // Some async length retrievers are present
-    // therefore synchronous length calculation is false.
-    // Please use getLength(callback) to get proper length
+    /*
+     * Some async length retrievers are present
+     * therefore synchronous length calculation is false.
+     * Please use getLength(callback) to get proper length
+     */
     this._error(new Error('Cannot calculate proper length in synchronous way.'));
   }
 
@@ -5066,7 +5337,7 @@ FormData.prototype.getLengthSync = function() {
 // Public API to check if length of added values is known
 // https://github.com/form-data/form-data/issues/196
 // https://github.com/form-data/form-data/issues/262
-FormData.prototype.hasKnownLength = function() {
+FormData.prototype.hasKnownLength = function () {
   var hasKnownLength = true;
 
   if (this._valuesToMeasure.length) {
@@ -5076,7 +5347,7 @@ FormData.prototype.hasKnownLength = function() {
   return hasKnownLength;
 };
 
-FormData.prototype.getLength = function(cb) {
+FormData.prototype.getLength = function (cb) {
   var knownLength = this._overheadLength + this._valueLength;
 
   if (this._streams.length) {
@@ -5088,13 +5359,13 @@ FormData.prototype.getLength = function(cb) {
     return;
   }
 
-  asynckit.parallel(this._valuesToMeasure, this._lengthRetriever, function(err, values) {
+  asynckit.parallel(this._valuesToMeasure, this._lengthRetriever, function (err, values) {
     if (err) {
       cb(err);
       return;
     }
 
-    values.forEach(function(length) {
+    values.forEach(function (length) {
       knownLength += length;
     });
 
@@ -5102,31 +5373,26 @@ FormData.prototype.getLength = function(cb) {
   });
 };
 
-FormData.prototype.submit = function(params, cb) {
-  var request
-    , options
-    , defaults = {method: 'post'}
-    ;
+FormData.prototype.submit = function (params, cb) {
+  var request;
+  var options;
+  var defaults = { method: 'post' };
 
-  // parse provided url if it's string
-  // or treat it as options object
-  if (typeof params == 'string') {
-
-    params = parseUrl(params);
+  // parse provided url if it's string or treat it as options object
+  if (typeof params === 'string') {
+    params = parseUrl(params); // eslint-disable-line no-param-reassign
+    /* eslint sort-keys: 0 */
     options = populate({
       port: params.port,
       path: params.pathname,
       host: params.hostname,
       protocol: params.protocol
     }, defaults);
-
-  // use custom params
-  } else {
-
+  } else { // use custom params
     options = populate(params, defaults);
     // if no port provided use default one
     if (!options.port) {
-      options.port = options.protocol == 'https:' ? 443 : 80;
+      options.port = options.protocol === 'https:' ? 443 : 80;
     }
   }
 
@@ -5134,14 +5400,14 @@ FormData.prototype.submit = function(params, cb) {
   options.headers = this.getHeaders(params.headers);
 
   // https if specified, fallback to http in any other case
-  if (options.protocol == 'https:') {
+  if (options.protocol === 'https:') {
     request = https.request(options);
   } else {
     request = http.request(options);
   }
 
   // get content length and fire away
-  this.getLength(function(err, length) {
+  this.getLength(function (err, length) {
     if (err && err !== 'Unknown stream') {
       this._error(err);
       return;
@@ -5173,7 +5439,7 @@ FormData.prototype.submit = function(params, cb) {
   return request;
 };
 
-FormData.prototype._error = function(err) {
+FormData.prototype._error = function (err) {
   if (!this.error) {
     this.error = err;
     this.pause();
@@ -5184,6 +5450,10 @@ FormData.prototype._error = function(err) {
 FormData.prototype.toString = function () {
   return '[object FormData]';
 };
+setToStringTag(FormData.prototype, 'FormData');
+
+// Public API
+module.exports = FormData;
 
 
 /***/ }),
@@ -5191,15 +5461,815 @@ FormData.prototype.toString = function () {
 /***/ 1835:
 /***/ ((module) => {
 
-// populates missing values
-module.exports = function(dst, src) {
+"use strict";
 
-  Object.keys(src).forEach(function(prop)
-  {
-    dst[prop] = dst[prop] || src[prop];
+
+// populates missing values
+module.exports = function (dst, src) {
+  Object.keys(src).forEach(function (prop) {
+    dst[prop] = dst[prop] || src[prop]; // eslint-disable-line no-param-reassign
   });
 
   return dst;
+};
+
+
+/***/ }),
+
+/***/ 9808:
+/***/ ((module) => {
+
+"use strict";
+
+
+/* eslint no-invalid-this: 1 */
+
+var ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
+var toStr = Object.prototype.toString;
+var max = Math.max;
+var funcType = '[object Function]';
+
+var concatty = function concatty(a, b) {
+    var arr = [];
+
+    for (var i = 0; i < a.length; i += 1) {
+        arr[i] = a[i];
+    }
+    for (var j = 0; j < b.length; j += 1) {
+        arr[j + a.length] = b[j];
+    }
+
+    return arr;
+};
+
+var slicy = function slicy(arrLike, offset) {
+    var arr = [];
+    for (var i = offset || 0, j = 0; i < arrLike.length; i += 1, j += 1) {
+        arr[j] = arrLike[i];
+    }
+    return arr;
+};
+
+var joiny = function (arr, joiner) {
+    var str = '';
+    for (var i = 0; i < arr.length; i += 1) {
+        str += arr[i];
+        if (i + 1 < arr.length) {
+            str += joiner;
+        }
+    }
+    return str;
+};
+
+module.exports = function bind(that) {
+    var target = this;
+    if (typeof target !== 'function' || toStr.apply(target) !== funcType) {
+        throw new TypeError(ERROR_MESSAGE + target);
+    }
+    var args = slicy(arguments, 1);
+
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                concatty(args, arguments)
+            );
+            if (Object(result) === result) {
+                return result;
+            }
+            return this;
+        }
+        return target.apply(
+            that,
+            concatty(args, arguments)
+        );
+
+    };
+
+    var boundLength = max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i < boundLength; i++) {
+        boundArgs[i] = '$' + i;
+    }
+
+    bound = Function('binder', 'return function (' + joiny(boundArgs, ',') + '){ return binder.apply(this,arguments); }')(binder);
+
+    if (target.prototype) {
+        var Empty = function Empty() {};
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+
+    return bound;
+};
+
+
+/***/ }),
+
+/***/ 7564:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var implementation = __nccwpck_require__(9808);
+
+module.exports = Function.prototype.bind || implementation;
+
+
+/***/ }),
+
+/***/ 470:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var undefined;
+
+var $Object = __nccwpck_require__(5399);
+
+var $Error = __nccwpck_require__(1620);
+var $EvalError = __nccwpck_require__(3056);
+var $RangeError = __nccwpck_require__(4585);
+var $ReferenceError = __nccwpck_require__(6905);
+var $SyntaxError = __nccwpck_require__(105);
+var $TypeError = __nccwpck_require__(3314);
+var $URIError = __nccwpck_require__(2578);
+
+var abs = __nccwpck_require__(5641);
+var floor = __nccwpck_require__(6171);
+var max = __nccwpck_require__(7147);
+var min = __nccwpck_require__(1017);
+var pow = __nccwpck_require__(6947);
+var round = __nccwpck_require__(2621);
+var sign = __nccwpck_require__(156);
+
+var $Function = Function;
+
+// eslint-disable-next-line consistent-return
+var getEvalledConstructor = function (expressionSyntax) {
+	try {
+		return $Function('"use strict"; return (' + expressionSyntax + ').constructor;')();
+	} catch (e) {}
+};
+
+var $gOPD = __nccwpck_require__(3170);
+var $defineProperty = __nccwpck_require__(9094);
+
+var throwTypeError = function () {
+	throw new $TypeError();
+};
+var ThrowTypeError = $gOPD
+	? (function () {
+		try {
+			// eslint-disable-next-line no-unused-expressions, no-caller, no-restricted-properties
+			arguments.callee; // IE 8 does not throw here
+			return throwTypeError;
+		} catch (calleeThrows) {
+			try {
+				// IE 8 throws on Object.getOwnPropertyDescriptor(arguments, '')
+				return $gOPD(arguments, 'callee').get;
+			} catch (gOPDthrows) {
+				return throwTypeError;
+			}
+		}
+	}())
+	: throwTypeError;
+
+var hasSymbols = __nccwpck_require__(3336)();
+
+var getProto = __nccwpck_require__(1967);
+var $ObjectGPO = __nccwpck_require__(1311);
+var $ReflectGPO = __nccwpck_require__(8681);
+
+var $apply = __nccwpck_require__(3945);
+var $call = __nccwpck_require__(8093);
+
+var needsEval = {};
+
+var TypedArray = typeof Uint8Array === 'undefined' || !getProto ? undefined : getProto(Uint8Array);
+
+var INTRINSICS = {
+	__proto__: null,
+	'%AggregateError%': typeof AggregateError === 'undefined' ? undefined : AggregateError,
+	'%Array%': Array,
+	'%ArrayBuffer%': typeof ArrayBuffer === 'undefined' ? undefined : ArrayBuffer,
+	'%ArrayIteratorPrototype%': hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined,
+	'%AsyncFromSyncIteratorPrototype%': undefined,
+	'%AsyncFunction%': needsEval,
+	'%AsyncGenerator%': needsEval,
+	'%AsyncGeneratorFunction%': needsEval,
+	'%AsyncIteratorPrototype%': needsEval,
+	'%Atomics%': typeof Atomics === 'undefined' ? undefined : Atomics,
+	'%BigInt%': typeof BigInt === 'undefined' ? undefined : BigInt,
+	'%BigInt64Array%': typeof BigInt64Array === 'undefined' ? undefined : BigInt64Array,
+	'%BigUint64Array%': typeof BigUint64Array === 'undefined' ? undefined : BigUint64Array,
+	'%Boolean%': Boolean,
+	'%DataView%': typeof DataView === 'undefined' ? undefined : DataView,
+	'%Date%': Date,
+	'%decodeURI%': decodeURI,
+	'%decodeURIComponent%': decodeURIComponent,
+	'%encodeURI%': encodeURI,
+	'%encodeURIComponent%': encodeURIComponent,
+	'%Error%': $Error,
+	'%eval%': eval, // eslint-disable-line no-eval
+	'%EvalError%': $EvalError,
+	'%Float16Array%': typeof Float16Array === 'undefined' ? undefined : Float16Array,
+	'%Float32Array%': typeof Float32Array === 'undefined' ? undefined : Float32Array,
+	'%Float64Array%': typeof Float64Array === 'undefined' ? undefined : Float64Array,
+	'%FinalizationRegistry%': typeof FinalizationRegistry === 'undefined' ? undefined : FinalizationRegistry,
+	'%Function%': $Function,
+	'%GeneratorFunction%': needsEval,
+	'%Int8Array%': typeof Int8Array === 'undefined' ? undefined : Int8Array,
+	'%Int16Array%': typeof Int16Array === 'undefined' ? undefined : Int16Array,
+	'%Int32Array%': typeof Int32Array === 'undefined' ? undefined : Int32Array,
+	'%isFinite%': isFinite,
+	'%isNaN%': isNaN,
+	'%IteratorPrototype%': hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined,
+	'%JSON%': typeof JSON === 'object' ? JSON : undefined,
+	'%Map%': typeof Map === 'undefined' ? undefined : Map,
+	'%MapIteratorPrototype%': typeof Map === 'undefined' || !hasSymbols || !getProto ? undefined : getProto(new Map()[Symbol.iterator]()),
+	'%Math%': Math,
+	'%Number%': Number,
+	'%Object%': $Object,
+	'%Object.getOwnPropertyDescriptor%': $gOPD,
+	'%parseFloat%': parseFloat,
+	'%parseInt%': parseInt,
+	'%Promise%': typeof Promise === 'undefined' ? undefined : Promise,
+	'%Proxy%': typeof Proxy === 'undefined' ? undefined : Proxy,
+	'%RangeError%': $RangeError,
+	'%ReferenceError%': $ReferenceError,
+	'%Reflect%': typeof Reflect === 'undefined' ? undefined : Reflect,
+	'%RegExp%': RegExp,
+	'%Set%': typeof Set === 'undefined' ? undefined : Set,
+	'%SetIteratorPrototype%': typeof Set === 'undefined' || !hasSymbols || !getProto ? undefined : getProto(new Set()[Symbol.iterator]()),
+	'%SharedArrayBuffer%': typeof SharedArrayBuffer === 'undefined' ? undefined : SharedArrayBuffer,
+	'%String%': String,
+	'%StringIteratorPrototype%': hasSymbols && getProto ? getProto(''[Symbol.iterator]()) : undefined,
+	'%Symbol%': hasSymbols ? Symbol : undefined,
+	'%SyntaxError%': $SyntaxError,
+	'%ThrowTypeError%': ThrowTypeError,
+	'%TypedArray%': TypedArray,
+	'%TypeError%': $TypeError,
+	'%Uint8Array%': typeof Uint8Array === 'undefined' ? undefined : Uint8Array,
+	'%Uint8ClampedArray%': typeof Uint8ClampedArray === 'undefined' ? undefined : Uint8ClampedArray,
+	'%Uint16Array%': typeof Uint16Array === 'undefined' ? undefined : Uint16Array,
+	'%Uint32Array%': typeof Uint32Array === 'undefined' ? undefined : Uint32Array,
+	'%URIError%': $URIError,
+	'%WeakMap%': typeof WeakMap === 'undefined' ? undefined : WeakMap,
+	'%WeakRef%': typeof WeakRef === 'undefined' ? undefined : WeakRef,
+	'%WeakSet%': typeof WeakSet === 'undefined' ? undefined : WeakSet,
+
+	'%Function.prototype.call%': $call,
+	'%Function.prototype.apply%': $apply,
+	'%Object.defineProperty%': $defineProperty,
+	'%Object.getPrototypeOf%': $ObjectGPO,
+	'%Math.abs%': abs,
+	'%Math.floor%': floor,
+	'%Math.max%': max,
+	'%Math.min%': min,
+	'%Math.pow%': pow,
+	'%Math.round%': round,
+	'%Math.sign%': sign,
+	'%Reflect.getPrototypeOf%': $ReflectGPO
+};
+
+if (getProto) {
+	try {
+		null.error; // eslint-disable-line no-unused-expressions
+	} catch (e) {
+		// https://github.com/tc39/proposal-shadowrealm/pull/384#issuecomment-1364264229
+		var errorProto = getProto(getProto(e));
+		INTRINSICS['%Error.prototype%'] = errorProto;
+	}
+}
+
+var doEval = function doEval(name) {
+	var value;
+	if (name === '%AsyncFunction%') {
+		value = getEvalledConstructor('async function () {}');
+	} else if (name === '%GeneratorFunction%') {
+		value = getEvalledConstructor('function* () {}');
+	} else if (name === '%AsyncGeneratorFunction%') {
+		value = getEvalledConstructor('async function* () {}');
+	} else if (name === '%AsyncGenerator%') {
+		var fn = doEval('%AsyncGeneratorFunction%');
+		if (fn) {
+			value = fn.prototype;
+		}
+	} else if (name === '%AsyncIteratorPrototype%') {
+		var gen = doEval('%AsyncGenerator%');
+		if (gen && getProto) {
+			value = getProto(gen.prototype);
+		}
+	}
+
+	INTRINSICS[name] = value;
+
+	return value;
+};
+
+var LEGACY_ALIASES = {
+	__proto__: null,
+	'%ArrayBufferPrototype%': ['ArrayBuffer', 'prototype'],
+	'%ArrayPrototype%': ['Array', 'prototype'],
+	'%ArrayProto_entries%': ['Array', 'prototype', 'entries'],
+	'%ArrayProto_forEach%': ['Array', 'prototype', 'forEach'],
+	'%ArrayProto_keys%': ['Array', 'prototype', 'keys'],
+	'%ArrayProto_values%': ['Array', 'prototype', 'values'],
+	'%AsyncFunctionPrototype%': ['AsyncFunction', 'prototype'],
+	'%AsyncGenerator%': ['AsyncGeneratorFunction', 'prototype'],
+	'%AsyncGeneratorPrototype%': ['AsyncGeneratorFunction', 'prototype', 'prototype'],
+	'%BooleanPrototype%': ['Boolean', 'prototype'],
+	'%DataViewPrototype%': ['DataView', 'prototype'],
+	'%DatePrototype%': ['Date', 'prototype'],
+	'%ErrorPrototype%': ['Error', 'prototype'],
+	'%EvalErrorPrototype%': ['EvalError', 'prototype'],
+	'%Float32ArrayPrototype%': ['Float32Array', 'prototype'],
+	'%Float64ArrayPrototype%': ['Float64Array', 'prototype'],
+	'%FunctionPrototype%': ['Function', 'prototype'],
+	'%Generator%': ['GeneratorFunction', 'prototype'],
+	'%GeneratorPrototype%': ['GeneratorFunction', 'prototype', 'prototype'],
+	'%Int8ArrayPrototype%': ['Int8Array', 'prototype'],
+	'%Int16ArrayPrototype%': ['Int16Array', 'prototype'],
+	'%Int32ArrayPrototype%': ['Int32Array', 'prototype'],
+	'%JSONParse%': ['JSON', 'parse'],
+	'%JSONStringify%': ['JSON', 'stringify'],
+	'%MapPrototype%': ['Map', 'prototype'],
+	'%NumberPrototype%': ['Number', 'prototype'],
+	'%ObjectPrototype%': ['Object', 'prototype'],
+	'%ObjProto_toString%': ['Object', 'prototype', 'toString'],
+	'%ObjProto_valueOf%': ['Object', 'prototype', 'valueOf'],
+	'%PromisePrototype%': ['Promise', 'prototype'],
+	'%PromiseProto_then%': ['Promise', 'prototype', 'then'],
+	'%Promise_all%': ['Promise', 'all'],
+	'%Promise_reject%': ['Promise', 'reject'],
+	'%Promise_resolve%': ['Promise', 'resolve'],
+	'%RangeErrorPrototype%': ['RangeError', 'prototype'],
+	'%ReferenceErrorPrototype%': ['ReferenceError', 'prototype'],
+	'%RegExpPrototype%': ['RegExp', 'prototype'],
+	'%SetPrototype%': ['Set', 'prototype'],
+	'%SharedArrayBufferPrototype%': ['SharedArrayBuffer', 'prototype'],
+	'%StringPrototype%': ['String', 'prototype'],
+	'%SymbolPrototype%': ['Symbol', 'prototype'],
+	'%SyntaxErrorPrototype%': ['SyntaxError', 'prototype'],
+	'%TypedArrayPrototype%': ['TypedArray', 'prototype'],
+	'%TypeErrorPrototype%': ['TypeError', 'prototype'],
+	'%Uint8ArrayPrototype%': ['Uint8Array', 'prototype'],
+	'%Uint8ClampedArrayPrototype%': ['Uint8ClampedArray', 'prototype'],
+	'%Uint16ArrayPrototype%': ['Uint16Array', 'prototype'],
+	'%Uint32ArrayPrototype%': ['Uint32Array', 'prototype'],
+	'%URIErrorPrototype%': ['URIError', 'prototype'],
+	'%WeakMapPrototype%': ['WeakMap', 'prototype'],
+	'%WeakSetPrototype%': ['WeakSet', 'prototype']
+};
+
+var bind = __nccwpck_require__(7564);
+var hasOwn = __nccwpck_require__(4076);
+var $concat = bind.call($call, Array.prototype.concat);
+var $spliceApply = bind.call($apply, Array.prototype.splice);
+var $replace = bind.call($call, String.prototype.replace);
+var $strSlice = bind.call($call, String.prototype.slice);
+var $exec = bind.call($call, RegExp.prototype.exec);
+
+/* adapted from https://github.com/lodash/lodash/blob/4.17.15/dist/lodash.js#L6735-L6744 */
+var rePropName = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g;
+var reEscapeChar = /\\(\\)?/g; /** Used to match backslashes in property paths. */
+var stringToPath = function stringToPath(string) {
+	var first = $strSlice(string, 0, 1);
+	var last = $strSlice(string, -1);
+	if (first === '%' && last !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected closing `%`');
+	} else if (last === '%' && first !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected opening `%`');
+	}
+	var result = [];
+	$replace(string, rePropName, function (match, number, quote, subString) {
+		result[result.length] = quote ? $replace(subString, reEscapeChar, '$1') : number || match;
+	});
+	return result;
+};
+/* end adaptation */
+
+var getBaseIntrinsic = function getBaseIntrinsic(name, allowMissing) {
+	var intrinsicName = name;
+	var alias;
+	if (hasOwn(LEGACY_ALIASES, intrinsicName)) {
+		alias = LEGACY_ALIASES[intrinsicName];
+		intrinsicName = '%' + alias[0] + '%';
+	}
+
+	if (hasOwn(INTRINSICS, intrinsicName)) {
+		var value = INTRINSICS[intrinsicName];
+		if (value === needsEval) {
+			value = doEval(intrinsicName);
+		}
+		if (typeof value === 'undefined' && !allowMissing) {
+			throw new $TypeError('intrinsic ' + name + ' exists, but is not available. Please file an issue!');
+		}
+
+		return {
+			alias: alias,
+			name: intrinsicName,
+			value: value
+		};
+	}
+
+	throw new $SyntaxError('intrinsic ' + name + ' does not exist!');
+};
+
+module.exports = function GetIntrinsic(name, allowMissing) {
+	if (typeof name !== 'string' || name.length === 0) {
+		throw new $TypeError('intrinsic name must be a non-empty string');
+	}
+	if (arguments.length > 1 && typeof allowMissing !== 'boolean') {
+		throw new $TypeError('"allowMissing" argument must be a boolean');
+	}
+
+	if ($exec(/^%?[^%]*%?$/, name) === null) {
+		throw new $SyntaxError('`%` may not be present anywhere but at the beginning and end of the intrinsic name');
+	}
+	var parts = stringToPath(name);
+	var intrinsicBaseName = parts.length > 0 ? parts[0] : '';
+
+	var intrinsic = getBaseIntrinsic('%' + intrinsicBaseName + '%', allowMissing);
+	var intrinsicRealName = intrinsic.name;
+	var value = intrinsic.value;
+	var skipFurtherCaching = false;
+
+	var alias = intrinsic.alias;
+	if (alias) {
+		intrinsicBaseName = alias[0];
+		$spliceApply(parts, $concat([0, 1], alias));
+	}
+
+	for (var i = 1, isOwn = true; i < parts.length; i += 1) {
+		var part = parts[i];
+		var first = $strSlice(part, 0, 1);
+		var last = $strSlice(part, -1);
+		if (
+			(
+				(first === '"' || first === "'" || first === '`')
+				|| (last === '"' || last === "'" || last === '`')
+			)
+			&& first !== last
+		) {
+			throw new $SyntaxError('property names with quotes must have matching quotes');
+		}
+		if (part === 'constructor' || !isOwn) {
+			skipFurtherCaching = true;
+		}
+
+		intrinsicBaseName += '.' + part;
+		intrinsicRealName = '%' + intrinsicBaseName + '%';
+
+		if (hasOwn(INTRINSICS, intrinsicRealName)) {
+			value = INTRINSICS[intrinsicRealName];
+		} else if (value != null) {
+			if (!(part in value)) {
+				if (!allowMissing) {
+					throw new $TypeError('base intrinsic for ' + name + ' exists, but the property is not available.');
+				}
+				return void undefined;
+			}
+			if ($gOPD && (i + 1) >= parts.length) {
+				var desc = $gOPD(value, part);
+				isOwn = !!desc;
+
+				// By convention, when a data property is converted to an accessor
+				// property to emulate a data property that does not suffer from
+				// the override mistake, that accessor's getter is marked with
+				// an `originalValue` property. Here, when we detect this, we
+				// uphold the illusion by pretending to see that original data
+				// property, i.e., returning the value rather than the getter
+				// itself.
+				if (isOwn && 'get' in desc && !('originalValue' in desc.get)) {
+					value = desc.get;
+				} else {
+					value = value[part];
+				}
+			} else {
+				isOwn = hasOwn(value, part);
+				value = value[part];
+			}
+
+			if (isOwn && !skipFurtherCaching) {
+				INTRINSICS[intrinsicRealName] = value;
+			}
+		}
+	}
+	return value;
+};
+
+
+/***/ }),
+
+/***/ 1311:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var $Object = __nccwpck_require__(5399);
+
+/** @type {import('./Object.getPrototypeOf')} */
+module.exports = $Object.getPrototypeOf || null;
+
+
+/***/ }),
+
+/***/ 8681:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./Reflect.getPrototypeOf')} */
+module.exports = (typeof Reflect !== 'undefined' && Reflect.getPrototypeOf) || null;
+
+
+/***/ }),
+
+/***/ 1967:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var reflectGetProto = __nccwpck_require__(8681);
+var originalGetProto = __nccwpck_require__(1311);
+
+var getDunderProto = __nccwpck_require__(6669);
+
+/** @type {import('.')} */
+module.exports = reflectGetProto
+	? function getProto(O) {
+		// @ts-expect-error TS can't narrow inside a closure, for some reason
+		return reflectGetProto(O);
+	}
+	: originalGetProto
+		? function getProto(O) {
+			if (!O || (typeof O !== 'object' && typeof O !== 'function')) {
+				throw new TypeError('getProto: not an object');
+			}
+			// @ts-expect-error TS can't narrow inside a closure, for some reason
+			return originalGetProto(O);
+		}
+		: getDunderProto
+			? function getProto(O) {
+				// @ts-expect-error TS can't narrow inside a closure, for some reason
+				return getDunderProto(O);
+			}
+			: null;
+
+
+/***/ }),
+
+/***/ 1174:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./gOPD')} */
+module.exports = Object.getOwnPropertyDescriptor;
+
+
+/***/ }),
+
+/***/ 3170:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+var $gOPD = __nccwpck_require__(1174);
+
+if ($gOPD) {
+	try {
+		$gOPD([], 'length');
+	} catch (e) {
+		// IE 8 has a broken gOPD
+		$gOPD = null;
+	}
+}
+
+module.exports = $gOPD;
+
+
+/***/ }),
+
+/***/ 3336:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var origSymbol = typeof Symbol !== 'undefined' && Symbol;
+var hasSymbolSham = __nccwpck_require__(1114);
+
+/** @type {import('.')} */
+module.exports = function hasNativeSymbols() {
+	if (typeof origSymbol !== 'function') { return false; }
+	if (typeof Symbol !== 'function') { return false; }
+	if (typeof origSymbol('foo') !== 'symbol') { return false; }
+	if (typeof Symbol('bar') !== 'symbol') { return false; }
+
+	return hasSymbolSham();
+};
+
+
+/***/ }),
+
+/***/ 1114:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./shams')} */
+/* eslint complexity: [2, 18], max-statements: [2, 33] */
+module.exports = function hasSymbols() {
+	if (typeof Symbol !== 'function' || typeof Object.getOwnPropertySymbols !== 'function') { return false; }
+	if (typeof Symbol.iterator === 'symbol') { return true; }
+
+	/** @type {{ [k in symbol]?: unknown }} */
+	var obj = {};
+	var sym = Symbol('test');
+	var symObj = Object(sym);
+	if (typeof sym === 'string') { return false; }
+
+	if (Object.prototype.toString.call(sym) !== '[object Symbol]') { return false; }
+	if (Object.prototype.toString.call(symObj) !== '[object Symbol]') { return false; }
+
+	// temp disabled per https://github.com/ljharb/object.assign/issues/17
+	// if (sym instanceof Symbol) { return false; }
+	// temp disabled per https://github.com/WebReflection/get-own-property-symbols/issues/4
+	// if (!(symObj instanceof Symbol)) { return false; }
+
+	// if (typeof Symbol.prototype.toString !== 'function') { return false; }
+	// if (String(sym) !== Symbol.prototype.toString.call(sym)) { return false; }
+
+	var symVal = 42;
+	obj[sym] = symVal;
+	for (var _ in obj) { return false; } // eslint-disable-line no-restricted-syntax, no-unreachable-loop
+	if (typeof Object.keys === 'function' && Object.keys(obj).length !== 0) { return false; }
+
+	if (typeof Object.getOwnPropertyNames === 'function' && Object.getOwnPropertyNames(obj).length !== 0) { return false; }
+
+	var syms = Object.getOwnPropertySymbols(obj);
+	if (syms.length !== 1 || syms[0] !== sym) { return false; }
+
+	if (!Object.prototype.propertyIsEnumerable.call(obj, sym)) { return false; }
+
+	if (typeof Object.getOwnPropertyDescriptor === 'function') {
+		// eslint-disable-next-line no-extra-parens
+		var descriptor = /** @type {PropertyDescriptor} */ (Object.getOwnPropertyDescriptor(obj, sym));
+		if (descriptor.value !== symVal || descriptor.enumerable !== true) { return false; }
+	}
+
+	return true;
+};
+
+
+/***/ }),
+
+/***/ 5479:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var hasSymbols = __nccwpck_require__(1114);
+
+/** @type {import('.')} */
+module.exports = function hasToStringTagShams() {
+	return hasSymbols() && !!Symbol.toStringTag;
+};
+
+
+/***/ }),
+
+/***/ 4076:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var call = Function.prototype.call;
+var $hasOwn = Object.prototype.hasOwnProperty;
+var bind = __nccwpck_require__(7564);
+
+/** @type {import('.')} */
+module.exports = bind.call(call, $hasOwn);
+
+
+/***/ }),
+
+/***/ 5641:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./abs')} */
+module.exports = Math.abs;
+
+
+/***/ }),
+
+/***/ 6171:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./floor')} */
+module.exports = Math.floor;
+
+
+/***/ }),
+
+/***/ 7044:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./isNaN')} */
+module.exports = Number.isNaN || function isNaN(a) {
+	return a !== a;
+};
+
+
+/***/ }),
+
+/***/ 7147:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./max')} */
+module.exports = Math.max;
+
+
+/***/ }),
+
+/***/ 1017:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./min')} */
+module.exports = Math.min;
+
+
+/***/ }),
+
+/***/ 6947:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./pow')} */
+module.exports = Math.pow;
+
+
+/***/ }),
+
+/***/ 2621:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./round')} */
+module.exports = Math.round;
+
+
+/***/ }),
+
+/***/ 156:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var $isNaN = __nccwpck_require__(7044);
+
+/** @type {import('./sign')} */
+module.exports = function sign(number) {
+	if ($isNaN(number) || number === 0) {
+		return number;
+	}
+	return number < 0 ? -1 : +1;
 };
 
 
@@ -5539,8 +6609,11 @@ exports.getProxyForUrl = getProxyForUrl;
 /***/ 2560:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-;(function (sax) { // wrapper for non-node envs
-  sax.parser = function (strict, opt) { return new SAXParser(strict, opt) }
+;(function (sax) {
+  // wrapper for non-node envs
+  sax.parser = function (strict, opt) {
+    return new SAXParser(strict, opt)
+  }
   sax.SAXParser = SAXParser
   sax.SAXStream = SAXStream
   sax.createStream = createStream
@@ -5557,9 +6630,18 @@ exports.getProxyForUrl = getProxyForUrl;
   sax.MAX_BUFFER_LENGTH = 64 * 1024
 
   var buffers = [
-    'comment', 'sgmlDecl', 'textNode', 'tagName', 'doctype',
-    'procInstName', 'procInstBody', 'entity', 'attribName',
-    'attribValue', 'cdata', 'script'
+    'comment',
+    'sgmlDecl',
+    'textNode',
+    'tagName',
+    'doctype',
+    'procInstName',
+    'procInstBody',
+    'entity',
+    'attribName',
+    'attribValue',
+    'cdata',
+    'script',
   ]
 
   sax.EVENTS = [
@@ -5580,10 +6662,10 @@ exports.getProxyForUrl = getProxyForUrl;
     'ready',
     'script',
     'opennamespace',
-    'closenamespace'
+    'closenamespace',
   ]
 
-  function SAXParser (strict, opt) {
+  function SAXParser(strict, opt) {
     if (!(this instanceof SAXParser)) {
       return new SAXParser(strict, opt)
     }
@@ -5592,9 +6674,13 @@ exports.getProxyForUrl = getProxyForUrl;
     clearBuffers(parser)
     parser.q = parser.c = ''
     parser.bufferCheckPosition = sax.MAX_BUFFER_LENGTH
+    parser.encoding = null;
     parser.opt = opt || {}
     parser.opt.lowercase = parser.opt.lowercase || parser.opt.lowercasetags
     parser.looseCase = parser.opt.lowercase ? 'toLowerCase' : 'toUpperCase'
+    parser.opt.maxEntityCount = parser.opt.maxEntityCount || 512
+    parser.opt.maxEntityDepth = parser.opt.maxEntityDepth || 4
+    parser.entityCount = parser.entityDepth = 0
     parser.tags = []
     parser.closed = parser.closedRoot = parser.sawRoot = false
     parser.tag = parser.error = null
@@ -5602,7 +6688,10 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.noscript = !!(strict || parser.opt.noscript)
     parser.state = S.BEGIN
     parser.strictEntities = parser.opt.strictEntities
-    parser.ENTITIES = parser.strictEntities ? Object.create(sax.XML_ENTITIES) : Object.create(sax.ENTITIES)
+    parser.ENTITIES =
+      parser.strictEntities ?
+        Object.create(sax.XML_ENTITIES)
+      : Object.create(sax.ENTITIES)
     parser.attribList = []
 
     // namespaces form a prototype chain.
@@ -5615,7 +6704,7 @@ exports.getProxyForUrl = getProxyForUrl;
     // disallow unquoted attribute values if not otherwise configured
     // and strict mode is true
     if (parser.opt.unquotedAttributeValues === undefined) {
-      parser.opt.unquotedAttributeValues = !strict;
+      parser.opt.unquotedAttributeValues = !strict
     }
 
     // mostly just for error reporting
@@ -5628,7 +6717,7 @@ exports.getProxyForUrl = getProxyForUrl;
 
   if (!Object.create) {
     Object.create = function (o) {
-      function F () {}
+      function F() {}
       F.prototype = o
       var newf = new F()
       return newf
@@ -5643,7 +6732,7 @@ exports.getProxyForUrl = getProxyForUrl;
     }
   }
 
-  function checkBufferLength (parser) {
+  function checkBufferLength(parser) {
     var maxAllowed = Math.max(sax.MAX_BUFFER_LENGTH, 10)
     var maxActual = 0
     for (var i = 0, l = buffers.length; i < l; i++) {
@@ -5679,13 +6768,13 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.bufferCheckPosition = m + parser.position
   }
 
-  function clearBuffers (parser) {
+  function clearBuffers(parser) {
     for (var i = 0, l = buffers.length; i < l; i++) {
       parser[buffers[i]] = ''
     }
   }
 
-  function flushBuffers (parser) {
+  function flushBuffers(parser) {
     closeText(parser)
     if (parser.cdata !== '') {
       emitNode(parser, 'oncdata', parser.cdata)
@@ -5698,11 +6787,20 @@ exports.getProxyForUrl = getProxyForUrl;
   }
 
   SAXParser.prototype = {
-    end: function () { end(this) },
+    end: function () {
+      end(this)
+    },
     write: write,
-    resume: function () { this.error = null; return this },
-    close: function () { return this.write(null) },
-    flush: function () { flushBuffers(this) }
+    resume: function () {
+      this.error = null
+      return this
+    },
+    close: function () {
+      return this.write(null)
+    },
+    flush: function () {
+      flushBuffers(this)
+    },
   }
 
   var Stream
@@ -5717,11 +6815,44 @@ exports.getProxyForUrl = getProxyForUrl;
     return ev !== 'error' && ev !== 'end'
   })
 
-  function createStream (strict, opt) {
+  function createStream(strict, opt) {
     return new SAXStream(strict, opt)
   }
 
-  function SAXStream (strict, opt) {
+  function determineBufferEncoding(data, isEnd) {
+    // BOM-based detection is the most reliable signal when present.
+    if (data.length >= 2) {
+      if (data[0] === 0xff && data[1] === 0xfe) {
+        return 'utf-16le'
+      }
+
+      if (data[0] === 0xfe && data[1] === 0xff) {
+        return 'utf-16be'
+      }
+    }
+
+    if (data.length >= 3 && data[0] === 0xef && data[1] === 0xbb && data[2] === 0xbf) {
+      return 'utf8'
+    }
+
+    if (data.length >= 4) {
+      // XML documents without a BOM still start with "<?xml", which is enough
+      // to distinguish UTF-16LE/BE from UTF-8 by looking at the zero bytes.
+      if (data[0] === 0x3c && data[1] === 0x00 && data[2] === 0x3f && data[3] === 0x00) {
+        return 'utf-16le'
+      }
+
+      if (data[0] === 0x00 && data[1] === 0x3c && data[2] === 0x00 && data[3] === 0x3f) {
+        return 'utf-16be'
+      }
+
+      return 'utf8'
+    }
+
+    return isEnd ? 'utf8' : null
+  }
+
+  function SAXStream(strict, opt) {
     if (!(this instanceof SAXStream)) {
       return new SAXStream(strict, opt)
     }
@@ -5747,7 +6878,7 @@ exports.getProxyForUrl = getProxyForUrl;
     }
 
     this._decoder = null
-
+    this._decoderBuffer = null
     streamWraps.forEach(function (ev) {
       Object.defineProperty(me, 'on' + ev, {
         get: function () {
@@ -5762,26 +6893,58 @@ exports.getProxyForUrl = getProxyForUrl;
           me.on(ev, h)
         },
         enumerable: true,
-        configurable: false
+        configurable: false,
       })
     })
   }
 
   SAXStream.prototype = Object.create(Stream.prototype, {
     constructor: {
-      value: SAXStream
-    }
+      value: SAXStream,
+    },
   })
 
-  SAXStream.prototype.write = function (data) {
-    if (typeof Buffer === 'function' &&
-      typeof Buffer.isBuffer === 'function' &&
-      Buffer.isBuffer(data)) {
-      if (!this._decoder) {
-        var SD = (__nccwpck_require__(3193).StringDecoder)
-        this._decoder = new SD('utf8')
+  SAXStream.prototype._decodeBuffer = function (data, isEnd) {
+    if (this._decoderBuffer) {
+      // Keep incomplete leading bytes until we have enough data to infer the
+      // stream encoding, then decode the buffered prefix together with the next chunk.
+      data = Buffer.concat([this._decoderBuffer, data])
+      this._decoderBuffer = null
+    }
+
+    if (!this._decoder) {
+      var encoding = determineBufferEncoding(data, isEnd)
+      if (!encoding) {
+        // A very short first chunk may not contain enough bytes to detect the
+        // encoding yet, so defer decoding until the next write/end call.
+        this._decoderBuffer = data
+        return ''
       }
-      data = this._decoder.write(data)
+
+      // Store the detected transport encoding so strict mode can compare it
+      // with the optional encoding declared in the XML prolog later on.
+      this._parser.encoding = encoding
+      this._decoder = new TextDecoder(encoding)
+    }
+
+    return this._decoder.decode(data, { stream: !isEnd })
+  }
+
+  SAXStream.prototype.write = function (data) {
+    if (
+      typeof Buffer === 'function' &&
+      typeof Buffer.isBuffer === 'function' &&
+      Buffer.isBuffer(data)
+    ) {
+      data = this._decodeBuffer(data, false)
+    } else if (this._decoderBuffer) {
+      // Flush any buffered binary prefix before handling a string chunk.
+      // This only matters if the caller mixes Buffer and string writes (used in test).
+      var remaining = this._decodeBuffer(Buffer.alloc(0), true)
+      if (remaining) {
+        this._parser.write(remaining)
+        this.emit('data', remaining)
+      }
     }
 
     this._parser.write(data.toString())
@@ -5793,6 +6956,20 @@ exports.getProxyForUrl = getProxyForUrl;
     if (chunk && chunk.length) {
       this.write(chunk)
     }
+    // Flush any remaining decoded data from the TextDecoder
+    if (this._decoderBuffer) {
+      var finalChunk = this._decodeBuffer(Buffer.alloc(0), true)
+      if (finalChunk) {
+        this._parser.write(finalChunk)
+        this.emit('data', finalChunk)
+      }
+    } else if (this._decoder) {
+      var remaining = this._decoder.decode()
+      if (remaining) {
+        this._parser.write(remaining)
+        this.emit('data', remaining)
+      }
+    }
     this._parser.end()
     return true
   }
@@ -5801,7 +6978,10 @@ exports.getProxyForUrl = getProxyForUrl;
     var me = this
     if (!me._parser['on' + ev] && streamWraps.indexOf(ev) !== -1) {
       me._parser['on' + ev] = function () {
-        var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+        var args =
+          arguments.length === 1 ?
+            [arguments[0]]
+          : Array.apply(null, arguments)
         args.splice(0, 0, ev)
         me.emit.apply(me, args)
       }
@@ -5824,30 +7004,34 @@ exports.getProxyForUrl = getProxyForUrl;
   // without a significant breaking change to either this  parser, or the
   // JavaScript language.  Implementation of an emoji-capable xml parser
   // is left as an exercise for the reader.
-  var nameStart = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+  var nameStart =
+    /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
 
-  var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
+  var nameBody =
+    /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
 
-  var entityStart = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
-  var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
+  var entityStart =
+    /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+  var entityBody =
+    /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
 
-  function isWhitespace (c) {
+  function isWhitespace(c) {
     return c === ' ' || c === '\n' || c === '\r' || c === '\t'
   }
 
-  function isQuote (c) {
-    return c === '"' || c === '\''
+  function isQuote(c) {
+    return c === '"' || c === "'"
   }
 
-  function isAttribEnd (c) {
+  function isAttribEnd(c) {
     return c === '>' || isWhitespace(c)
   }
 
-  function isMatch (regex, c) {
+  function isMatch(regex, c) {
     return regex.test(c)
   }
 
-  function notMatch (regex, c) {
+  function notMatch(regex, c) {
     return !isMatch(regex, c)
   }
 
@@ -5888,271 +7072,271 @@ exports.getProxyForUrl = getProxyForUrl;
     CLOSE_TAG: S++, // </a
     CLOSE_TAG_SAW_WHITE: S++, // </a   >
     SCRIPT: S++, // <script> ...
-    SCRIPT_ENDING: S++ // <script> ... <
+    SCRIPT_ENDING: S++, // <script> ... <
   }
 
   sax.XML_ENTITIES = {
-    'amp': '&',
-    'gt': '>',
-    'lt': '<',
-    'quot': '"',
-    'apos': "'"
+    amp: '&',
+    gt: '>',
+    lt: '<',
+    quot: '"',
+    apos: "'",
   }
 
   sax.ENTITIES = {
-    'amp': '&',
-    'gt': '>',
-    'lt': '<',
-    'quot': '"',
-    'apos': "'",
-    'AElig': 198,
-    'Aacute': 193,
-    'Acirc': 194,
-    'Agrave': 192,
-    'Aring': 197,
-    'Atilde': 195,
-    'Auml': 196,
-    'Ccedil': 199,
-    'ETH': 208,
-    'Eacute': 201,
-    'Ecirc': 202,
-    'Egrave': 200,
-    'Euml': 203,
-    'Iacute': 205,
-    'Icirc': 206,
-    'Igrave': 204,
-    'Iuml': 207,
-    'Ntilde': 209,
-    'Oacute': 211,
-    'Ocirc': 212,
-    'Ograve': 210,
-    'Oslash': 216,
-    'Otilde': 213,
-    'Ouml': 214,
-    'THORN': 222,
-    'Uacute': 218,
-    'Ucirc': 219,
-    'Ugrave': 217,
-    'Uuml': 220,
-    'Yacute': 221,
-    'aacute': 225,
-    'acirc': 226,
-    'aelig': 230,
-    'agrave': 224,
-    'aring': 229,
-    'atilde': 227,
-    'auml': 228,
-    'ccedil': 231,
-    'eacute': 233,
-    'ecirc': 234,
-    'egrave': 232,
-    'eth': 240,
-    'euml': 235,
-    'iacute': 237,
-    'icirc': 238,
-    'igrave': 236,
-    'iuml': 239,
-    'ntilde': 241,
-    'oacute': 243,
-    'ocirc': 244,
-    'ograve': 242,
-    'oslash': 248,
-    'otilde': 245,
-    'ouml': 246,
-    'szlig': 223,
-    'thorn': 254,
-    'uacute': 250,
-    'ucirc': 251,
-    'ugrave': 249,
-    'uuml': 252,
-    'yacute': 253,
-    'yuml': 255,
-    'copy': 169,
-    'reg': 174,
-    'nbsp': 160,
-    'iexcl': 161,
-    'cent': 162,
-    'pound': 163,
-    'curren': 164,
-    'yen': 165,
-    'brvbar': 166,
-    'sect': 167,
-    'uml': 168,
-    'ordf': 170,
-    'laquo': 171,
-    'not': 172,
-    'shy': 173,
-    'macr': 175,
-    'deg': 176,
-    'plusmn': 177,
-    'sup1': 185,
-    'sup2': 178,
-    'sup3': 179,
-    'acute': 180,
-    'micro': 181,
-    'para': 182,
-    'middot': 183,
-    'cedil': 184,
-    'ordm': 186,
-    'raquo': 187,
-    'frac14': 188,
-    'frac12': 189,
-    'frac34': 190,
-    'iquest': 191,
-    'times': 215,
-    'divide': 247,
-    'OElig': 338,
-    'oelig': 339,
-    'Scaron': 352,
-    'scaron': 353,
-    'Yuml': 376,
-    'fnof': 402,
-    'circ': 710,
-    'tilde': 732,
-    'Alpha': 913,
-    'Beta': 914,
-    'Gamma': 915,
-    'Delta': 916,
-    'Epsilon': 917,
-    'Zeta': 918,
-    'Eta': 919,
-    'Theta': 920,
-    'Iota': 921,
-    'Kappa': 922,
-    'Lambda': 923,
-    'Mu': 924,
-    'Nu': 925,
-    'Xi': 926,
-    'Omicron': 927,
-    'Pi': 928,
-    'Rho': 929,
-    'Sigma': 931,
-    'Tau': 932,
-    'Upsilon': 933,
-    'Phi': 934,
-    'Chi': 935,
-    'Psi': 936,
-    'Omega': 937,
-    'alpha': 945,
-    'beta': 946,
-    'gamma': 947,
-    'delta': 948,
-    'epsilon': 949,
-    'zeta': 950,
-    'eta': 951,
-    'theta': 952,
-    'iota': 953,
-    'kappa': 954,
-    'lambda': 955,
-    'mu': 956,
-    'nu': 957,
-    'xi': 958,
-    'omicron': 959,
-    'pi': 960,
-    'rho': 961,
-    'sigmaf': 962,
-    'sigma': 963,
-    'tau': 964,
-    'upsilon': 965,
-    'phi': 966,
-    'chi': 967,
-    'psi': 968,
-    'omega': 969,
-    'thetasym': 977,
-    'upsih': 978,
-    'piv': 982,
-    'ensp': 8194,
-    'emsp': 8195,
-    'thinsp': 8201,
-    'zwnj': 8204,
-    'zwj': 8205,
-    'lrm': 8206,
-    'rlm': 8207,
-    'ndash': 8211,
-    'mdash': 8212,
-    'lsquo': 8216,
-    'rsquo': 8217,
-    'sbquo': 8218,
-    'ldquo': 8220,
-    'rdquo': 8221,
-    'bdquo': 8222,
-    'dagger': 8224,
-    'Dagger': 8225,
-    'bull': 8226,
-    'hellip': 8230,
-    'permil': 8240,
-    'prime': 8242,
-    'Prime': 8243,
-    'lsaquo': 8249,
-    'rsaquo': 8250,
-    'oline': 8254,
-    'frasl': 8260,
-    'euro': 8364,
-    'image': 8465,
-    'weierp': 8472,
-    'real': 8476,
-    'trade': 8482,
-    'alefsym': 8501,
-    'larr': 8592,
-    'uarr': 8593,
-    'rarr': 8594,
-    'darr': 8595,
-    'harr': 8596,
-    'crarr': 8629,
-    'lArr': 8656,
-    'uArr': 8657,
-    'rArr': 8658,
-    'dArr': 8659,
-    'hArr': 8660,
-    'forall': 8704,
-    'part': 8706,
-    'exist': 8707,
-    'empty': 8709,
-    'nabla': 8711,
-    'isin': 8712,
-    'notin': 8713,
-    'ni': 8715,
-    'prod': 8719,
-    'sum': 8721,
-    'minus': 8722,
-    'lowast': 8727,
-    'radic': 8730,
-    'prop': 8733,
-    'infin': 8734,
-    'ang': 8736,
-    'and': 8743,
-    'or': 8744,
-    'cap': 8745,
-    'cup': 8746,
-    'int': 8747,
-    'there4': 8756,
-    'sim': 8764,
-    'cong': 8773,
-    'asymp': 8776,
-    'ne': 8800,
-    'equiv': 8801,
-    'le': 8804,
-    'ge': 8805,
-    'sub': 8834,
-    'sup': 8835,
-    'nsub': 8836,
-    'sube': 8838,
-    'supe': 8839,
-    'oplus': 8853,
-    'otimes': 8855,
-    'perp': 8869,
-    'sdot': 8901,
-    'lceil': 8968,
-    'rceil': 8969,
-    'lfloor': 8970,
-    'rfloor': 8971,
-    'lang': 9001,
-    'rang': 9002,
-    'loz': 9674,
-    'spades': 9824,
-    'clubs': 9827,
-    'hearts': 9829,
-    'diams': 9830
+    amp: '&',
+    gt: '>',
+    lt: '<',
+    quot: '"',
+    apos: "'",
+    AElig: 198,
+    Aacute: 193,
+    Acirc: 194,
+    Agrave: 192,
+    Aring: 197,
+    Atilde: 195,
+    Auml: 196,
+    Ccedil: 199,
+    ETH: 208,
+    Eacute: 201,
+    Ecirc: 202,
+    Egrave: 200,
+    Euml: 203,
+    Iacute: 205,
+    Icirc: 206,
+    Igrave: 204,
+    Iuml: 207,
+    Ntilde: 209,
+    Oacute: 211,
+    Ocirc: 212,
+    Ograve: 210,
+    Oslash: 216,
+    Otilde: 213,
+    Ouml: 214,
+    THORN: 222,
+    Uacute: 218,
+    Ucirc: 219,
+    Ugrave: 217,
+    Uuml: 220,
+    Yacute: 221,
+    aacute: 225,
+    acirc: 226,
+    aelig: 230,
+    agrave: 224,
+    aring: 229,
+    atilde: 227,
+    auml: 228,
+    ccedil: 231,
+    eacute: 233,
+    ecirc: 234,
+    egrave: 232,
+    eth: 240,
+    euml: 235,
+    iacute: 237,
+    icirc: 238,
+    igrave: 236,
+    iuml: 239,
+    ntilde: 241,
+    oacute: 243,
+    ocirc: 244,
+    ograve: 242,
+    oslash: 248,
+    otilde: 245,
+    ouml: 246,
+    szlig: 223,
+    thorn: 254,
+    uacute: 250,
+    ucirc: 251,
+    ugrave: 249,
+    uuml: 252,
+    yacute: 253,
+    yuml: 255,
+    copy: 169,
+    reg: 174,
+    nbsp: 160,
+    iexcl: 161,
+    cent: 162,
+    pound: 163,
+    curren: 164,
+    yen: 165,
+    brvbar: 166,
+    sect: 167,
+    uml: 168,
+    ordf: 170,
+    laquo: 171,
+    not: 172,
+    shy: 173,
+    macr: 175,
+    deg: 176,
+    plusmn: 177,
+    sup1: 185,
+    sup2: 178,
+    sup3: 179,
+    acute: 180,
+    micro: 181,
+    para: 182,
+    middot: 183,
+    cedil: 184,
+    ordm: 186,
+    raquo: 187,
+    frac14: 188,
+    frac12: 189,
+    frac34: 190,
+    iquest: 191,
+    times: 215,
+    divide: 247,
+    OElig: 338,
+    oelig: 339,
+    Scaron: 352,
+    scaron: 353,
+    Yuml: 376,
+    fnof: 402,
+    circ: 710,
+    tilde: 732,
+    Alpha: 913,
+    Beta: 914,
+    Gamma: 915,
+    Delta: 916,
+    Epsilon: 917,
+    Zeta: 918,
+    Eta: 919,
+    Theta: 920,
+    Iota: 921,
+    Kappa: 922,
+    Lambda: 923,
+    Mu: 924,
+    Nu: 925,
+    Xi: 926,
+    Omicron: 927,
+    Pi: 928,
+    Rho: 929,
+    Sigma: 931,
+    Tau: 932,
+    Upsilon: 933,
+    Phi: 934,
+    Chi: 935,
+    Psi: 936,
+    Omega: 937,
+    alpha: 945,
+    beta: 946,
+    gamma: 947,
+    delta: 948,
+    epsilon: 949,
+    zeta: 950,
+    eta: 951,
+    theta: 952,
+    iota: 953,
+    kappa: 954,
+    lambda: 955,
+    mu: 956,
+    nu: 957,
+    xi: 958,
+    omicron: 959,
+    pi: 960,
+    rho: 961,
+    sigmaf: 962,
+    sigma: 963,
+    tau: 964,
+    upsilon: 965,
+    phi: 966,
+    chi: 967,
+    psi: 968,
+    omega: 969,
+    thetasym: 977,
+    upsih: 978,
+    piv: 982,
+    ensp: 8194,
+    emsp: 8195,
+    thinsp: 8201,
+    zwnj: 8204,
+    zwj: 8205,
+    lrm: 8206,
+    rlm: 8207,
+    ndash: 8211,
+    mdash: 8212,
+    lsquo: 8216,
+    rsquo: 8217,
+    sbquo: 8218,
+    ldquo: 8220,
+    rdquo: 8221,
+    bdquo: 8222,
+    dagger: 8224,
+    Dagger: 8225,
+    bull: 8226,
+    hellip: 8230,
+    permil: 8240,
+    prime: 8242,
+    Prime: 8243,
+    lsaquo: 8249,
+    rsaquo: 8250,
+    oline: 8254,
+    frasl: 8260,
+    euro: 8364,
+    image: 8465,
+    weierp: 8472,
+    real: 8476,
+    trade: 8482,
+    alefsym: 8501,
+    larr: 8592,
+    uarr: 8593,
+    rarr: 8594,
+    darr: 8595,
+    harr: 8596,
+    crarr: 8629,
+    lArr: 8656,
+    uArr: 8657,
+    rArr: 8658,
+    dArr: 8659,
+    hArr: 8660,
+    forall: 8704,
+    part: 8706,
+    exist: 8707,
+    empty: 8709,
+    nabla: 8711,
+    isin: 8712,
+    notin: 8713,
+    ni: 8715,
+    prod: 8719,
+    sum: 8721,
+    minus: 8722,
+    lowast: 8727,
+    radic: 8730,
+    prop: 8733,
+    infin: 8734,
+    ang: 8736,
+    and: 8743,
+    or: 8744,
+    cap: 8745,
+    cup: 8746,
+    int: 8747,
+    there4: 8756,
+    sim: 8764,
+    cong: 8773,
+    asymp: 8776,
+    ne: 8800,
+    equiv: 8801,
+    le: 8804,
+    ge: 8805,
+    sub: 8834,
+    sup: 8835,
+    nsub: 8836,
+    sube: 8838,
+    supe: 8839,
+    oplus: 8853,
+    otimes: 8855,
+    perp: 8869,
+    sdot: 8901,
+    lceil: 8968,
+    rceil: 8969,
+    lfloor: 8970,
+    rfloor: 8971,
+    lang: 9001,
+    rang: 9002,
+    loz: 9674,
+    spades: 9824,
+    clubs: 9827,
+    hearts: 9829,
+    diams: 9830,
   }
 
   Object.keys(sax.ENTITIES).forEach(function (key) {
@@ -6168,33 +7352,90 @@ exports.getProxyForUrl = getProxyForUrl;
   // shorthand
   S = sax.STATE
 
-  function emit (parser, event, data) {
+  function emit(parser, event, data) {
     parser[event] && parser[event](data)
   }
 
-  function emitNode (parser, nodeType, data) {
+  function getDeclaredEncoding(body) {
+    var match = body && body.match(/(?:^|\s)encoding\s*=\s*(['"])([^'"]+)\1/i)
+    return match ? match[2] : null
+  }
+
+  function normalizeEncodingName(encoding) {
+    if (!encoding) {
+      return null
+    }
+
+    return encoding.toLowerCase().replace(/[^a-z0-9]/g, '')
+  }
+
+  function encodingsMatch(detectedEncoding, declaredEncoding) {
+    const detected = normalizeEncodingName(detectedEncoding)
+    const declared = normalizeEncodingName(declaredEncoding)
+
+    if (!detected || !declared) {
+      return true
+    }
+
+    if (declared === 'utf16') {
+      return detected === 'utf16le' || detected === 'utf16be'
+    }
+
+    return detected === declared
+  }
+
+  function validateXmlDeclarationEncoding(parser, data) {
+    if (
+      !parser.strict ||
+      !parser.encoding ||
+      !data ||
+      data.name !== 'xml'
+    ) {
+      return
+    }
+
+    var declaredEncoding = getDeclaredEncoding(data.body)
+    if (
+      declaredEncoding &&
+      !encodingsMatch(parser.encoding, declaredEncoding)
+    ) {
+      strictFail(
+        parser,
+        'XML declaration encoding ' +
+          declaredEncoding +
+          ' does not match detected stream encoding ' +
+          parser.encoding.toUpperCase()
+      )
+    }
+  }
+
+  function emitNode(parser, nodeType, data) {
     if (parser.textNode) closeText(parser)
     emit(parser, nodeType, data)
   }
 
-  function closeText (parser) {
+  function closeText(parser) {
     parser.textNode = textopts(parser.opt, parser.textNode)
     if (parser.textNode) emit(parser, 'ontext', parser.textNode)
     parser.textNode = ''
   }
 
-  function textopts (opt, text) {
+  function textopts(opt, text) {
     if (opt.trim) text = text.trim()
     if (opt.normalize) text = text.replace(/\s+/g, ' ')
     return text
   }
 
-  function error (parser, er) {
+  function error(parser, er) {
     closeText(parser)
     if (parser.trackPosition) {
-      er += '\nLine: ' + parser.line +
-        '\nColumn: ' + parser.column +
-        '\nChar: ' + parser.c
+      er +=
+        '\nLine: ' +
+        parser.line +
+        '\nColumn: ' +
+        parser.column +
+        '\nChar: ' +
+        parser.c
     }
     er = new Error(er)
     parser.error = er
@@ -6202,11 +7443,14 @@ exports.getProxyForUrl = getProxyForUrl;
     return parser
   }
 
-  function end (parser) {
-    if (parser.sawRoot && !parser.closedRoot) strictFail(parser, 'Unclosed root tag')
-    if ((parser.state !== S.BEGIN) &&
-      (parser.state !== S.BEGIN_WHITESPACE) &&
-      (parser.state !== S.TEXT)) {
+  function end(parser) {
+    if (parser.sawRoot && !parser.closedRoot)
+      strictFail(parser, 'Unclosed root tag')
+    if (
+      parser.state !== S.BEGIN &&
+      parser.state !== S.BEGIN_WHITESPACE &&
+      parser.state !== S.TEXT
+    ) {
       error(parser, 'Unexpected end')
     }
     closeText(parser)
@@ -6217,7 +7461,7 @@ exports.getProxyForUrl = getProxyForUrl;
     return parser
   }
 
-  function strictFail (parser, message) {
+  function strictFail(parser, message) {
     if (typeof parser !== 'object' || !(parser instanceof SAXParser)) {
       throw new Error('bad call to strictFail')
     }
@@ -6226,10 +7470,10 @@ exports.getProxyForUrl = getProxyForUrl;
     }
   }
 
-  function newTag (parser) {
+  function newTag(parser) {
     if (!parser.strict) parser.tagName = parser.tagName[parser.looseCase]()
     var parent = parser.tags[parser.tags.length - 1] || parser
-    var tag = parser.tag = { name: parser.tagName, attributes: {} }
+    var tag = (parser.tag = { name: parser.tagName, attributes: {} })
 
     // will be overridden if tag contails an xmlns="foo" or xmlns:foo="bar"
     if (parser.opt.xmlns) {
@@ -6239,9 +7483,9 @@ exports.getProxyForUrl = getProxyForUrl;
     emitNode(parser, 'onopentagstart', tag)
   }
 
-  function qname (name, attribute) {
+  function qname(name, attribute) {
     var i = name.indexOf(':')
-    var qualName = i < 0 ? [ '', name ] : name.split(':')
+    var qualName = i < 0 ? ['', name] : name.split(':')
     var prefix = qualName[0]
     var local = qualName[1]
 
@@ -6254,13 +7498,15 @@ exports.getProxyForUrl = getProxyForUrl;
     return { prefix: prefix, local: local }
   }
 
-  function attrib (parser) {
+  function attrib(parser) {
     if (!parser.strict) {
       parser.attribName = parser.attribName[parser.looseCase]()
     }
 
-    if (parser.attribList.indexOf(parser.attribName) !== -1 ||
-      parser.tag.attributes.hasOwnProperty(parser.attribName)) {
+    if (
+      parser.attribList.indexOf(parser.attribName) !== -1 ||
+      parser.tag.attributes.hasOwnProperty(parser.attribName)
+    ) {
       parser.attribName = parser.attribValue = ''
       return
     }
@@ -6273,13 +7519,26 @@ exports.getProxyForUrl = getProxyForUrl;
       if (prefix === 'xmlns') {
         // namespace binding attribute. push the binding into scope
         if (local === 'xml' && parser.attribValue !== XML_NAMESPACE) {
-          strictFail(parser,
-            'xml: prefix must be bound to ' + XML_NAMESPACE + '\n' +
-            'Actual: ' + parser.attribValue)
-        } else if (local === 'xmlns' && parser.attribValue !== XMLNS_NAMESPACE) {
-          strictFail(parser,
-            'xmlns: prefix must be bound to ' + XMLNS_NAMESPACE + '\n' +
-            'Actual: ' + parser.attribValue)
+          strictFail(
+            parser,
+            'xml: prefix must be bound to ' +
+              XML_NAMESPACE +
+              '\n' +
+              'Actual: ' +
+              parser.attribValue
+          )
+        } else if (
+          local === 'xmlns' &&
+          parser.attribValue !== XMLNS_NAMESPACE
+        ) {
+          strictFail(
+            parser,
+            'xmlns: prefix must be bound to ' +
+              XMLNS_NAMESPACE +
+              '\n' +
+              'Actual: ' +
+              parser.attribValue
+          )
         } else {
           var tag = parser.tag
           var parent = parser.tags[parser.tags.length - 1] || parser
@@ -6299,14 +7558,14 @@ exports.getProxyForUrl = getProxyForUrl;
       parser.tag.attributes[parser.attribName] = parser.attribValue
       emitNode(parser, 'onattribute', {
         name: parser.attribName,
-        value: parser.attribValue
+        value: parser.attribValue,
       })
     }
 
     parser.attribName = parser.attribValue = ''
   }
 
-  function openTag (parser, selfClosing) {
+  function openTag(parser, selfClosing) {
     if (parser.opt.xmlns) {
       // emit namespace binding events
       var tag = parser.tag
@@ -6318,8 +7577,10 @@ exports.getProxyForUrl = getProxyForUrl;
       tag.uri = tag.ns[qn.prefix] || ''
 
       if (tag.prefix && !tag.uri) {
-        strictFail(parser, 'Unbound namespace prefix: ' +
-          JSON.stringify(parser.tagName))
+        strictFail(
+          parser,
+          'Unbound namespace prefix: ' + JSON.stringify(parser.tagName)
+        )
         tag.uri = qn.prefix
       }
 
@@ -6328,7 +7589,7 @@ exports.getProxyForUrl = getProxyForUrl;
         Object.keys(tag.ns).forEach(function (p) {
           emitNode(parser, 'onopennamespace', {
             prefix: p,
-            uri: tag.ns[p]
+            uri: tag.ns[p],
           })
         })
       }
@@ -6343,20 +7604,22 @@ exports.getProxyForUrl = getProxyForUrl;
         var qualName = qname(name, true)
         var prefix = qualName.prefix
         var local = qualName.local
-        var uri = prefix === '' ? '' : (tag.ns[prefix] || '')
+        var uri = prefix === '' ? '' : tag.ns[prefix] || ''
         var a = {
           name: name,
           value: value,
           prefix: prefix,
           local: local,
-          uri: uri
+          uri: uri,
         }
 
         // if there's any attributes with an undefined namespace,
         // then fail on them now.
         if (prefix && prefix !== 'xmlns' && !uri) {
-          strictFail(parser, 'Unbound namespace prefix: ' +
-            JSON.stringify(prefix))
+          strictFail(
+            parser,
+            'Unbound namespace prefix: ' + JSON.stringify(prefix)
+          )
           a.uri = prefix
         }
         parser.tag.attributes[name] = a
@@ -6385,7 +7648,7 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.attribList.length = 0
   }
 
-  function closeTag (parser) {
+  function closeTag(parser) {
     if (!parser.tagName) {
       strictFail(parser, 'Weird empty close tag.')
       parser.textNode += '</>'
@@ -6432,7 +7695,7 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.tagName = tagName
     var s = parser.tags.length
     while (s-- > t) {
-      var tag = parser.tag = parser.tags.pop()
+      var tag = (parser.tag = parser.tags.pop())
       parser.tagName = parser.tag.name
       emitNode(parser, 'onclosetag', parser.tagName)
 
@@ -6456,7 +7719,7 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.state = S.TEXT
   }
 
-  function parseEntity (parser) {
+  function parseEntity(parser) {
     var entity = parser.entity
     var entityLC = entity.toLowerCase()
     var num
@@ -6481,7 +7744,12 @@ exports.getProxyForUrl = getProxyForUrl;
       }
     }
     entity = entity.replace(/^0+/, '')
-    if (isNaN(num) || numStr.toLowerCase() !== entity) {
+    if (
+      isNaN(num) ||
+      numStr.toLowerCase() !== entity ||
+      num < 0 ||
+      num > 0x10ffff
+    ) {
       strictFail(parser, 'Invalid character entity')
       return '&' + parser.entity + ';'
     }
@@ -6489,7 +7757,7 @@ exports.getProxyForUrl = getProxyForUrl;
     return String.fromCodePoint(num)
   }
 
-  function beginWhiteSpace (parser, c) {
+  function beginWhiteSpace(parser, c) {
     if (c === '<') {
       parser.state = S.OPEN_WAKA
       parser.startTagPosition = parser.position
@@ -6502,7 +7770,7 @@ exports.getProxyForUrl = getProxyForUrl;
     }
   }
 
-  function charAt (chunk, i) {
+  function charAt(chunk, i) {
     var result = ''
     if (i < chunk.length) {
       result = chunk.charAt(i)
@@ -6510,14 +7778,16 @@ exports.getProxyForUrl = getProxyForUrl;
     return result
   }
 
-  function write (chunk) {
+  function write(chunk) {
     var parser = this
     if (this.error) {
       throw this.error
     }
     if (parser.closed) {
-      return error(parser,
-        'Cannot write after close. Assign an onready handler.')
+      return error(
+        parser,
+        'Cannot write after close. Assign an onready handler.'
+      )
     }
     if (chunk === null) {
       return end(parser)
@@ -6575,11 +7845,17 @@ exports.getProxyForUrl = getProxyForUrl;
             }
             parser.textNode += chunk.substring(starti, i - 1)
           }
-          if (c === '<' && !(parser.sawRoot && parser.closedRoot && !parser.strict)) {
+          if (
+            c === '<' &&
+            !(parser.sawRoot && parser.closedRoot && !parser.strict)
+          ) {
             parser.state = S.OPEN_WAKA
             parser.startTagPosition = parser.position
           } else {
-            if (!isWhitespace(c) && (!parser.sawRoot || parser.closedRoot)) {
+            if (
+              !isWhitespace(c) &&
+              (!parser.sawRoot || parser.closedRoot)
+            ) {
               strictFail(parser, 'Text data outside of root node.')
             }
             if (c === '&') {
@@ -6641,10 +7917,14 @@ exports.getProxyForUrl = getProxyForUrl;
             parser.state = S.COMMENT
             parser.comment = ''
             parser.sgmlDecl = ''
-            continue;
+            continue
           }
 
-          if (parser.doctype && parser.doctype !== true && parser.sgmlDecl) {
+          if (
+            parser.doctype &&
+            parser.doctype !== true &&
+            parser.sgmlDecl
+          ) {
             parser.state = S.DOCTYPE_DTD
             parser.doctype += '<!' + parser.sgmlDecl + c
             parser.sgmlDecl = ''
@@ -6656,8 +7936,10 @@ exports.getProxyForUrl = getProxyForUrl;
           } else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
             parser.state = S.DOCTYPE
             if (parser.doctype || parser.sawRoot) {
-              strictFail(parser,
-                'Inappropriately located doctype declaration')
+              strictFail(
+                parser,
+                'Inappropriately located doctype declaration'
+              )
             }
             parser.doctype = ''
             parser.sgmlDecl = ''
@@ -6766,10 +8048,22 @@ exports.getProxyForUrl = getProxyForUrl;
           continue
 
         case S.CDATA:
+          var starti = i - 1
+          while (c && c !== ']') {
+            c = charAt(chunk, i++)
+            if (c && parser.trackPosition) {
+              parser.position++
+              if (c === '\n') {
+                parser.line++
+                parser.column = 0
+              } else {
+                parser.column++
+              }
+            }
+          }
+          parser.cdata += chunk.substring(starti, i - 1)
           if (c === ']') {
             parser.state = S.CDATA_ENDING
-          } else {
-            parser.cdata += c
           }
           continue
 
@@ -6820,10 +8114,12 @@ exports.getProxyForUrl = getProxyForUrl;
 
         case S.PROC_INST_ENDING:
           if (c === '>') {
-            emitNode(parser, 'onprocessinginstruction', {
+            const procInstEndData = {
               name: parser.procInstName,
-              body: parser.procInstBody
-            })
+              body: parser.procInstBody,
+            }
+            validateXmlDeclarationEncoding(parser, procInstEndData)
+            emitNode(parser, 'onprocessinginstruction', procInstEndData)
             parser.procInstName = parser.procInstBody = ''
             parser.state = S.TEXT
           } else {
@@ -6855,7 +8151,10 @@ exports.getProxyForUrl = getProxyForUrl;
             openTag(parser, true)
             closeTag(parser)
           } else {
-            strictFail(parser, 'Forward-slash in opening tag not followed by >')
+            strictFail(
+              parser,
+              'Forward-slash in opening tag not followed by >'
+            )
             parser.state = S.ATTRIB
           }
           continue
@@ -6905,7 +8204,7 @@ exports.getProxyForUrl = getProxyForUrl;
             parser.attribValue = ''
             emitNode(parser, 'onattribute', {
               name: parser.attribName,
-              value: ''
+              value: '',
             })
             parser.attribName = ''
             if (c === '>') {
@@ -7002,7 +8301,7 @@ exports.getProxyForUrl = getProxyForUrl;
           } else if (isMatch(nameBody, c)) {
             parser.tagName += c
           } else if (parser.script) {
-            parser.script += '</' + parser.tagName
+            parser.script += '</' + parser.tagName + c
             parser.tagName = ''
             parser.state = S.SCRIPT
           } else {
@@ -7048,16 +8347,36 @@ exports.getProxyForUrl = getProxyForUrl;
 
           if (c === ';') {
             var parsedEntity = parseEntity(parser)
-            if (parser.opt.unparsedEntities && !Object.values(sax.XML_ENTITIES).includes(parsedEntity)) {
+            if (
+              parser.opt.unparsedEntities &&
+              !Object.values(sax.XML_ENTITIES).includes(parsedEntity)
+            ) {
+              if ((parser.entityCount += 1) > parser.opt.maxEntityCount) {
+                error(
+                  parser,
+                  'Parsed entity count exceeds max entity count'
+                )
+              }
+
+              if ((parser.entityDepth += 1) > parser.opt.maxEntityDepth) {
+                error(
+                  parser,
+                  'Parsed entity depth exceeds max entity depth'
+                )
+              }
+
               parser.entity = ''
               parser.state = returnState
               parser.write(parsedEntity)
+              parser.entityDepth -= 1
             } else {
               parser[buffer] += parsedEntity
               parser.entity = ''
               parser.state = returnState
             }
-          } else if (isMatch(parser.entity.length ? entityBody : entityStart, c)) {
+          } else if (
+            isMatch(parser.entity.length ? entityBody : entityStart, c)
+          ) {
             parser.entity += c
           } else {
             strictFail(parser, 'Invalid character in entity name')
@@ -7083,7 +8402,7 @@ exports.getProxyForUrl = getProxyForUrl;
   /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
   /* istanbul ignore next */
   if (!String.fromCodePoint) {
-    (function () {
+    ;(function () {
       var stringFromCharCode = String.fromCharCode
       var floor = Math.floor
       var fromCodePoint = function () {
@@ -7102,18 +8421,20 @@ exports.getProxyForUrl = getProxyForUrl;
           if (
             !isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
             codePoint < 0 || // not a valid Unicode code point
-            codePoint > 0x10FFFF || // not a valid Unicode code point
+            codePoint > 0x10ffff || // not a valid Unicode code point
             floor(codePoint) !== codePoint // not an integer
           ) {
             throw RangeError('Invalid code point: ' + codePoint)
           }
-          if (codePoint <= 0xFFFF) { // BMP code point
+          if (codePoint <= 0xffff) {
+            // BMP code point
             codeUnits.push(codePoint)
-          } else { // Astral code point; split in surrogate halves
+          } else {
+            // Astral code point; split in surrogate halves
             // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
             codePoint -= 0x10000
-            highSurrogate = (codePoint >> 10) + 0xD800
-            lowSurrogate = (codePoint % 0x400) + 0xDC00
+            highSurrogate = (codePoint >> 10) + 0xd800
+            lowSurrogate = (codePoint % 0x400) + 0xdc00
             codeUnits.push(highSurrogate, lowSurrogate)
           }
           if (index + 1 === length || codeUnits.length > MAX_SIZE) {
@@ -7128,14 +8449,14 @@ exports.getProxyForUrl = getProxyForUrl;
         Object.defineProperty(String, 'fromCodePoint', {
           value: fromCodePoint,
           configurable: true,
-          writable: true
+          writable: true,
         })
       } else {
         String.fromCodePoint = fromCodePoint
       }
-    }())
+    })()
   }
-})( false ? 0 : exports)
+})( false ? (0) : exports)
 
 
 /***/ }),
@@ -12748,7 +14069,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(8915)
-const { stringify, getHeadersList } = __nccwpck_require__(3834)
+const { stringify } = __nccwpck_require__(3834)
 const { webidl } = __nccwpck_require__(4222)
 const { Headers } = __nccwpck_require__(6349)
 
@@ -12824,14 +14145,13 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = getHeadersList(headers).cookies
+  const cookies = headers.getSetCookie()
 
   if (!cookies) {
     return []
   }
 
-  // In older versions of undici, cookies is a list of name:value.
-  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
+  return cookies.map((pair) => parseSetCookie(pair))
 }
 
 /**
@@ -13259,14 +14579,15 @@ module.exports = {
 /***/ }),
 
 /***/ 3834:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
 "use strict";
 
 
-const assert = __nccwpck_require__(2613)
-const { kHeadersList } = __nccwpck_require__(6443)
-
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -13527,31 +14848,13 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
-let kHeadersListNode
-
-function getHeadersList (headers) {
-  if (headers[kHeadersList]) {
-    return headers[kHeadersList]
-  }
-
-  if (!kHeadersListNode) {
-    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
-      (symbol) => symbol.description === 'headers list'
-    )
-
-    assert(kHeadersListNode, 'Headers cannot be parsed')
-  }
-
-  const headersList = headers[kHeadersListNode]
-  assert(headersList)
-
-  return headersList
-}
-
 module.exports = {
   isCTLExcludingHtab,
-  stringify,
-  getHeadersList
+  validateCookieName,
+  validateCookiePath,
+  validateCookieValue,
+  toIMFDate,
+  stringify
 }
 
 
@@ -15480,6 +16783,14 @@ const { isUint8Array, isArrayBuffer } = __nccwpck_require__(8253)
 const { File: UndiciFile } = __nccwpck_require__(3041)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(4322)
 
+let random
+try {
+  const crypto = __nccwpck_require__(7598)
+  random = (max) => crypto.randomInt(0, max)
+} catch {
+  random = (max) => Math.floor(Math.random(max))
+}
+
 let ReadableStream = globalThis.ReadableStream
 
 /** @type {globalThis['File']} */
@@ -15565,7 +16876,7 @@ function extractBody (object, keepalive = false) {
     // Set source to a copy of the bytes held by object.
     source = new Uint8Array(object.buffer.slice(object.byteOffset, object.byteOffset + object.byteLength))
   } else if (util.isFormDataLike(object)) {
-    const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, '0')}`
+    const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, '0')}`
     const prefix = `--${boundary}\r\nContent-Disposition: form-data`
 
     /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
@@ -17547,6 +18858,7 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(5523)
+const util = __nccwpck_require__(9023)
 const { webidl } = __nccwpck_require__(4222)
 const assert = __nccwpck_require__(2613)
 
@@ -18100,6 +19412,9 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
+  },
+  [util.inspect.custom]: {
+    enumerable: false
   }
 })
 
@@ -27276,6 +28591,20 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
+
+    this.on('connectionError', (origin, targets, error) => {
+      // If a connection error occurs, we remove the client from the pool,
+      // and emit a connectionError event. They will not be re-used.
+      // Fixes https://github.com/nodejs/undici/issues/3895
+      for (const target of targets) {
+        // Do not use kRemoveClient here, as it will close the client,
+        // but the client cannot be closed in this state.
+        const idx = this[kClients].indexOf(target)
+        if (idx !== -1) {
+          this[kClients].splice(idx, 1)
+        }
+      }
+    })
   }
 
   [kGetDispatcher] () {
@@ -34709,6 +36038,14 @@ module.exports = require("net");
 
 /***/ }),
 
+/***/ 7598:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:crypto");
+
+/***/ }),
+
 /***/ 8474:
 /***/ ((module) => {
 
@@ -36474,14 +37811,16 @@ module.exports = parseParams
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
-// Axios v1.7.8 Copyright (c) 2024 Matt Zabriskie and contributors
+/*! Axios v1.13.6 Copyright (c) 2026 Matt Zabriskie and contributors */
 
 
 const FormData$1 = __nccwpck_require__(6454);
+const crypto = __nccwpck_require__(6982);
 const url = __nccwpck_require__(7016);
 const proxyFromEnv = __nccwpck_require__(7777);
 const http = __nccwpck_require__(8611);
 const https = __nccwpck_require__(5692);
+const http2 = __nccwpck_require__(5675);
 const util = __nccwpck_require__(9023);
 const followRedirects = __nccwpck_require__(1573);
 const zlib = __nccwpck_require__(3106);
@@ -36491,15 +37830,24 @@ const events = __nccwpck_require__(4434);
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 const FormData__default = /*#__PURE__*/_interopDefaultLegacy(FormData$1);
+const crypto__default = /*#__PURE__*/_interopDefaultLegacy(crypto);
 const url__default = /*#__PURE__*/_interopDefaultLegacy(url);
 const proxyFromEnv__default = /*#__PURE__*/_interopDefaultLegacy(proxyFromEnv);
 const http__default = /*#__PURE__*/_interopDefaultLegacy(http);
 const https__default = /*#__PURE__*/_interopDefaultLegacy(https);
+const http2__default = /*#__PURE__*/_interopDefaultLegacy(http2);
 const util__default = /*#__PURE__*/_interopDefaultLegacy(util);
 const followRedirects__default = /*#__PURE__*/_interopDefaultLegacy(followRedirects);
 const zlib__default = /*#__PURE__*/_interopDefaultLegacy(zlib);
 const stream__default = /*#__PURE__*/_interopDefaultLegacy(stream);
 
+/**
+ * Create a bound version of a function with a specified `this` context
+ *
+ * @param {Function} fn - The function to bind
+ * @param {*} thisArg - The value to be passed as the `this` parameter
+ * @returns {Function} A new function that will call the original function with the specified `this` context
+ */
 function bind(fn, thisArg) {
   return function wrap() {
     return fn.apply(thisArg, arguments);
@@ -36508,29 +37856,30 @@ function bind(fn, thisArg) {
 
 // utils is a library of generic helper functions non-specific to axios
 
-const {toString} = Object.prototype;
-const {getPrototypeOf} = Object;
+const { toString } = Object.prototype;
+const { getPrototypeOf } = Object;
+const { iterator, toStringTag } = Symbol;
 
-const kindOf = (cache => thing => {
-    const str = toString.call(thing);
-    return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
+const kindOf = ((cache) => (thing) => {
+  const str = toString.call(thing);
+  return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
 })(Object.create(null));
 
 const kindOfTest = (type) => {
   type = type.toLowerCase();
-  return (thing) => kindOf(thing) === type
+  return (thing) => kindOf(thing) === type;
 };
 
-const typeOfTest = type => thing => typeof thing === type;
+const typeOfTest = (type) => (thing) => typeof thing === type;
 
 /**
- * Determine if a value is an Array
+ * Determine if a value is a non-null object
  *
  * @param {Object} val The value to test
  *
  * @returns {boolean} True if value is an Array, otherwise false
  */
-const {isArray} = Array;
+const { isArray } = Array;
 
 /**
  * Determine if a value is undefined
@@ -36549,8 +37898,14 @@ const isUndefined = typeOfTest('undefined');
  * @returns {boolean} True if value is a Buffer, otherwise false
  */
 function isBuffer(val) {
-  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
-    && isFunction(val.constructor.isBuffer) && val.constructor.isBuffer(val);
+  return (
+    val !== null &&
+    !isUndefined(val) &&
+    val.constructor !== null &&
+    !isUndefined(val.constructor) &&
+    isFunction$1(val.constructor.isBuffer) &&
+    val.constructor.isBuffer(val)
+  );
 }
 
 /**
@@ -36562,7 +37917,6 @@ function isBuffer(val) {
  */
 const isArrayBuffer = kindOfTest('ArrayBuffer');
 
-
 /**
  * Determine if a value is a view on an ArrayBuffer
  *
@@ -36572,10 +37926,10 @@ const isArrayBuffer = kindOfTest('ArrayBuffer');
  */
 function isArrayBufferView(val) {
   let result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+  if (typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView) {
     result = ArrayBuffer.isView(val);
   } else {
-    result = (val) && (val.buffer) && (isArrayBuffer(val.buffer));
+    result = val && val.buffer && isArrayBuffer(val.buffer);
   }
   return result;
 }
@@ -36595,7 +37949,7 @@ const isString = typeOfTest('string');
  * @param {*} val The value to test
  * @returns {boolean} True if value is a Function, otherwise false
  */
-const isFunction = typeOfTest('function');
+const isFunction$1 = typeOfTest('function');
 
 /**
  * Determine if a value is a Number
@@ -36621,7 +37975,7 @@ const isObject = (thing) => thing !== null && typeof thing === 'object';
  * @param {*} thing The value to test
  * @returns {boolean} True if value is a Boolean, otherwise false
  */
-const isBoolean = thing => thing === true || thing === false;
+const isBoolean = (thing) => thing === true || thing === false;
 
 /**
  * Determine if a value is a plain Object
@@ -36636,7 +37990,34 @@ const isPlainObject = (val) => {
   }
 
   const prototype = getPrototypeOf(val);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in val) && !(Symbol.iterator in val);
+  return (
+    (prototype === null ||
+      prototype === Object.prototype ||
+      Object.getPrototypeOf(prototype) === null) &&
+    !(toStringTag in val) &&
+    !(iterator in val)
+  );
+};
+
+/**
+ * Determine if a value is an empty object (safely handles Buffers)
+ *
+ * @param {*} val The value to test
+ *
+ * @returns {boolean} True if value is an empty object, otherwise false
+ */
+const isEmptyObject = (val) => {
+  // Early return for non-objects or Buffers to prevent RangeError
+  if (!isObject(val) || isBuffer(val)) {
+    return false;
+  }
+
+  try {
+    return Object.keys(val).length === 0 && Object.getPrototypeOf(val) === Object.prototype;
+  } catch (e) {
+    // Fallback for any other objects that might cause RangeError with Object.keys()
+    return false;
+  }
 };
 
 /**
@@ -36656,6 +38037,31 @@ const isDate = kindOfTest('Date');
  * @returns {boolean} True if value is a File, otherwise false
  */
 const isFile = kindOfTest('File');
+
+/**
+ * Determine if a value is a React Native Blob
+ * React Native "blob": an object with a `uri` attribute. Optionally, it can
+ * also have a `name` and `type` attribute to specify filename and content type
+ *
+ * @see https://github.com/facebook/react-native/blob/26684cf3adf4094eb6c405d345a75bf8c7c0bf88/Libraries/Network/FormData.js#L68-L71
+ * 
+ * @param {*} value The value to test
+ * 
+ * @returns {boolean} True if value is a React Native Blob, otherwise false
+ */
+const isReactNativeBlob = (value) => {
+  return !!(value && typeof value.uri !== 'undefined');
+};
+
+/**
+ * Determine if environment is React Native
+ * ReactNative `FormData` has a non-standard `getParts()` method
+ * 
+ * @param {*} formData The formData to test
+ * 
+ * @returns {boolean} True if environment is React Native, otherwise false
+ */
+const isReactNative = (formData) => formData && typeof formData.getParts !== 'undefined';
 
 /**
  * Determine if a value is a Blob
@@ -36682,7 +38088,7 @@ const isFileList = kindOfTest('FileList');
  *
  * @returns {boolean} True if value is a Stream, otherwise false
  */
-const isStream = (val) => isObject(val) && isFunction(val.pipe);
+const isStream = (val) => isObject(val) && isFunction$1(val.pipe);
 
 /**
  * Determine if a value is a FormData
@@ -36691,17 +38097,28 @@ const isStream = (val) => isObject(val) && isFunction(val.pipe);
  *
  * @returns {boolean} True if value is an FormData, otherwise false
  */
+function getGlobal() {
+  if (typeof globalThis !== 'undefined') return globalThis;
+  if (typeof self !== 'undefined') return self;
+  if (typeof window !== 'undefined') return window;
+  if (typeof global !== 'undefined') return global;
+  return {};
+}
+
+const G = getGlobal();
+const FormDataCtor = typeof G.FormData !== 'undefined' ? G.FormData : undefined;
+
 const isFormData = (thing) => {
   let kind;
   return thing && (
-    (typeof FormData === 'function' && thing instanceof FormData) || (
-      isFunction(thing.append) && (
+    (FormDataCtor && thing instanceof FormDataCtor) || (
+      isFunction$1(thing.append) && (
         (kind = kindOf(thing)) === 'formdata' ||
         // detect form-data instance
-        (kind === 'object' && isFunction(thing.toString) && thing.toString() === '[object FormData]')
+        (kind === 'object' && isFunction$1(thing.toString) && thing.toString() === '[object FormData]')
       )
     )
-  )
+  );
 };
 
 /**
@@ -36713,7 +38130,12 @@ const isFormData = (thing) => {
  */
 const isURLSearchParams = kindOfTest('URLSearchParams');
 
-const [isReadableStream, isRequest, isResponse, isHeaders] = ['ReadableStream', 'Request', 'Response', 'Headers'].map(kindOfTest);
+const [isReadableStream, isRequest, isResponse, isHeaders] = [
+  'ReadableStream',
+  'Request',
+  'Response',
+  'Headers',
+].map(kindOfTest);
 
 /**
  * Trim excess whitespace off the beginning and end of a string
@@ -36722,9 +38144,9 @@ const [isReadableStream, isRequest, isResponse, isHeaders] = ['ReadableStream', 
  *
  * @returns {String} The String freed of excess whitespace
  */
-const trim = (str) => str.trim ?
-  str.trim() : str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-
+const trim = (str) => {
+  return str.trim ? str.trim() : str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+};
 /**
  * Iterate over an Array or an Object invoking a function for each item.
  *
@@ -36734,13 +38156,14 @@ const trim = (str) => str.trim ?
  * If 'obj' is an Object callback will be called passing
  * the value, key, and complete object for each property.
  *
- * @param {Object|Array} obj The object to iterate
+ * @param {Object|Array<unknown>} obj The object to iterate
  * @param {Function} fn The callback to invoke for each item
  *
- * @param {Boolean} [allOwnKeys = false]
+ * @param {Object} [options]
+ * @param {Boolean} [options.allOwnKeys = false]
  * @returns {any}
  */
-function forEach(obj, fn, {allOwnKeys = false} = {}) {
+function forEach(obj, fn, { allOwnKeys = false } = {}) {
   // Don't bother if no value provided
   if (obj === null || typeof obj === 'undefined') {
     return;
@@ -36761,6 +38184,11 @@ function forEach(obj, fn, {allOwnKeys = false} = {}) {
       fn.call(null, obj[i], i, obj);
     }
   } else {
+    // Buffer check
+    if (isBuffer(obj)) {
+      return;
+    }
+
     // Iterate over object keys
     const keys = allOwnKeys ? Object.getOwnPropertyNames(obj) : Object.keys(obj);
     const len = keys.length;
@@ -36773,7 +38201,19 @@ function forEach(obj, fn, {allOwnKeys = false} = {}) {
   }
 }
 
+/**
+ * Finds a key in an object, case-insensitive, returning the actual key name.
+ * Returns null if the object is a Buffer or if no match is found.
+ *
+ * @param {Object} obj - The object to search.
+ * @param {string} key - The key to find (case-insensitive).
+ * @returns {?string} The actual key name if found, otherwise null.
+ */
 function findKey(obj, key) {
+  if (isBuffer(obj)) {
+    return null;
+  }
+
   key = key.toLowerCase();
   const keys = Object.keys(obj);
   let i = keys.length;
@@ -36789,8 +38229,8 @@ function findKey(obj, key) {
 
 const _global = (() => {
   /*eslint no-undef:0*/
-  if (typeof globalThis !== "undefined") return globalThis;
-  return typeof self !== "undefined" ? self : (typeof window !== 'undefined' ? window : global)
+  if (typeof globalThis !== 'undefined') return globalThis;
+  return typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : global;
 })();
 
 const isContextDefined = (context) => !isUndefined(context) && context !== _global;
@@ -36805,7 +38245,7 @@ const isContextDefined = (context) => !isUndefined(context) && context !== _glob
  * Example:
  *
  * ```js
- * var result = merge({foo: 123}, {foo: 456});
+ * const result = merge({foo: 123}, {foo: 456});
  * console.log(result.foo); // outputs 456
  * ```
  *
@@ -36814,17 +38254,22 @@ const isContextDefined = (context) => !isUndefined(context) && context !== _glob
  * @returns {Object} Result of all merge properties
  */
 function merge(/* obj1, obj2, obj3, ... */) {
-  const {caseless} = isContextDefined(this) && this || {};
+  const { caseless, skipUndefined } = (isContextDefined(this) && this) || {};
   const result = {};
   const assignValue = (val, key) => {
-    const targetKey = caseless && findKey(result, key) || key;
+    // Skip dangerous property names to prevent prototype pollution
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      return;
+    }
+
+    const targetKey = (caseless && findKey(result, key)) || key;
     if (isPlainObject(result[targetKey]) && isPlainObject(val)) {
       result[targetKey] = merge(result[targetKey], val);
     } else if (isPlainObject(val)) {
       result[targetKey] = merge({}, val);
     } else if (isArray(val)) {
       result[targetKey] = val.slice();
-    } else {
+    } else if (!skipUndefined || !isUndefined(val)) {
       result[targetKey] = val;
     }
   };
@@ -36842,17 +38287,32 @@ function merge(/* obj1, obj2, obj3, ... */) {
  * @param {Object} b The object to copy properties from
  * @param {Object} thisArg The object to bind function to
  *
- * @param {Boolean} [allOwnKeys]
+ * @param {Object} [options]
+ * @param {Boolean} [options.allOwnKeys]
  * @returns {Object} The resulting value of object a
  */
-const extend = (a, b, thisArg, {allOwnKeys}= {}) => {
-  forEach(b, (val, key) => {
-    if (thisArg && isFunction(val)) {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  }, {allOwnKeys});
+const extend = (a, b, thisArg, { allOwnKeys } = {}) => {
+  forEach(
+    b,
+    (val, key) => {
+      if (thisArg && isFunction$1(val)) {
+        Object.defineProperty(a, key, {
+          value: bind(val, thisArg),
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
+      } else {
+        Object.defineProperty(a, key, {
+          value: val,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
+      }
+    },
+    { allOwnKeys }
+  );
   return a;
 };
 
@@ -36864,7 +38324,7 @@ const extend = (a, b, thisArg, {allOwnKeys}= {}) => {
  * @returns {string} content value without BOM
  */
 const stripBOM = (content) => {
-  if (content.charCodeAt(0) === 0xFEFF) {
+  if (content.charCodeAt(0) === 0xfeff) {
     content = content.slice(1);
   }
   return content;
@@ -36881,9 +38341,14 @@ const stripBOM = (content) => {
  */
 const inherits = (constructor, superConstructor, props, descriptors) => {
   constructor.prototype = Object.create(superConstructor.prototype, descriptors);
-  constructor.prototype.constructor = constructor;
+  Object.defineProperty(constructor.prototype, 'constructor', {
+    value: constructor,
+    writable: true,
+    enumerable: false,
+    configurable: true,
+  });
   Object.defineProperty(constructor, 'super', {
-    value: superConstructor.prototype
+    value: superConstructor.prototype,
   });
   props && Object.assign(constructor.prototype, props);
 };
@@ -36942,7 +38407,6 @@ const endsWith = (str, searchString, position) => {
   return lastIndex !== -1 && lastIndex === position;
 };
 
-
 /**
  * Returns new array from array like object or null if failed
  *
@@ -36971,9 +38435,9 @@ const toArray = (thing) => {
  * @returns {Array}
  */
 // eslint-disable-next-line func-names
-const isTypedArray = (TypedArray => {
+const isTypedArray = ((TypedArray) => {
   // eslint-disable-next-line func-names
-  return thing => {
+  return (thing) => {
     return TypedArray && thing instanceof TypedArray;
   };
 })(typeof Uint8Array !== 'undefined' && getPrototypeOf(Uint8Array));
@@ -36987,13 +38451,13 @@ const isTypedArray = (TypedArray => {
  * @returns {void}
  */
 const forEachEntry = (obj, fn) => {
-  const generator = obj && obj[Symbol.iterator];
+  const generator = obj && obj[iterator];
 
-  const iterator = generator.call(obj);
+  const _iterator = generator.call(obj);
 
   let result;
 
-  while ((result = iterator.next()) && !result.done) {
+  while ((result = _iterator.next()) && !result.done) {
     const pair = result.value;
     fn.call(obj, pair[0], pair[1]);
   }
@@ -37021,16 +38485,18 @@ const matchAll = (regExp, str) => {
 /* Checking if the kindOfTest function returns true when passed an HTMLFormElement. */
 const isHTMLForm = kindOfTest('HTMLFormElement');
 
-const toCamelCase = str => {
-  return str.toLowerCase().replace(/[-_\s]([a-z\d])(\w*)/g,
-    function replacer(m, p1, p2) {
-      return p1.toUpperCase() + p2;
-    }
-  );
+const toCamelCase = (str) => {
+  return str.toLowerCase().replace(/[-_\s]([a-z\d])(\w*)/g, function replacer(m, p1, p2) {
+    return p1.toUpperCase() + p2;
+  });
 };
 
 /* Creating a function that will check if an object has a property. */
-const hasOwnProperty = (({hasOwnProperty}) => (obj, prop) => hasOwnProperty.call(obj, prop))(Object.prototype);
+const hasOwnProperty = (
+  ({ hasOwnProperty }) =>
+  (obj, prop) =>
+    hasOwnProperty.call(obj, prop)
+)(Object.prototype);
 
 /**
  * Determine if a value is a RegExp object
@@ -37063,13 +38529,13 @@ const reduceDescriptors = (obj, reducer) => {
 const freezeMethods = (obj) => {
   reduceDescriptors(obj, (descriptor, name) => {
     // skip restricted props in strict mode
-    if (isFunction(obj) && ['arguments', 'caller', 'callee'].indexOf(name) !== -1) {
+    if (isFunction$1(obj) && ['arguments', 'caller', 'callee'].indexOf(name) !== -1) {
       return false;
     }
 
     const value = obj[name];
 
-    if (!isFunction(value)) return;
+    if (!isFunction$1(value)) return;
 
     descriptor.enumerable = false;
 
@@ -37080,17 +38546,25 @@ const freezeMethods = (obj) => {
 
     if (!descriptor.set) {
       descriptor.set = () => {
-        throw Error('Can not rewrite read-only method \'' + name + '\'');
+        throw Error("Can not rewrite read-only method '" + name + "'");
       };
     }
   });
 };
 
+/**
+ * Converts an array or a delimited string into an object set with values as keys and true as values.
+ * Useful for fast membership checks.
+ *
+ * @param {Array|string} arrayOrString - The array or string to convert.
+ * @param {string} delimiter - The delimiter to use if input is a string.
+ * @returns {Object} An object with keys from the array or string, values set to true.
+ */
 const toObjectSet = (arrayOrString, delimiter) => {
   const obj = {};
 
   const define = (arr) => {
-    arr.forEach(value => {
+    arr.forEach((value) => {
       obj[value] = true;
     });
   };
@@ -37103,27 +38577,7 @@ const toObjectSet = (arrayOrString, delimiter) => {
 const noop = () => {};
 
 const toFiniteNumber = (value, defaultValue) => {
-  return value != null && Number.isFinite(value = +value) ? value : defaultValue;
-};
-
-const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
-
-const DIGIT = '0123456789';
-
-const ALPHABET = {
-  DIGIT,
-  ALPHA,
-  ALPHA_DIGIT: ALPHA + ALPHA.toUpperCase() + DIGIT
-};
-
-const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
-  let str = '';
-  const {length} = alphabet;
-  while (size--) {
-    str += alphabet[Math.random() * length|0];
-  }
-
-  return str;
+  return value != null && Number.isFinite((value = +value)) ? value : defaultValue;
 };
 
 /**
@@ -37134,20 +38588,35 @@ const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
  * @returns {boolean}
  */
 function isSpecCompliantForm(thing) {
-  return !!(thing && isFunction(thing.append) && thing[Symbol.toStringTag] === 'FormData' && thing[Symbol.iterator]);
+  return !!(
+    thing &&
+    isFunction$1(thing.append) &&
+    thing[toStringTag] === 'FormData' &&
+    thing[iterator]
+  );
 }
 
+/**
+ * Recursively converts an object to a JSON-compatible object, handling circular references and Buffers.
+ *
+ * @param {Object} obj - The object to convert.
+ * @returns {Object} The JSON-compatible object.
+ */
 const toJSONObject = (obj) => {
   const stack = new Array(10);
 
   const visit = (source, i) => {
-
     if (isObject(source)) {
       if (stack.indexOf(source) >= 0) {
         return;
       }
 
-      if(!('toJSON' in source)) {
+      //Buffer check
+      if (isBuffer(source)) {
+        return source;
+      }
+
+      if (!('toJSON' in source)) {
         stack[i] = source;
         const target = isArray(source) ? [] : {};
 
@@ -37168,40 +38637,76 @@ const toJSONObject = (obj) => {
   return visit(obj, 0);
 };
 
+/**
+ * Determines if a value is an async function.
+ *
+ * @param {*} thing - The value to test.
+ * @returns {boolean} True if value is an async function, otherwise false.
+ */
 const isAsyncFn = kindOfTest('AsyncFunction');
 
+/**
+ * Determines if a value is thenable (has then and catch methods).
+ *
+ * @param {*} thing - The value to test.
+ * @returns {boolean} True if value is thenable, otherwise false.
+ */
 const isThenable = (thing) =>
-  thing && (isObject(thing) || isFunction(thing)) && isFunction(thing.then) && isFunction(thing.catch);
+  thing &&
+  (isObject(thing) || isFunction$1(thing)) &&
+  isFunction$1(thing.then) &&
+  isFunction$1(thing.catch);
 
 // original code
 // https://github.com/DigitalBrainJS/AxiosPromise/blob/16deab13710ec09779922131f3fa5954320f83ab/lib/utils.js#L11-L34
 
+/**
+ * Provides a cross-platform setImmediate implementation.
+ * Uses native setImmediate if available, otherwise falls back to postMessage or setTimeout.
+ *
+ * @param {boolean} setImmediateSupported - Whether setImmediate is supported.
+ * @param {boolean} postMessageSupported - Whether postMessage is supported.
+ * @returns {Function} A function to schedule a callback asynchronously.
+ */
 const _setImmediate = ((setImmediateSupported, postMessageSupported) => {
   if (setImmediateSupported) {
     return setImmediate;
   }
 
-  return postMessageSupported ? ((token, callbacks) => {
-    _global.addEventListener("message", ({source, data}) => {
-      if (source === _global && data === token) {
-        callbacks.length && callbacks.shift()();
-      }
-    }, false);
+  return postMessageSupported
+    ? ((token, callbacks) => {
+        _global.addEventListener(
+          'message',
+          ({ source, data }) => {
+            if (source === _global && data === token) {
+              callbacks.length && callbacks.shift()();
+            }
+          },
+          false
+        );
 
-    return (cb) => {
-      callbacks.push(cb);
-      _global.postMessage(token, "*");
-    }
-  })(`axios@${Math.random()}`, []) : (cb) => setTimeout(cb);
-})(
-  typeof setImmediate === 'function',
-  isFunction(_global.postMessage)
-);
+        return (cb) => {
+          callbacks.push(cb);
+          _global.postMessage(token, '*');
+        };
+      })(`axios@${Math.random()}`, [])
+    : (cb) => setTimeout(cb);
+})(typeof setImmediate === 'function', isFunction$1(_global.postMessage));
 
-const asap = typeof queueMicrotask !== 'undefined' ?
-  queueMicrotask.bind(_global) : ( typeof process !== 'undefined' && process.nextTick || _setImmediate);
+/**
+ * Schedules a microtask or asynchronous callback as soon as possible.
+ * Uses queueMicrotask if available, otherwise falls back to process.nextTick or _setImmediate.
+ *
+ * @type {Function}
+ */
+const asap =
+  typeof queueMicrotask !== 'undefined'
+    ? queueMicrotask.bind(_global)
+    : (typeof process !== 'undefined' && process.nextTick) || _setImmediate;
 
 // *********************
+
+const isIterable = (thing) => thing != null && isFunction$1(thing[iterator]);
 
 const utils$1 = {
   isArray,
@@ -37214,6 +38719,7 @@ const utils$1 = {
   isBoolean,
   isObject,
   isPlainObject,
+  isEmptyObject,
   isReadableStream,
   isRequest,
   isResponse,
@@ -37221,9 +38727,11 @@ const utils$1 = {
   isUndefined,
   isDate,
   isFile,
+  isReactNativeBlob,
+  isReactNative,
   isBlob,
   isRegExp,
-  isFunction,
+  isFunction: isFunction$1,
   isStream,
   isURLSearchParams,
   isTypedArray,
@@ -37253,49 +38761,66 @@ const utils$1 = {
   findKey,
   global: _global,
   isContextDefined,
-  ALPHABET,
-  generateString,
   isSpecCompliantForm,
   toJSONObject,
   isAsyncFn,
   isThenable,
   setImmediate: _setImmediate,
-  asap
+  asap,
+  isIterable,
 };
 
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [config] The config.
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- *
- * @returns {Error} The created error.
- */
-function AxiosError(message, code, config, request, response) {
-  Error.call(this);
+class AxiosError extends Error {
+  static from(error, code, config, request, response, customProps) {
+    const axiosError = new AxiosError(error.message, code || error.code, config, request, response);
+    axiosError.cause = error;
+    axiosError.name = error.name;
 
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, this.constructor);
-  } else {
-    this.stack = (new Error()).stack;
+    // Preserve status from the original error if not already set from response
+    if (error.status != null && axiosError.status == null) {
+      axiosError.status = error.status;
+    }
+
+    customProps && Object.assign(axiosError, customProps);
+    return axiosError;
   }
 
-  this.message = message;
-  this.name = 'AxiosError';
-  code && (this.code = code);
-  config && (this.config = config);
-  request && (this.request = request);
-  if (response) {
-    this.response = response;
-    this.status = response.status ? response.status : null;
-  }
-}
+    /**
+     * Create an Error with the specified message, config, error code, request and response.
+     *
+     * @param {string} message The error message.
+     * @param {string} [code] The error code (for example, 'ECONNABORTED').
+     * @param {Object} [config] The config.
+     * @param {Object} [request] The request.
+     * @param {Object} [response] The response.
+     *
+     * @returns {Error} The created error.
+     */
+    constructor(message, code, config, request, response) {
+      super(message);
+      
+      // Make message enumerable to maintain backward compatibility
+      // The native Error constructor sets message as non-enumerable,
+      // but axios < v1.13.3 had it as enumerable
+      Object.defineProperty(this, 'message', {
+          value: message,
+          enumerable: true,
+          writable: true,
+          configurable: true
+      });
+      
+      this.name = 'AxiosError';
+      this.isAxiosError = true;
+      code && (this.code = code);
+      config && (this.config = config);
+      request && (this.request = request);
+      if (response) {
+          this.response = response;
+          this.status = response.status;
+      }
+    }
 
-utils$1.inherits(AxiosError, Error, {
-  toJSON: function toJSON() {
+  toJSON() {
     return {
       // Standard
       message: this.message,
@@ -37311,55 +38836,26 @@ utils$1.inherits(AxiosError, Error, {
       // Axios
       config: utils$1.toJSONObject(this.config),
       code: this.code,
-      status: this.status
+      status: this.status,
     };
   }
-});
+}
 
-const prototype$1 = AxiosError.prototype;
-const descriptors = {};
+// This can be changed to static properties as soon as the parser options in .eslint.cjs are updated.
+AxiosError.ERR_BAD_OPTION_VALUE = 'ERR_BAD_OPTION_VALUE';
+AxiosError.ERR_BAD_OPTION = 'ERR_BAD_OPTION';
+AxiosError.ECONNABORTED = 'ECONNABORTED';
+AxiosError.ETIMEDOUT = 'ETIMEDOUT';
+AxiosError.ERR_NETWORK = 'ERR_NETWORK';
+AxiosError.ERR_FR_TOO_MANY_REDIRECTS = 'ERR_FR_TOO_MANY_REDIRECTS';
+AxiosError.ERR_DEPRECATED = 'ERR_DEPRECATED';
+AxiosError.ERR_BAD_RESPONSE = 'ERR_BAD_RESPONSE';
+AxiosError.ERR_BAD_REQUEST = 'ERR_BAD_REQUEST';
+AxiosError.ERR_CANCELED = 'ERR_CANCELED';
+AxiosError.ERR_NOT_SUPPORT = 'ERR_NOT_SUPPORT';
+AxiosError.ERR_INVALID_URL = 'ERR_INVALID_URL';
 
-[
-  'ERR_BAD_OPTION_VALUE',
-  'ERR_BAD_OPTION',
-  'ECONNABORTED',
-  'ETIMEDOUT',
-  'ERR_NETWORK',
-  'ERR_FR_TOO_MANY_REDIRECTS',
-  'ERR_DEPRECATED',
-  'ERR_BAD_RESPONSE',
-  'ERR_BAD_REQUEST',
-  'ERR_CANCELED',
-  'ERR_NOT_SUPPORT',
-  'ERR_INVALID_URL'
-// eslint-disable-next-line func-names
-].forEach(code => {
-  descriptors[code] = {value: code};
-});
-
-Object.defineProperties(AxiosError, descriptors);
-Object.defineProperty(prototype$1, 'isAxiosError', {value: true});
-
-// eslint-disable-next-line func-names
-AxiosError.from = (error, code, config, request, response, customProps) => {
-  const axiosError = Object.create(prototype$1);
-
-  utils$1.toFlatObject(error, axiosError, function filter(obj) {
-    return obj !== Error.prototype;
-  }, prop => {
-    return prop !== 'isAxiosError';
-  });
-
-  AxiosError.call(axiosError, error.message, code, config, request, response);
-
-  axiosError.cause = error;
-
-  axiosError.name = error.name;
-
-  customProps && Object.assign(axiosError, customProps);
-
-  return axiosError;
-};
+const AxiosError$1 = AxiosError;
 
 /**
  * Determines if the given thing is a array or js object.
@@ -37394,11 +38890,14 @@ function removeBrackets(key) {
  */
 function renderKey(path, key, dots) {
   if (!path) return key;
-  return path.concat(key).map(function each(token, i) {
-    // eslint-disable-next-line no-param-reassign
-    token = removeBrackets(token);
-    return !dots && i ? '[' + token + ']' : token;
-  }).join(dots ? '.' : '');
+  return path
+    .concat(key)
+    .map(function each(token, i) {
+      // eslint-disable-next-line no-param-reassign
+      token = removeBrackets(token);
+      return !dots && i ? '[' + token + ']' : token;
+    })
+    .join(dots ? '.' : '');
 }
 
 /**
@@ -37448,21 +38947,26 @@ function toFormData(obj, formData, options) {
   formData = formData || new (FormData__default["default"] || FormData)();
 
   // eslint-disable-next-line no-param-reassign
-  options = utils$1.toFlatObject(options, {
-    metaTokens: true,
-    dots: false,
-    indexes: false
-  }, false, function defined(option, source) {
-    // eslint-disable-next-line no-eq-null,eqeqeq
-    return !utils$1.isUndefined(source[option]);
-  });
+  options = utils$1.toFlatObject(
+    options,
+    {
+      metaTokens: true,
+      dots: false,
+      indexes: false,
+    },
+    false,
+    function defined(option, source) {
+      // eslint-disable-next-line no-eq-null,eqeqeq
+      return !utils$1.isUndefined(source[option]);
+    }
+  );
 
   const metaTokens = options.metaTokens;
   // eslint-disable-next-line no-use-before-define
   const visitor = options.visitor || defaultVisitor;
   const dots = options.dots;
   const indexes = options.indexes;
-  const _Blob = options.Blob || typeof Blob !== 'undefined' && Blob;
+  const _Blob = options.Blob || (typeof Blob !== 'undefined' && Blob);
   const useBlob = _Blob && utils$1.isSpecCompliantForm(formData);
 
   if (!utils$1.isFunction(visitor)) {
@@ -37476,8 +38980,12 @@ function toFormData(obj, formData, options) {
       return value.toISOString();
     }
 
+    if (utils$1.isBoolean(value)) {
+      return value.toString();
+    }
+
     if (!useBlob && utils$1.isBlob(value)) {
-      throw new AxiosError('Blob is not supported. Use a Buffer instead.');
+      throw new AxiosError$1('Blob is not supported. Use a Buffer instead.');
     }
 
     if (utils$1.isArrayBuffer(value) || utils$1.isTypedArray(value)) {
@@ -37500,6 +39008,11 @@ function toFormData(obj, formData, options) {
   function defaultVisitor(value, key, path) {
     let arr = value;
 
+    if (utils$1.isReactNative(formData) && utils$1.isReactNativeBlob(value)) {
+      formData.append(renderKey(path, key, dots), convertValue(value));
+      return false;
+    }
+
     if (value && !path && typeof value === 'object') {
       if (utils$1.endsWith(key, '{}')) {
         // eslint-disable-next-line no-param-reassign
@@ -37508,17 +39021,22 @@ function toFormData(obj, formData, options) {
         value = JSON.stringify(value);
       } else if (
         (utils$1.isArray(value) && isFlatArray(value)) ||
-        ((utils$1.isFileList(value) || utils$1.endsWith(key, '[]')) && (arr = utils$1.toArray(value))
-        )) {
+        ((utils$1.isFileList(value) || utils$1.endsWith(key, '[]')) && (arr = utils$1.toArray(value)))
+      ) {
         // eslint-disable-next-line no-param-reassign
         key = removeBrackets(key);
 
         arr.forEach(function each(el, index) {
-          !(utils$1.isUndefined(el) || el === null) && formData.append(
-            // eslint-disable-next-line no-nested-ternary
-            indexes === true ? renderKey([key], index, dots) : (indexes === null ? key : key + '[]'),
-            convertValue(el)
-          );
+          !(utils$1.isUndefined(el) || el === null) &&
+            formData.append(
+              // eslint-disable-next-line no-nested-ternary
+              indexes === true
+                ? renderKey([key], index, dots)
+                : indexes === null
+                  ? key
+                  : key + '[]',
+              convertValue(el)
+            );
         });
         return false;
       }
@@ -37538,7 +39056,7 @@ function toFormData(obj, formData, options) {
   const exposedHelpers = Object.assign(predicates, {
     defaultVisitor,
     convertValue,
-    isVisitable
+    isVisitable,
   });
 
   function build(value, path) {
@@ -37551,9 +39069,9 @@ function toFormData(obj, formData, options) {
     stack.push(value);
 
     utils$1.forEach(value, function each(el, key) {
-      const result = !(utils$1.isUndefined(el) || el === null) && visitor.call(
-        formData, el, utils$1.isString(key) ? key.trim() : key, path, exposedHelpers
-      );
+      const result =
+        !(utils$1.isUndefined(el) || el === null) &&
+        visitor.call(formData, el, utils$1.isString(key) ? key.trim() : key, path, exposedHelpers);
 
       if (result === true) {
         build(el, path ? path.concat(key) : [key]);
@@ -37588,7 +39106,7 @@ function encode$1(str) {
     ')': '%29',
     '~': '%7E',
     '%20': '+',
-    '%00': '\x00'
+    '%00': '\x00',
   };
   return encodeURIComponent(str).replace(/[!'()~]|%20|%00/g, function replacer(match) {
     return charMap[match];
@@ -37616,13 +39134,17 @@ prototype.append = function append(name, value) {
 };
 
 prototype.toString = function toString(encoder) {
-  const _encode = encoder ? function(value) {
-    return encoder.call(this, value, encode$1);
-  } : encode$1;
+  const _encode = encoder
+    ? function (value) {
+        return encoder.call(this, value, encode$1);
+      }
+    : encode$1;
 
-  return this._pairs.map(function each(pair) {
-    return _encode(pair[0]) + '=' + _encode(pair[1]);
-  }, '').join('&');
+  return this._pairs
+    .map(function each(pair) {
+      return _encode(pair[0]) + '=' + _encode(pair[1]);
+    }, '')
+    .join('&');
 };
 
 /**
@@ -37634,13 +39156,11 @@ prototype.toString = function toString(encoder) {
  * @returns {string} The encoded value.
  */
 function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
+  return encodeURIComponent(val)
+    .replace(/%3A/gi, ':')
+    .replace(/%24/g, '$')
+    .replace(/%2C/gi, ',')
+    .replace(/%20/g, '+');
 }
 
 /**
@@ -37653,33 +39173,32 @@ function encode(val) {
  * @returns {string} The formatted url
  */
 function buildURL(url, params, options) {
-  /*eslint no-param-reassign:0*/
   if (!params) {
     return url;
   }
-  
-  const _encode = options && options.encode || encode;
 
-  if (utils$1.isFunction(options)) {
-    options = {
-      serialize: options
-    };
-  } 
+  const _encode = (options && options.encode) || encode;
 
-  const serializeFn = options && options.serialize;
+  const _options = utils$1.isFunction(options)
+    ? {
+        serialize: options,
+      }
+    : options;
+
+  const serializeFn = _options && _options.serialize;
 
   let serializedParams;
 
   if (serializeFn) {
-    serializedParams = serializeFn(params, options);
+    serializedParams = serializeFn(params, _options);
   } else {
-    serializedParams = utils$1.isURLSearchParams(params) ?
-      params.toString() :
-      new AxiosURLSearchParams(params, options).toString(_encode);
+    serializedParams = utils$1.isURLSearchParams(params)
+      ? params.toString()
+      : new AxiosURLSearchParams(params, _options).toString(_encode);
   }
 
   if (serializedParams) {
-    const hashmarkIndex = url.indexOf("#");
+    const hashmarkIndex = url.indexOf('#');
 
     if (hashmarkIndex !== -1) {
       url = url.slice(0, hashmarkIndex);
@@ -37700,6 +39219,7 @@ class InterceptorManager {
    *
    * @param {Function} fulfilled The function to handle `then` for a `Promise`
    * @param {Function} rejected The function to handle `reject` for a `Promise`
+   * @param {Object} options The options for the interceptor, synchronous and runWhen
    *
    * @return {Number} An ID used to remove interceptor later
    */
@@ -37708,7 +39228,7 @@ class InterceptorManager {
       fulfilled,
       rejected,
       synchronous: options ? options.synchronous : false,
-      runWhen: options ? options.runWhen : null
+      runWhen: options ? options.runWhen : null,
     });
     return this.handlers.length - 1;
   }
@@ -37718,7 +39238,7 @@ class InterceptorManager {
    *
    * @param {Number} id The ID that was returned by `use`
    *
-   * @returns {Boolean} `true` if the interceptor was removed, `false` otherwise
+   * @returns {void}
    */
   eject(id) {
     if (this.handlers[id]) {
@@ -37761,24 +39281,49 @@ const InterceptorManager$1 = InterceptorManager;
 const transitionalDefaults = {
   silentJSONParsing: true,
   forcedJSONParsing: true,
-  clarifyTimeoutError: false
+  clarifyTimeoutError: false,
+  legacyInterceptorReqResOrdering: true,
 };
 
 const URLSearchParams = url__default["default"].URLSearchParams;
+
+const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
+
+const DIGIT = '0123456789';
+
+const ALPHABET = {
+  DIGIT,
+  ALPHA,
+  ALPHA_DIGIT: ALPHA + ALPHA.toUpperCase() + DIGIT,
+};
+
+const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
+  let str = '';
+  const { length } = alphabet;
+  const randomValues = new Uint32Array(size);
+  crypto__default["default"].randomFillSync(randomValues);
+  for (let i = 0; i < size; i++) {
+    str += alphabet[randomValues[i] % length];
+  }
+
+  return str;
+};
 
 const platform$1 = {
   isNode: true,
   classes: {
     URLSearchParams,
     FormData: FormData__default["default"],
-    Blob: typeof Blob !== 'undefined' && Blob || null
+    Blob: (typeof Blob !== 'undefined' && Blob) || null,
   },
-  protocols: [ 'http', 'https', 'file', 'data' ]
+  ALPHABET,
+  generateString,
+  protocols: ['http', 'https', 'file', 'data'],
 };
 
 const hasBrowserEnv = typeof window !== 'undefined' && typeof document !== 'undefined';
 
-const _navigator = typeof navigator === 'object' && navigator || undefined;
+const _navigator = (typeof navigator === 'object' && navigator) || undefined;
 
 /**
  * Determine if we're running in a standard browser environment
@@ -37797,7 +39342,8 @@ const _navigator = typeof navigator === 'object' && navigator || undefined;
  *
  * @returns {boolean}
  */
-const hasStandardBrowserEnv = hasBrowserEnv &&
+const hasStandardBrowserEnv =
+  hasBrowserEnv &&
   (!_navigator || ['ReactNative', 'NativeScript', 'NS'].indexOf(_navigator.product) < 0);
 
 /**
@@ -37818,7 +39364,7 @@ const hasStandardBrowserWebWorkerEnv = (() => {
   );
 })();
 
-const origin = hasBrowserEnv && window.location.href || 'http://localhost';
+const origin = (hasBrowserEnv && window.location.href) || 'http://localhost';
 
 const utils = /*#__PURE__*/Object.freeze({
   __proto__: null,
@@ -37831,20 +39377,21 @@ const utils = /*#__PURE__*/Object.freeze({
 
 const platform = {
   ...utils,
-  ...platform$1
+  ...platform$1,
 };
 
 function toURLEncodedForm(data, options) {
-  return toFormData(data, new platform.classes.URLSearchParams(), Object.assign({
-    visitor: function(value, key, path, helpers) {
+  return toFormData(data, new platform.classes.URLSearchParams(), {
+    visitor: function (value, key, path, helpers) {
       if (platform.isNode && utils$1.isBuffer(value)) {
         this.append(key, value.toString('base64'));
         return false;
       }
 
       return helpers.defaultVisitor.apply(this, arguments);
-    }
-  }, options));
+    },
+    ...options,
+  });
 }
 
 /**
@@ -37859,7 +39406,7 @@ function parsePropPath(name) {
   // foo.x.y.z
   // foo-x-y-z
   // foo x y z
-  return utils$1.matchAll(/\w+|\[(\w*)]/g, name).map(match => {
+  return utils$1.matchAll(/\w+|\[(\w*)]/g, name).map((match) => {
     return match[0] === '[]' ? '' : match[1] || match[0];
   });
 }
@@ -37963,96 +39510,107 @@ function stringifySafely(rawValue, parser, encoder) {
 }
 
 const defaults = {
-
   transitional: transitionalDefaults,
 
   adapter: ['xhr', 'http', 'fetch'],
 
-  transformRequest: [function transformRequest(data, headers) {
-    const contentType = headers.getContentType() || '';
-    const hasJSONContentType = contentType.indexOf('application/json') > -1;
-    const isObjectPayload = utils$1.isObject(data);
+  transformRequest: [
+    function transformRequest(data, headers) {
+      const contentType = headers.getContentType() || '';
+      const hasJSONContentType = contentType.indexOf('application/json') > -1;
+      const isObjectPayload = utils$1.isObject(data);
 
-    if (isObjectPayload && utils$1.isHTMLForm(data)) {
-      data = new FormData(data);
-    }
-
-    const isFormData = utils$1.isFormData(data);
-
-    if (isFormData) {
-      return hasJSONContentType ? JSON.stringify(formDataToJSON(data)) : data;
-    }
-
-    if (utils$1.isArrayBuffer(data) ||
-      utils$1.isBuffer(data) ||
-      utils$1.isStream(data) ||
-      utils$1.isFile(data) ||
-      utils$1.isBlob(data) ||
-      utils$1.isReadableStream(data)
-    ) {
-      return data;
-    }
-    if (utils$1.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils$1.isURLSearchParams(data)) {
-      headers.setContentType('application/x-www-form-urlencoded;charset=utf-8', false);
-      return data.toString();
-    }
-
-    let isFileList;
-
-    if (isObjectPayload) {
-      if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
-        return toURLEncodedForm(data, this.formSerializer).toString();
+      if (isObjectPayload && utils$1.isHTMLForm(data)) {
+        data = new FormData(data);
       }
 
-      if ((isFileList = utils$1.isFileList(data)) || contentType.indexOf('multipart/form-data') > -1) {
-        const _FormData = this.env && this.env.FormData;
+      const isFormData = utils$1.isFormData(data);
 
-        return toFormData(
-          isFileList ? {'files[]': data} : data,
-          _FormData && new _FormData(),
-          this.formSerializer
-        );
+      if (isFormData) {
+        return hasJSONContentType ? JSON.stringify(formDataToJSON(data)) : data;
       }
-    }
 
-    if (isObjectPayload || hasJSONContentType ) {
-      headers.setContentType('application/json', false);
-      return stringifySafely(data);
-    }
+      if (
+        utils$1.isArrayBuffer(data) ||
+        utils$1.isBuffer(data) ||
+        utils$1.isStream(data) ||
+        utils$1.isFile(data) ||
+        utils$1.isBlob(data) ||
+        utils$1.isReadableStream(data)
+      ) {
+        return data;
+      }
+      if (utils$1.isArrayBufferView(data)) {
+        return data.buffer;
+      }
+      if (utils$1.isURLSearchParams(data)) {
+        headers.setContentType('application/x-www-form-urlencoded;charset=utf-8', false);
+        return data.toString();
+      }
 
-    return data;
-  }],
+      let isFileList;
 
-  transformResponse: [function transformResponse(data) {
-    const transitional = this.transitional || defaults.transitional;
-    const forcedJSONParsing = transitional && transitional.forcedJSONParsing;
-    const JSONRequested = this.responseType === 'json';
+      if (isObjectPayload) {
+        if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
+          return toURLEncodedForm(data, this.formSerializer).toString();
+        }
 
-    if (utils$1.isResponse(data) || utils$1.isReadableStream(data)) {
-      return data;
-    }
+        if (
+          (isFileList = utils$1.isFileList(data)) ||
+          contentType.indexOf('multipart/form-data') > -1
+        ) {
+          const _FormData = this.env && this.env.FormData;
 
-    if (data && utils$1.isString(data) && ((forcedJSONParsing && !this.responseType) || JSONRequested)) {
-      const silentJSONParsing = transitional && transitional.silentJSONParsing;
-      const strictJSONParsing = !silentJSONParsing && JSONRequested;
-
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        if (strictJSONParsing) {
-          if (e.name === 'SyntaxError') {
-            throw AxiosError.from(e, AxiosError.ERR_BAD_RESPONSE, this, null, this.response);
-          }
-          throw e;
+          return toFormData(
+            isFileList ? { 'files[]': data } : data,
+            _FormData && new _FormData(),
+            this.formSerializer
+          );
         }
       }
-    }
 
-    return data;
-  }],
+      if (isObjectPayload || hasJSONContentType) {
+        headers.setContentType('application/json', false);
+        return stringifySafely(data);
+      }
+
+      return data;
+    },
+  ],
+
+  transformResponse: [
+    function transformResponse(data) {
+      const transitional = this.transitional || defaults.transitional;
+      const forcedJSONParsing = transitional && transitional.forcedJSONParsing;
+      const JSONRequested = this.responseType === 'json';
+
+      if (utils$1.isResponse(data) || utils$1.isReadableStream(data)) {
+        return data;
+      }
+
+      if (
+        data &&
+        utils$1.isString(data) &&
+        ((forcedJSONParsing && !this.responseType) || JSONRequested)
+      ) {
+        const silentJSONParsing = transitional && transitional.silentJSONParsing;
+        const strictJSONParsing = !silentJSONParsing && JSONRequested;
+
+        try {
+          return JSON.parse(data, this.parseReviver);
+        } catch (e) {
+          if (strictJSONParsing) {
+            if (e.name === 'SyntaxError') {
+              throw AxiosError$1.from(e, AxiosError$1.ERR_BAD_RESPONSE, this, null, this.response);
+            }
+            throw e;
+          }
+        }
+      }
+
+      return data;
+    },
+  ],
 
   /**
    * A timeout in milliseconds to abort a request. If set to 0 (default) a
@@ -38068,7 +39626,7 @@ const defaults = {
 
   env: {
     FormData: platform.classes.FormData,
-    Blob: platform.classes.Blob
+    Blob: platform.classes.Blob,
   },
 
   validateStatus: function validateStatus(status) {
@@ -38077,10 +39635,10 @@ const defaults = {
 
   headers: {
     common: {
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': undefined
-    }
-  }
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': undefined,
+    },
+  },
 };
 
 utils$1.forEach(['delete', 'get', 'head', 'post', 'put', 'patch'], (method) => {
@@ -38092,10 +39650,23 @@ const defaults$1 = defaults;
 // RawAxiosHeaders whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
 const ignoreDuplicateOf = utils$1.toObjectSet([
-  'age', 'authorization', 'content-length', 'content-type', 'etag',
-  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
-  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
-  'referer', 'retry-after', 'user-agent'
+  'age',
+  'authorization',
+  'content-length',
+  'content-type',
+  'etag',
+  'expires',
+  'from',
+  'host',
+  'if-modified-since',
+  'if-unmodified-since',
+  'last-modified',
+  'location',
+  'max-forwards',
+  'proxy-authorization',
+  'referer',
+  'retry-after',
+  'user-agent',
 ]);
 
 /**
@@ -38112,31 +39683,32 @@ const ignoreDuplicateOf = utils$1.toObjectSet([
  *
  * @returns {Object} Headers parsed into an object
  */
-const parseHeaders = rawHeaders => {
+const parseHeaders = (rawHeaders) => {
   const parsed = {};
   let key;
   let val;
   let i;
 
-  rawHeaders && rawHeaders.split('\n').forEach(function parser(line) {
-    i = line.indexOf(':');
-    key = line.substring(0, i).trim().toLowerCase();
-    val = line.substring(i + 1).trim();
+  rawHeaders &&
+    rawHeaders.split('\n').forEach(function parser(line) {
+      i = line.indexOf(':');
+      key = line.substring(0, i).trim().toLowerCase();
+      val = line.substring(i + 1).trim();
 
-    if (!key || (parsed[key] && ignoreDuplicateOf[key])) {
-      return;
-    }
-
-    if (key === 'set-cookie') {
-      if (parsed[key]) {
-        parsed[key].push(val);
-      } else {
-        parsed[key] = [val];
+      if (!key || (parsed[key] && ignoreDuplicateOf[key])) {
+        return;
       }
-    } else {
-      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-    }
-  });
+
+      if (key === 'set-cookie') {
+        if (parsed[key]) {
+          parsed[key].push(val);
+        } else {
+          parsed[key] = [val];
+        }
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    });
 
   return parsed;
 };
@@ -38190,8 +39762,10 @@ function matchHeaderValue(context, value, header, filter, isHeaderNameFilter) {
 }
 
 function formatHeader(header) {
-  return header.trim()
-    .toLowerCase().replace(/([a-z\d])(\w*)/g, (w, char, str) => {
+  return header
+    .trim()
+    .toLowerCase()
+    .replace(/([a-z\d])(\w*)/g, (w, char, str) => {
       return char.toUpperCase() + str;
     });
 }
@@ -38199,12 +39773,12 @@ function formatHeader(header) {
 function buildAccessors(obj, header) {
   const accessorName = utils$1.toCamelCase(' ' + header);
 
-  ['get', 'set', 'has'].forEach(methodName => {
+  ['get', 'set', 'has'].forEach((methodName) => {
     Object.defineProperty(obj, methodName + accessorName, {
-      value: function(arg1, arg2, arg3) {
+      value: function (arg1, arg2, arg3) {
         return this[methodName].call(this, header, arg1, arg2, arg3);
       },
-      configurable: true
+      configurable: true,
     });
   });
 }
@@ -38226,7 +39800,12 @@ class AxiosHeaders {
 
       const key = utils$1.findKey(self, lHeader);
 
-      if(!key || self[key] === undefined || _rewrite === true || (_rewrite === undefined && self[key] !== false)) {
+      if (
+        !key ||
+        self[key] === undefined ||
+        _rewrite === true ||
+        (_rewrite === undefined && self[key] !== false)
+      ) {
         self[key || _header] = normalizeValue(_value);
       }
     }
@@ -38236,12 +39815,25 @@ class AxiosHeaders {
 
     if (utils$1.isPlainObject(header) || header instanceof this.constructor) {
       setHeaders(header, valueOrRewrite);
-    } else if(utils$1.isString(header) && (header = header.trim()) && !isValidHeaderName(header)) {
+    } else if (utils$1.isString(header) && (header = header.trim()) && !isValidHeaderName(header)) {
       setHeaders(parseHeaders(header), valueOrRewrite);
-    } else if (utils$1.isHeaders(header)) {
-      for (const [key, value] of header.entries()) {
-        setHeader(value, key, rewrite);
+    } else if (utils$1.isObject(header) && utils$1.isIterable(header)) {
+      let obj = {},
+        dest,
+        key;
+      for (const entry of header) {
+        if (!utils$1.isArray(entry)) {
+          throw TypeError('Object iterator must return a key-value pair');
+        }
+
+        obj[(key = entry[0])] = (dest = obj[key])
+          ? utils$1.isArray(dest)
+            ? [...dest, entry[1]]
+            : [dest, entry[1]]
+          : entry[1];
       }
+
+      setHeaders(obj, valueOrRewrite);
     } else {
       header != null && setHeader(valueOrRewrite, header, rewrite);
     }
@@ -38285,7 +39877,11 @@ class AxiosHeaders {
     if (header) {
       const key = utils$1.findKey(this, header);
 
-      return !!(key && this[key] !== undefined && (!matcher || matchHeaderValue(this, this[key], key, matcher)));
+      return !!(
+        key &&
+        this[key] !== undefined &&
+        (!matcher || matchHeaderValue(this, this[key], key, matcher))
+      );
     }
 
     return false;
@@ -38325,7 +39921,7 @@ class AxiosHeaders {
 
     while (i--) {
       const key = keys[i];
-      if(!matcher || matchHeaderValue(this, this[key], key, matcher, true)) {
+      if (!matcher || matchHeaderValue(this, this[key], key, matcher, true)) {
         delete this[key];
         deleted = true;
       }
@@ -38369,7 +39965,9 @@ class AxiosHeaders {
     const obj = Object.create(null);
 
     utils$1.forEach(this, (value, header) => {
-      value != null && value !== false && (obj[header] = asStrings && utils$1.isArray(value) ? value.join(', ') : value);
+      value != null &&
+        value !== false &&
+        (obj[header] = asStrings && utils$1.isArray(value) ? value.join(', ') : value);
     });
 
     return obj;
@@ -38380,7 +39978,13 @@ class AxiosHeaders {
   }
 
   toString() {
-    return Object.entries(this.toJSON()).map(([header, value]) => header + ': ' + value).join('\n');
+    return Object.entries(this.toJSON())
+      .map(([header, value]) => header + ': ' + value)
+      .join('\n');
+  }
+
+  getSetCookie() {
+    return this.get('set-cookie') || [];
   }
 
   get [Symbol.toStringTag]() {
@@ -38400,9 +40004,12 @@ class AxiosHeaders {
   }
 
   static accessor(header) {
-    const internals = this[$internals] = (this[$internals] = {
-      accessors: {}
-    });
+    const internals =
+      (this[$internals] =
+      this[$internals] =
+        {
+          accessors: {},
+        });
 
     const accessors = internals.accessors;
     const prototype = this.prototype;
@@ -38422,17 +40029,24 @@ class AxiosHeaders {
   }
 }
 
-AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent', 'Authorization']);
+AxiosHeaders.accessor([
+  'Content-Type',
+  'Content-Length',
+  'Accept',
+  'Accept-Encoding',
+  'User-Agent',
+  'Authorization',
+]);
 
 // reserved names hotfix
-utils$1.reduceDescriptors(AxiosHeaders.prototype, ({value}, key) => {
+utils$1.reduceDescriptors(AxiosHeaders.prototype, ({ value }, key) => {
   let mapped = key[0].toUpperCase() + key.slice(1); // map `set` => `Set`
   return {
     get: () => value,
     set(headerValue) {
       this[mapped] = headerValue;
-    }
-  }
+    },
+  };
 });
 
 utils$1.freezeMethods(AxiosHeaders);
@@ -38466,24 +40080,24 @@ function isCancel(value) {
   return !!(value && value.__CANCEL__);
 }
 
-/**
- * A `CanceledError` is an object that is thrown when an operation is canceled.
- *
- * @param {string=} message The message.
- * @param {Object=} config The config.
- * @param {Object=} request The request.
- *
- * @returns {CanceledError} The created error.
- */
-function CanceledError(message, config, request) {
-  // eslint-disable-next-line no-eq-null,eqeqeq
-  AxiosError.call(this, message == null ? 'canceled' : message, AxiosError.ERR_CANCELED, config, request);
-  this.name = 'CanceledError';
+class CanceledError extends AxiosError$1 {
+  /**
+   * A `CanceledError` is an object that is thrown when an operation is canceled.
+   *
+   * @param {string=} message The message.
+   * @param {Object=} config The config.
+   * @param {Object=} request The request.
+   *
+   * @returns {CanceledError} The created error.
+   */
+  constructor(message, config, request) {
+    super(message == null ? 'canceled' : message, AxiosError$1.ERR_CANCELED, config, request);
+    this.name = 'CanceledError';
+    this.__CANCEL__ = true;
+  }
 }
 
-utils$1.inherits(CanceledError, AxiosError, {
-  __CANCEL__: true
-});
+const CanceledError$1 = CanceledError;
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -38499,13 +40113,17 @@ function settle(resolve, reject, response) {
   if (!response.status || !validateStatus || validateStatus(response.status)) {
     resolve(response);
   } else {
-    reject(new AxiosError(
-      'Request failed with status code ' + response.status,
-      [AxiosError.ERR_BAD_REQUEST, AxiosError.ERR_BAD_RESPONSE][Math.floor(response.status / 100) - 4],
-      response.config,
-      response.request,
-      response
-    ));
+    reject(
+      new AxiosError$1(
+        'Request failed with status code ' + response.status,
+        [AxiosError$1.ERR_BAD_REQUEST, AxiosError$1.ERR_BAD_RESPONSE][
+          Math.floor(response.status / 100) - 4
+        ],
+        response.config,
+        response.request,
+        response
+      )
+    );
   }
 }
 
@@ -38520,6 +40138,10 @@ function isAbsoluteURL(url) {
   // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
   // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
   // by any combination of letters, digits, plus, period, or hyphen.
+  if (typeof url !== 'string') {
+    return false;
+  }
+
   return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);
 }
 
@@ -38547,18 +40169,19 @@ function combineURLs(baseURL, relativeURL) {
  *
  * @returns {string} The combined full path
  */
-function buildFullPath(baseURL, requestedURL) {
-  if (baseURL && !isAbsoluteURL(requestedURL)) {
+function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls) {
+  let isRelativeUrl = !isAbsoluteURL(requestedURL);
+  if (baseURL && (isRelativeUrl || allowAbsoluteUrls == false)) {
     return combineURLs(baseURL, requestedURL);
   }
   return requestedURL;
 }
 
-const VERSION = "1.7.8";
+const VERSION = "1.13.6";
 
 function parseProtocol(url) {
   const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
-  return match && match[1] || '';
+  return (match && match[1]) || '';
 }
 
 const DATA_URL_PATTERN = /^(?:([^;]+);)?(?:[^;]+;)?(base64|),([\s\S]*)$/;
@@ -38574,7 +40197,7 @@ const DATA_URL_PATTERN = /^(?:([^;]+);)?(?:[^;]+;)?(base64|),([\s\S]*)$/;
  * @returns {Buffer|Blob}
  */
 function fromDataURI(uri, asBlob, options) {
-  const _Blob = options && options.Blob || platform.classes.Blob;
+  const _Blob = (options && options.Blob) || platform.classes.Blob;
   const protocol = parseProtocol(uri);
 
   if (asBlob === undefined && _Blob) {
@@ -38587,7 +40210,7 @@ function fromDataURI(uri, asBlob, options) {
     const match = DATA_URL_PATTERN.exec(uri);
 
     if (!match) {
-      throw new AxiosError('Invalid URL', AxiosError.ERR_INVALID_URL);
+      throw new AxiosError$1('Invalid URL', AxiosError$1.ERR_INVALID_URL);
     }
 
     const mime = match[1];
@@ -38597,38 +40220,43 @@ function fromDataURI(uri, asBlob, options) {
 
     if (asBlob) {
       if (!_Blob) {
-        throw new AxiosError('Blob is not supported', AxiosError.ERR_NOT_SUPPORT);
+        throw new AxiosError$1('Blob is not supported', AxiosError$1.ERR_NOT_SUPPORT);
       }
 
-      return new _Blob([buffer], {type: mime});
+      return new _Blob([buffer], { type: mime });
     }
 
     return buffer;
   }
 
-  throw new AxiosError('Unsupported protocol ' + protocol, AxiosError.ERR_NOT_SUPPORT);
+  throw new AxiosError$1('Unsupported protocol ' + protocol, AxiosError$1.ERR_NOT_SUPPORT);
 }
 
 const kInternals = Symbol('internals');
 
-class AxiosTransformStream extends stream__default["default"].Transform{
+class AxiosTransformStream extends stream__default["default"].Transform {
   constructor(options) {
-    options = utils$1.toFlatObject(options, {
-      maxRate: 0,
-      chunkSize: 64 * 1024,
-      minChunkSize: 100,
-      timeWindow: 500,
-      ticksRate: 2,
-      samplesCount: 15
-    }, null, (prop, source) => {
-      return !utils$1.isUndefined(source[prop]);
-    });
+    options = utils$1.toFlatObject(
+      options,
+      {
+        maxRate: 0,
+        chunkSize: 64 * 1024,
+        minChunkSize: 100,
+        timeWindow: 500,
+        ticksRate: 2,
+        samplesCount: 15,
+      },
+      null,
+      (prop, source) => {
+        return !utils$1.isUndefined(source[prop]);
+      }
+    );
 
     super({
-      readableHighWaterMark: options.chunkSize
+      readableHighWaterMark: options.chunkSize,
     });
 
-    const internals = this[kInternals] = {
+    const internals = (this[kInternals] = {
       timeWindow: options.timeWindow,
       chunkSize: options.chunkSize,
       maxRate: options.maxRate,
@@ -38638,10 +40266,10 @@ class AxiosTransformStream extends stream__default["default"].Transform{
       notifiedBytesLoaded: 0,
       ts: Date.now(),
       bytes: 0,
-      onReadCallback: null
-    };
+      onReadCallback: null,
+    });
 
-    this.on('newListener', event => {
+    this.on('newListener', (event) => {
       if (event === 'progress') {
         if (!internals.isCaptured) {
           internals.isCaptured = true;
@@ -38669,8 +40297,11 @@ class AxiosTransformStream extends stream__default["default"].Transform{
     const timeWindow = internals.timeWindow;
 
     const divider = 1000 / timeWindow;
-    const bytesThreshold = (maxRate / divider);
-    const minChunkSize = internals.minChunkSize !== false ? Math.max(internals.minChunkSize, bytesThreshold * 0.01) : 0;
+    const bytesThreshold = maxRate / divider;
+    const minChunkSize =
+      internals.minChunkSize !== false
+        ? Math.max(internals.minChunkSize, bytesThreshold * 0.01)
+        : 0;
 
     const pushChunk = (_chunk, _callback) => {
       const bytes = Buffer.byteLength(_chunk);
@@ -38699,7 +40330,7 @@ class AxiosTransformStream extends stream__default["default"].Transform{
       if (maxRate) {
         const now = Date.now();
 
-        if (!internals.ts || (passed = (now - internals.ts)) >= timeWindow) {
+        if (!internals.ts || (passed = now - internals.ts) >= timeWindow) {
           internals.ts = now;
           bytesLeft = bytesThreshold - internals.bytes;
           internals.bytes = bytesLeft < 0 ? -bytesLeft : 0;
@@ -38722,14 +40353,19 @@ class AxiosTransformStream extends stream__default["default"].Transform{
         }
       }
 
-      if (maxChunkSize && chunkSize > maxChunkSize && (chunkSize - maxChunkSize) > minChunkSize) {
+      if (maxChunkSize && chunkSize > maxChunkSize && chunkSize - maxChunkSize > minChunkSize) {
         chunkRemainder = _chunk.subarray(maxChunkSize);
         _chunk = _chunk.subarray(0, maxChunkSize);
       }
 
-      pushChunk(_chunk, chunkRemainder ? () => {
-        process.nextTick(_callback, null, chunkRemainder);
-      } : _callback);
+      pushChunk(
+        _chunk,
+        chunkRemainder
+          ? () => {
+              process.nextTick(_callback, null, chunkRemainder);
+            }
+          : _callback
+      );
     };
 
     transformChunk(chunk, function transformNextChunk(err, _chunk) {
@@ -38748,7 +40384,7 @@ class AxiosTransformStream extends stream__default["default"].Transform{
 
 const AxiosTransformStream$1 = AxiosTransformStream;
 
-const {asyncIterator} = Symbol;
+const { asyncIterator } = Symbol;
 
 const readBlob = async function* (blob) {
   if (blob.stream) {
@@ -38764,7 +40400,7 @@ const readBlob = async function* (blob) {
 
 const readBlob$1 = readBlob;
 
-const BOUNDARY_ALPHABET = utils$1.ALPHABET.ALPHA_DIGIT + '-_';
+const BOUNDARY_ALPHABET = platform.ALPHABET.ALPHA_DIGIT + '-_';
 
 const textEncoder = typeof TextEncoder === 'function' ? new TextEncoder() : new util__default["default"].TextEncoder();
 
@@ -38774,7 +40410,7 @@ const CRLF_BYTES_COUNT = 2;
 
 class FormDataPart {
   constructor(name, value) {
-    const {escapeName} = this.constructor;
+    const { escapeName } = this.constructor;
     const isStringValue = utils$1.isString(value);
 
     let headers = `Content-Disposition: form-data; name="${escapeName(name)}"${
@@ -38784,7 +40420,7 @@ class FormDataPart {
     if (isStringValue) {
       value = textEncoder.encode(String(value).replace(/\r?\n|\r\n?/g, CRLF));
     } else {
-      headers += `Content-Type: ${value.type || "application/octet-stream"}${CRLF}`;
+      headers += `Content-Type: ${value.type || 'application/octet-stream'}${CRLF}`;
     }
 
     this.headers = textEncoder.encode(headers + CRLF);
@@ -38797,12 +40433,12 @@ class FormDataPart {
     this.value = value;
   }
 
-  async *encode(){
+  async *encode() {
     yield this.headers;
 
-    const {value} = this;
+    const { value } = this;
 
-    if(utils$1.isTypedArray(value)) {
+    if (utils$1.isTypedArray(value)) {
       yield value;
     } else {
       yield* readBlob$1(value);
@@ -38812,11 +40448,15 @@ class FormDataPart {
   }
 
   static escapeName(name) {
-      return String(name).replace(/[\r\n"]/g, (match) => ({
-        '\r' : '%0D',
-        '\n' : '%0A',
-        '"' : '%22',
-      }[match]));
+    return String(name).replace(
+      /[\r\n"]/g,
+      (match) =>
+        ({
+          '\r': '%0D',
+          '\n': '%0A',
+          '"': '%22',
+        })[match]
+    );
   }
 }
 
@@ -38824,19 +40464,19 @@ const formDataToStream = (form, headersHandler, options) => {
   const {
     tag = 'form-data-boundary',
     size = 25,
-    boundary = tag + '-' + utils$1.generateString(size, BOUNDARY_ALPHABET)
+    boundary = tag + '-' + platform.generateString(size, BOUNDARY_ALPHABET),
   } = options || {};
 
-  if(!utils$1.isFormData(form)) {
+  if (!utils$1.isFormData(form)) {
     throw TypeError('FormData instance required');
   }
 
   if (boundary.length < 1 || boundary.length > 70) {
-    throw Error('boundary must be 10-70 characters long')
+    throw Error('boundary must be 10-70 characters long');
   }
 
   const boundaryBytes = textEncoder.encode('--' + boundary + CRLF);
-  const footerBytes = textEncoder.encode('--' + boundary + '--' + CRLF + CRLF);
+  const footerBytes = textEncoder.encode('--' + boundary + '--' + CRLF);
   let contentLength = footerBytes.byteLength;
 
   const parts = Array.from(form.entries()).map(([name, value]) => {
@@ -38850,7 +40490,7 @@ const formDataToStream = (form, headersHandler, options) => {
   contentLength = utils$1.toFiniteNumber(contentLength);
 
   const computedHeaders = {
-    'Content-Type': `multipart/form-data; boundary=${boundary}`
+    'Content-Type': `multipart/form-data; boundary=${boundary}`,
   };
 
   if (Number.isFinite(contentLength)) {
@@ -38859,14 +40499,16 @@ const formDataToStream = (form, headersHandler, options) => {
 
   headersHandler && headersHandler(computedHeaders);
 
-  return stream.Readable.from((async function *() {
-    for(const part of parts) {
-      yield boundaryBytes;
-      yield* part.encode();
-    }
+  return stream.Readable.from(
+    (async function* () {
+      for (const part of parts) {
+        yield boundaryBytes;
+        yield* part.encode();
+      }
 
-    yield footerBytes;
-  })());
+      yield footerBytes;
+    })()
+  );
 };
 
 const formDataToStream$1 = formDataToStream;
@@ -38882,10 +40524,11 @@ class ZlibHeaderTransformStream extends stream__default["default"].Transform {
       this._transform = this.__transform;
 
       // Add Default Compression headers if no zlib headers are present
-      if (chunk[0] !== 120) { // Hex: 78
+      if (chunk[0] !== 120) {
+        // Hex: 78
         const header = Buffer.alloc(2);
         header[0] = 120; // Hex: 78
-        header[1] = 156; // Hex: 9C 
+        header[1] = 156; // Hex: 9C
         this.push(header, encoding);
       }
     }
@@ -38897,16 +40540,18 @@ class ZlibHeaderTransformStream extends stream__default["default"].Transform {
 const ZlibHeaderTransformStream$1 = ZlibHeaderTransformStream;
 
 const callbackify = (fn, reducer) => {
-  return utils$1.isAsyncFn(fn) ? function (...args) {
-    const cb = args.pop();
-    fn.apply(this, args).then((value) => {
-      try {
-        reducer ? cb(null, ...reducer(value)) : cb(null, value);
-      } catch (err) {
-        cb(err);
+  return utils$1.isAsyncFn(fn)
+    ? function (...args) {
+        const cb = args.pop();
+        fn.apply(this, args).then((value) => {
+          try {
+            reducer ? cb(null, ...reducer(value)) : cb(null, value);
+          } catch (err) {
+            cb(err);
+          }
+        }, cb);
       }
-    }, cb);
-  } : fn;
+    : fn;
 };
 
 const callbackify$1 = callbackify;
@@ -38959,7 +40604,7 @@ function speedometer(samplesCount, min) {
 
     const passed = startedAt && now - startedAt;
 
-    return passed ? Math.round(bytesCount * 1000 / passed) : undefined;
+    return passed ? Math.round((bytesCount * 1000) / passed) : undefined;
   };
 }
 
@@ -38982,13 +40627,13 @@ function throttle(fn, freq) {
       clearTimeout(timer);
       timer = null;
     }
-    fn.apply(null, args);
+    fn(...args);
   };
 
   const throttled = (...args) => {
     const now = Date.now();
     const passed = now - timestamp;
-    if ( passed >= threshold) {
+    if (passed >= threshold) {
       invoke(args, now);
     } else {
       lastArgs = args;
@@ -39010,7 +40655,7 @@ const progressEventReducer = (listener, isDownloadStream, freq = 3) => {
   let bytesNotified = 0;
   const _speedometer = speedometer(50, 250);
 
-  return throttle(e => {
+  return throttle((e) => {
     const loaded = e.loaded;
     const total = e.lengthComputable ? e.total : undefined;
     const progressBytes = loaded - bytesNotified;
@@ -39022,13 +40667,13 @@ const progressEventReducer = (listener, isDownloadStream, freq = 3) => {
     const data = {
       loaded,
       total,
-      progress: total ? (loaded / total) : undefined,
+      progress: total ? loaded / total : undefined,
       bytes: progressBytes,
       rate: rate ? rate : undefined,
       estimated: rate && total && inRange ? (total - loaded) / rate : undefined,
       event: e,
       lengthComputable: total != null,
-      [isDownloadStream ? 'download' : 'upload']: true
+      [isDownloadStream ? 'download' : 'upload']: true,
     };
 
     listener(data);
@@ -39038,42 +40683,223 @@ const progressEventReducer = (listener, isDownloadStream, freq = 3) => {
 const progressEventDecorator = (total, throttled) => {
   const lengthComputable = total != null;
 
-  return [(loaded) => throttled[0]({
-    lengthComputable,
-    total,
-    loaded
-  }), throttled[1]];
+  return [
+    (loaded) =>
+      throttled[0]({
+        lengthComputable,
+        total,
+        loaded,
+      }),
+    throttled[1],
+  ];
 };
 
-const asyncDecorator = (fn) => (...args) => utils$1.asap(() => fn(...args));
+const asyncDecorator =
+  (fn) =>
+  (...args) =>
+    utils$1.asap(() => fn(...args));
+
+/**
+ * Estimate decoded byte length of a data:// URL *without* allocating large buffers.
+ * - For base64: compute exact decoded size using length and padding;
+ *               handle %XX at the character-count level (no string allocation).
+ * - For non-base64: use UTF-8 byteLength of the encoded body as a safe upper bound.
+ *
+ * @param {string} url
+ * @returns {number}
+ */
+function estimateDataURLDecodedBytes(url) {
+  if (!url || typeof url !== 'string') return 0;
+  if (!url.startsWith('data:')) return 0;
+
+  const comma = url.indexOf(',');
+  if (comma < 0) return 0;
+
+  const meta = url.slice(5, comma);
+  const body = url.slice(comma + 1);
+  const isBase64 = /;base64/i.test(meta);
+
+  if (isBase64) {
+    let effectiveLen = body.length;
+    const len = body.length; // cache length
+
+    for (let i = 0; i < len; i++) {
+      if (body.charCodeAt(i) === 37 /* '%' */ && i + 2 < len) {
+        const a = body.charCodeAt(i + 1);
+        const b = body.charCodeAt(i + 2);
+        const isHex =
+          ((a >= 48 && a <= 57) || (a >= 65 && a <= 70) || (a >= 97 && a <= 102)) &&
+          ((b >= 48 && b <= 57) || (b >= 65 && b <= 70) || (b >= 97 && b <= 102));
+
+        if (isHex) {
+          effectiveLen -= 2;
+          i += 2;
+        }
+      }
+    }
+
+    let pad = 0;
+    let idx = len - 1;
+
+    const tailIsPct3D = (j) =>
+      j >= 2 &&
+      body.charCodeAt(j - 2) === 37 && // '%'
+      body.charCodeAt(j - 1) === 51 && // '3'
+      (body.charCodeAt(j) === 68 || body.charCodeAt(j) === 100); // 'D' or 'd'
+
+    if (idx >= 0) {
+      if (body.charCodeAt(idx) === 61 /* '=' */) {
+        pad++;
+        idx--;
+      } else if (tailIsPct3D(idx)) {
+        pad++;
+        idx -= 3;
+      }
+    }
+
+    if (pad === 1 && idx >= 0) {
+      if (body.charCodeAt(idx) === 61 /* '=' */) {
+        pad++;
+      } else if (tailIsPct3D(idx)) {
+        pad++;
+      }
+    }
+
+    const groups = Math.floor(effectiveLen / 4);
+    const bytes = groups * 3 - (pad || 0);
+    return bytes > 0 ? bytes : 0;
+  }
+
+  return Buffer.byteLength(body, 'utf8');
+}
 
 const zlibOptions = {
   flush: zlib__default["default"].constants.Z_SYNC_FLUSH,
-  finishFlush: zlib__default["default"].constants.Z_SYNC_FLUSH
+  finishFlush: zlib__default["default"].constants.Z_SYNC_FLUSH,
 };
 
 const brotliOptions = {
   flush: zlib__default["default"].constants.BROTLI_OPERATION_FLUSH,
-  finishFlush: zlib__default["default"].constants.BROTLI_OPERATION_FLUSH
+  finishFlush: zlib__default["default"].constants.BROTLI_OPERATION_FLUSH,
 };
 
 const isBrotliSupported = utils$1.isFunction(zlib__default["default"].createBrotliDecompress);
 
-const {http: httpFollow, https: httpsFollow} = followRedirects__default["default"];
+const { http: httpFollow, https: httpsFollow } = followRedirects__default["default"];
 
 const isHttps = /https:?/;
 
-const supportedProtocols = platform.protocols.map(protocol => {
+const supportedProtocols = platform.protocols.map((protocol) => {
   return protocol + ':';
 });
 
 const flushOnFinish = (stream, [throttled, flush]) => {
-  stream
-    .on('end', flush)
-    .on('error', flush);
+  stream.on('end', flush).on('error', flush);
 
   return throttled;
 };
+
+class Http2Sessions {
+  constructor() {
+    this.sessions = Object.create(null);
+  }
+
+  getSession(authority, options) {
+    options = Object.assign(
+      {
+        sessionTimeout: 1000,
+      },
+      options
+    );
+
+    let authoritySessions = this.sessions[authority];
+
+    if (authoritySessions) {
+      let len = authoritySessions.length;
+
+      for (let i = 0; i < len; i++) {
+        const [sessionHandle, sessionOptions] = authoritySessions[i];
+        if (
+          !sessionHandle.destroyed &&
+          !sessionHandle.closed &&
+          util__default["default"].isDeepStrictEqual(sessionOptions, options)
+        ) {
+          return sessionHandle;
+        }
+      }
+    }
+
+    const session = http2__default["default"].connect(authority, options);
+
+    let removed;
+
+    const removeSession = () => {
+      if (removed) {
+        return;
+      }
+
+      removed = true;
+
+      let entries = authoritySessions,
+        len = entries.length,
+        i = len;
+
+      while (i--) {
+        if (entries[i][0] === session) {
+          if (len === 1) {
+            delete this.sessions[authority];
+          } else {
+            entries.splice(i, 1);
+          }
+          return;
+        }
+      }
+    };
+
+    const originalRequestFn = session.request;
+
+    const { sessionTimeout } = options;
+
+    if (sessionTimeout != null) {
+      let timer;
+      let streamsCount = 0;
+
+      session.request = function () {
+        const stream = originalRequestFn.apply(this, arguments);
+
+        streamsCount++;
+
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+
+        stream.once('close', () => {
+          if (!--streamsCount) {
+            timer = setTimeout(() => {
+              timer = null;
+              removeSession();
+            }, sessionTimeout);
+          }
+        });
+
+        return stream;
+      };
+    }
+
+    session.once('close', removeSession);
+
+    let entry = [session, options];
+
+    authoritySessions
+      ? authoritySessions.push(entry)
+      : (authoritySessions = this.sessions[authority] = [entry]);
+
+    return session;
+  }
+}
+
+const http2Sessions = new Http2Sessions();
 
 /**
  * If the proxy or config beforeRedirects functions are defined, call them with the options
@@ -39117,12 +40943,16 @@ function setProxy(options, configProxy, location) {
 
     if (proxy.auth) {
       // Support proxy auth object form
-      if (proxy.auth.username || proxy.auth.password) {
+      const validProxyAuth = Boolean(proxy.auth.username || proxy.auth.password);
+
+      if (validProxyAuth) {
         proxy.auth = (proxy.auth.username || '') + ':' + (proxy.auth.password || '');
+      } else if (typeof proxy.auth === 'object') {
+        throw new AxiosError$1('Invalid proxy authorization', AxiosError$1.ERR_BAD_OPTION, { proxy });
       }
-      const base64 = Buffer
-        .from(proxy.auth, 'utf8')
-        .toString('base64');
+
+      const base64 = Buffer.from(proxy.auth, 'utf8').toString('base64');
+
       options.headers['Proxy-Authorization'] = 'Basic ' + base64;
     }
 
@@ -39145,7 +40975,8 @@ function setProxy(options, configProxy, location) {
   };
 }
 
-const isHttpAdapterSupported = typeof process !== 'undefined' && utils$1.kindOf(process) === 'process';
+const isHttpAdapterSupported =
+  typeof process !== 'undefined' && utils$1.kindOf(process) === 'process';
 
 // temporary hotfix
 
@@ -39171,599 +41002,753 @@ const wrapAsync = (asyncExecutor) => {
     };
 
     asyncExecutor(_resolve, _reject, (onDoneHandler) => (onDone = onDoneHandler)).catch(_reject);
-  })
+  });
 };
 
-const resolveFamily = ({address, family}) => {
+const resolveFamily = ({ address, family }) => {
   if (!utils$1.isString(address)) {
     throw TypeError('address must be a string');
   }
-  return ({
+  return {
     address,
-    family: family || (address.indexOf('.') < 0 ? 6 : 4)
-  });
+    family: family || (address.indexOf('.') < 0 ? 6 : 4),
+  };
 };
 
-const buildAddressEntry = (address, family) => resolveFamily(utils$1.isObject(address) ? address : {address, family});
+const buildAddressEntry = (address, family) =>
+  resolveFamily(utils$1.isObject(address) ? address : { address, family });
+
+const http2Transport = {
+  request(options, cb) {
+    const authority =
+      options.protocol +
+      '//' +
+      options.hostname +
+      ':' +
+      (options.port || (options.protocol === 'https:' ? 443 : 80));
+
+    const { http2Options, headers } = options;
+
+    const session = http2Sessions.getSession(authority, http2Options);
+
+    const { HTTP2_HEADER_SCHEME, HTTP2_HEADER_METHOD, HTTP2_HEADER_PATH, HTTP2_HEADER_STATUS } =
+      http2__default["default"].constants;
+
+    const http2Headers = {
+      [HTTP2_HEADER_SCHEME]: options.protocol.replace(':', ''),
+      [HTTP2_HEADER_METHOD]: options.method,
+      [HTTP2_HEADER_PATH]: options.path,
+    };
+
+    utils$1.forEach(headers, (header, name) => {
+      name.charAt(0) !== ':' && (http2Headers[name] = header);
+    });
+
+    const req = session.request(http2Headers);
+
+    req.once('response', (responseHeaders) => {
+      const response = req; //duplex
+
+      responseHeaders = Object.assign({}, responseHeaders);
+
+      const status = responseHeaders[HTTP2_HEADER_STATUS];
+
+      delete responseHeaders[HTTP2_HEADER_STATUS];
+
+      response.headers = responseHeaders;
+
+      response.statusCode = +status;
+
+      cb(response);
+    });
+
+    return req;
+  },
+};
 
 /*eslint consistent-return:0*/
-const httpAdapter = isHttpAdapterSupported && function httpAdapter(config) {
-  return wrapAsync(async function dispatchHttpRequest(resolve, reject, onDone) {
-    let {data, lookup, family} = config;
-    const {responseType, responseEncoding} = config;
-    const method = config.method.toUpperCase();
-    let isDone;
-    let rejected = false;
-    let req;
+const httpAdapter = isHttpAdapterSupported &&
+  function httpAdapter(config) {
+    return wrapAsync(async function dispatchHttpRequest(resolve, reject, onDone) {
+      let { data, lookup, family, httpVersion = 1, http2Options } = config;
+      const { responseType, responseEncoding } = config;
+      const method = config.method.toUpperCase();
+      let isDone;
+      let rejected = false;
+      let req;
 
-    if (lookup) {
-      const _lookup = callbackify$1(lookup, (value) => utils$1.isArray(value) ? value : [value]);
-      // hotfix to support opt.all option which is required for node 20.x
-      lookup = (hostname, opt, cb) => {
-        _lookup(hostname, opt, (err, arg0, arg1) => {
-          if (err) {
-            return cb(err);
-          }
+      httpVersion = +httpVersion;
 
-          const addresses = utils$1.isArray(arg0) ? arg0.map(addr => buildAddressEntry(addr)) : [buildAddressEntry(arg0, arg1)];
+      if (Number.isNaN(httpVersion)) {
+        throw TypeError(`Invalid protocol version: '${config.httpVersion}' is not a number`);
+      }
 
-          opt.all ? cb(err, addresses) : cb(err, addresses[0].address, addresses[0].family);
-        });
+      if (httpVersion !== 1 && httpVersion !== 2) {
+        throw TypeError(`Unsupported protocol version '${httpVersion}'`);
+      }
+
+      const isHttp2 = httpVersion === 2;
+
+      if (lookup) {
+        const _lookup = callbackify$1(lookup, (value) => (utils$1.isArray(value) ? value : [value]));
+        // hotfix to support opt.all option which is required for node 20.x
+        lookup = (hostname, opt, cb) => {
+          _lookup(hostname, opt, (err, arg0, arg1) => {
+            if (err) {
+              return cb(err);
+            }
+
+            const addresses = utils$1.isArray(arg0)
+              ? arg0.map((addr) => buildAddressEntry(addr))
+              : [buildAddressEntry(arg0, arg1)];
+
+            opt.all ? cb(err, addresses) : cb(err, addresses[0].address, addresses[0].family);
+          });
+        };
+      }
+
+      const abortEmitter = new events.EventEmitter();
+
+      function abort(reason) {
+        try {
+          abortEmitter.emit(
+            'abort',
+            !reason || reason.type ? new CanceledError$1(null, config, req) : reason
+          );
+        } catch (err) {
+          console.warn('emit error', err);
+        }
+      }
+
+      abortEmitter.once('abort', reject);
+
+      const onFinished = () => {
+        if (config.cancelToken) {
+          config.cancelToken.unsubscribe(abort);
+        }
+
+        if (config.signal) {
+          config.signal.removeEventListener('abort', abort);
+        }
+
+        abortEmitter.removeAllListeners();
       };
-    }
 
-    // temporary internal emitter until the AxiosRequest class will be implemented
-    const emitter = new events.EventEmitter();
-
-    const onFinished = () => {
-      if (config.cancelToken) {
-        config.cancelToken.unsubscribe(abort);
+      if (config.cancelToken || config.signal) {
+        config.cancelToken && config.cancelToken.subscribe(abort);
+        if (config.signal) {
+          config.signal.aborted ? abort() : config.signal.addEventListener('abort', abort);
+        }
       }
 
-      if (config.signal) {
-        config.signal.removeEventListener('abort', abort);
-      }
+      onDone((response, isRejected) => {
+        isDone = true;
 
-      emitter.removeAllListeners();
-    };
+        if (isRejected) {
+          rejected = true;
+          onFinished();
+          return;
+        }
 
-    onDone((value, isRejected) => {
-      isDone = true;
-      if (isRejected) {
-        rejected = true;
-        onFinished();
-      }
-    });
+        const { data } = response;
 
-    function abort(reason) {
-      emitter.emit('abort', !reason || reason.type ? new CanceledError(null, config, req) : reason);
-    }
+        if (data instanceof stream__default["default"].Readable || data instanceof stream__default["default"].Duplex) {
+          const offListeners = stream__default["default"].finished(data, () => {
+            offListeners();
+            onFinished();
+          });
+        } else {
+          onFinished();
+        }
+      });
 
-    emitter.once('abort', reject);
+      // Parse url
+      const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
+      const parsed = new URL(fullPath, platform.hasBrowserEnv ? platform.origin : undefined);
+      const protocol = parsed.protocol || supportedProtocols[0];
 
-    if (config.cancelToken || config.signal) {
-      config.cancelToken && config.cancelToken.subscribe(abort);
-      if (config.signal) {
-        config.signal.aborted ? abort() : config.signal.addEventListener('abort', abort);
-      }
-    }
+      if (protocol === 'data:') {
+        // Apply the same semantics as HTTP: only enforce if a finite, non-negative cap is set.
+        if (config.maxContentLength > -1) {
+          // Use the exact string passed to fromDataURI (config.url); fall back to fullPath if needed.
+          const dataUrl = String(config.url || fullPath || '');
+          const estimated = estimateDataURLDecodedBytes(dataUrl);
 
-    // Parse url
-    const fullPath = buildFullPath(config.baseURL, config.url);
-    const parsed = new URL(fullPath, platform.hasBrowserEnv ? platform.origin : undefined);
-    const protocol = parsed.protocol || supportedProtocols[0];
+          if (estimated > config.maxContentLength) {
+            return reject(
+              new AxiosError$1(
+                'maxContentLength size of ' + config.maxContentLength + ' exceeded',
+                AxiosError$1.ERR_BAD_RESPONSE,
+                config
+              )
+            );
+          }
+        }
 
-    if (protocol === 'data:') {
-      let convertedData;
+        let convertedData;
 
-      if (method !== 'GET') {
+        if (method !== 'GET') {
+          return settle(resolve, reject, {
+            status: 405,
+            statusText: 'method not allowed',
+            headers: {},
+            config,
+          });
+        }
+
+        try {
+          convertedData = fromDataURI(config.url, responseType === 'blob', {
+            Blob: config.env && config.env.Blob,
+          });
+        } catch (err) {
+          throw AxiosError$1.from(err, AxiosError$1.ERR_BAD_REQUEST, config);
+        }
+
+        if (responseType === 'text') {
+          convertedData = convertedData.toString(responseEncoding);
+
+          if (!responseEncoding || responseEncoding === 'utf8') {
+            convertedData = utils$1.stripBOM(convertedData);
+          }
+        } else if (responseType === 'stream') {
+          convertedData = stream__default["default"].Readable.from(convertedData);
+        }
+
         return settle(resolve, reject, {
-          status: 405,
-          statusText: 'method not allowed',
-          headers: {},
-          config
+          data: convertedData,
+          status: 200,
+          statusText: 'OK',
+          headers: new AxiosHeaders$1(),
+          config,
         });
       }
+
+      if (supportedProtocols.indexOf(protocol) === -1) {
+        return reject(
+          new AxiosError$1('Unsupported protocol ' + protocol, AxiosError$1.ERR_BAD_REQUEST, config)
+        );
+      }
+
+      const headers = AxiosHeaders$1.from(config.headers).normalize();
+
+      // Set User-Agent (required by some servers)
+      // See https://github.com/axios/axios/issues/69
+      // User-Agent is specified; handle case where no UA header is desired
+      // Only set header if it hasn't been set in config
+      headers.set('User-Agent', 'axios/' + VERSION, false);
+
+      const { onUploadProgress, onDownloadProgress } = config;
+      const maxRate = config.maxRate;
+      let maxUploadRate = undefined;
+      let maxDownloadRate = undefined;
+
+      // support for spec compliant FormData objects
+      if (utils$1.isSpecCompliantForm(data)) {
+        const userBoundary = headers.getContentType(/boundary=([-_\w\d]{10,70})/i);
+
+        data = formDataToStream$1(
+          data,
+          (formHeaders) => {
+            headers.set(formHeaders);
+          },
+          {
+            tag: `axios-${VERSION}-boundary`,
+            boundary: (userBoundary && userBoundary[1]) || undefined,
+          }
+        );
+        // support for https://www.npmjs.com/package/form-data api
+      } else if (utils$1.isFormData(data) && utils$1.isFunction(data.getHeaders)) {
+        headers.set(data.getHeaders());
+
+        if (!headers.hasContentLength()) {
+          try {
+            const knownLength = await util__default["default"].promisify(data.getLength).call(data);
+            Number.isFinite(knownLength) &&
+              knownLength >= 0 &&
+              headers.setContentLength(knownLength);
+            /*eslint no-empty:0*/
+          } catch (e) {}
+        }
+      } else if (utils$1.isBlob(data) || utils$1.isFile(data)) {
+        data.size && headers.setContentType(data.type || 'application/octet-stream');
+        headers.setContentLength(data.size || 0);
+        data = stream__default["default"].Readable.from(readBlob$1(data));
+      } else if (data && !utils$1.isStream(data)) {
+        if (Buffer.isBuffer(data)) ; else if (utils$1.isArrayBuffer(data)) {
+          data = Buffer.from(new Uint8Array(data));
+        } else if (utils$1.isString(data)) {
+          data = Buffer.from(data, 'utf-8');
+        } else {
+          return reject(
+            new AxiosError$1(
+              'Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream',
+              AxiosError$1.ERR_BAD_REQUEST,
+              config
+            )
+          );
+        }
+
+        // Add Content-Length header if data exists
+        headers.setContentLength(data.length, false);
+
+        if (config.maxBodyLength > -1 && data.length > config.maxBodyLength) {
+          return reject(
+            new AxiosError$1(
+              'Request body larger than maxBodyLength limit',
+              AxiosError$1.ERR_BAD_REQUEST,
+              config
+            )
+          );
+        }
+      }
+
+      const contentLength = utils$1.toFiniteNumber(headers.getContentLength());
+
+      if (utils$1.isArray(maxRate)) {
+        maxUploadRate = maxRate[0];
+        maxDownloadRate = maxRate[1];
+      } else {
+        maxUploadRate = maxDownloadRate = maxRate;
+      }
+
+      if (data && (onUploadProgress || maxUploadRate)) {
+        if (!utils$1.isStream(data)) {
+          data = stream__default["default"].Readable.from(data, { objectMode: false });
+        }
+
+        data = stream__default["default"].pipeline(
+          [
+            data,
+            new AxiosTransformStream$1({
+              maxRate: utils$1.toFiniteNumber(maxUploadRate),
+            }),
+          ],
+          utils$1.noop
+        );
+
+        onUploadProgress &&
+          data.on(
+            'progress',
+            flushOnFinish(
+              data,
+              progressEventDecorator(
+                contentLength,
+                progressEventReducer(asyncDecorator(onUploadProgress), false, 3)
+              )
+            )
+          );
+      }
+
+      // HTTP basic authentication
+      let auth = undefined;
+      if (config.auth) {
+        const username = config.auth.username || '';
+        const password = config.auth.password || '';
+        auth = username + ':' + password;
+      }
+
+      if (!auth && parsed.username) {
+        const urlUsername = parsed.username;
+        const urlPassword = parsed.password;
+        auth = urlUsername + ':' + urlPassword;
+      }
+
+      auth && headers.delete('authorization');
+
+      let path;
 
       try {
-        convertedData = fromDataURI(config.url, responseType === 'blob', {
-          Blob: config.env && config.env.Blob
-        });
+        path = buildURL(
+          parsed.pathname + parsed.search,
+          config.params,
+          config.paramsSerializer
+        ).replace(/^\?/, '');
       } catch (err) {
-        throw AxiosError.from(err, AxiosError.ERR_BAD_REQUEST, config);
+        const customErr = new Error(err.message);
+        customErr.config = config;
+        customErr.url = config.url;
+        customErr.exists = true;
+        return reject(customErr);
       }
 
-      if (responseType === 'text') {
-        convertedData = convertedData.toString(responseEncoding);
-
-        if (!responseEncoding || responseEncoding === 'utf8') {
-          convertedData = utils$1.stripBOM(convertedData);
-        }
-      } else if (responseType === 'stream') {
-        convertedData = stream__default["default"].Readable.from(convertedData);
-      }
-
-      return settle(resolve, reject, {
-        data: convertedData,
-        status: 200,
-        statusText: 'OK',
-        headers: new AxiosHeaders$1(),
-        config
-      });
-    }
-
-    if (supportedProtocols.indexOf(protocol) === -1) {
-      return reject(new AxiosError(
-        'Unsupported protocol ' + protocol,
-        AxiosError.ERR_BAD_REQUEST,
-        config
-      ));
-    }
-
-    const headers = AxiosHeaders$1.from(config.headers).normalize();
-
-    // Set User-Agent (required by some servers)
-    // See https://github.com/axios/axios/issues/69
-    // User-Agent is specified; handle case where no UA header is desired
-    // Only set header if it hasn't been set in config
-    headers.set('User-Agent', 'axios/' + VERSION, false);
-
-    const {onUploadProgress, onDownloadProgress} = config;
-    const maxRate = config.maxRate;
-    let maxUploadRate = undefined;
-    let maxDownloadRate = undefined;
-
-    // support for spec compliant FormData objects
-    if (utils$1.isSpecCompliantForm(data)) {
-      const userBoundary = headers.getContentType(/boundary=([-_\w\d]{10,70})/i);
-
-      data = formDataToStream$1(data, (formHeaders) => {
-        headers.set(formHeaders);
-      }, {
-        tag: `axios-${VERSION}-boundary`,
-        boundary: userBoundary && userBoundary[1] || undefined
-      });
-      // support for https://www.npmjs.com/package/form-data api
-    } else if (utils$1.isFormData(data) && utils$1.isFunction(data.getHeaders)) {
-      headers.set(data.getHeaders());
-
-      if (!headers.hasContentLength()) {
-        try {
-          const knownLength = await util__default["default"].promisify(data.getLength).call(data);
-          Number.isFinite(knownLength) && knownLength >= 0 && headers.setContentLength(knownLength);
-          /*eslint no-empty:0*/
-        } catch (e) {
-        }
-      }
-    } else if (utils$1.isBlob(data) || utils$1.isFile(data)) {
-      data.size && headers.setContentType(data.type || 'application/octet-stream');
-      headers.setContentLength(data.size || 0);
-      data = stream__default["default"].Readable.from(readBlob$1(data));
-    } else if (data && !utils$1.isStream(data)) {
-      if (Buffer.isBuffer(data)) ; else if (utils$1.isArrayBuffer(data)) {
-        data = Buffer.from(new Uint8Array(data));
-      } else if (utils$1.isString(data)) {
-        data = Buffer.from(data, 'utf-8');
-      } else {
-        return reject(new AxiosError(
-          'Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream',
-          AxiosError.ERR_BAD_REQUEST,
-          config
-        ));
-      }
-
-      // Add Content-Length header if data exists
-      headers.setContentLength(data.length, false);
-
-      if (config.maxBodyLength > -1 && data.length > config.maxBodyLength) {
-        return reject(new AxiosError(
-          'Request body larger than maxBodyLength limit',
-          AxiosError.ERR_BAD_REQUEST,
-          config
-        ));
-      }
-    }
-
-    const contentLength = utils$1.toFiniteNumber(headers.getContentLength());
-
-    if (utils$1.isArray(maxRate)) {
-      maxUploadRate = maxRate[0];
-      maxDownloadRate = maxRate[1];
-    } else {
-      maxUploadRate = maxDownloadRate = maxRate;
-    }
-
-    if (data && (onUploadProgress || maxUploadRate)) {
-      if (!utils$1.isStream(data)) {
-        data = stream__default["default"].Readable.from(data, {objectMode: false});
-      }
-
-      data = stream__default["default"].pipeline([data, new AxiosTransformStream$1({
-        maxRate: utils$1.toFiniteNumber(maxUploadRate)
-      })], utils$1.noop);
-
-      onUploadProgress && data.on('progress', flushOnFinish(
-        data,
-        progressEventDecorator(
-          contentLength,
-          progressEventReducer(asyncDecorator(onUploadProgress), false, 3)
-        )
-      ));
-    }
-
-    // HTTP basic authentication
-    let auth = undefined;
-    if (config.auth) {
-      const username = config.auth.username || '';
-      const password = config.auth.password || '';
-      auth = username + ':' + password;
-    }
-
-    if (!auth && parsed.username) {
-      const urlUsername = parsed.username;
-      const urlPassword = parsed.password;
-      auth = urlUsername + ':' + urlPassword;
-    }
-
-    auth && headers.delete('authorization');
-
-    let path;
-
-    try {
-      path = buildURL(
-        parsed.pathname + parsed.search,
-        config.params,
-        config.paramsSerializer
-      ).replace(/^\?/, '');
-    } catch (err) {
-      const customErr = new Error(err.message);
-      customErr.config = config;
-      customErr.url = config.url;
-      customErr.exists = true;
-      return reject(customErr);
-    }
-
-    headers.set(
-      'Accept-Encoding',
-      'gzip, compress, deflate' + (isBrotliSupported ? ', br' : ''), false
+      headers.set(
+        'Accept-Encoding',
+        'gzip, compress, deflate' + (isBrotliSupported ? ', br' : ''),
+        false
       );
 
-    const options = {
-      path,
-      method: method,
-      headers: headers.toJSON(),
-      agents: { http: config.httpAgent, https: config.httpsAgent },
-      auth,
-      protocol,
-      family,
-      beforeRedirect: dispatchBeforeRedirect,
-      beforeRedirects: {}
-    };
-
-    // cacheable-lookup integration hotfix
-    !utils$1.isUndefined(lookup) && (options.lookup = lookup);
-
-    if (config.socketPath) {
-      options.socketPath = config.socketPath;
-    } else {
-      options.hostname = parsed.hostname.startsWith("[") ? parsed.hostname.slice(1, -1) : parsed.hostname;
-      options.port = parsed.port;
-      setProxy(options, config.proxy, protocol + '//' + parsed.hostname + (parsed.port ? ':' + parsed.port : '') + options.path);
-    }
-
-    let transport;
-    const isHttpsRequest = isHttps.test(options.protocol);
-    options.agent = isHttpsRequest ? config.httpsAgent : config.httpAgent;
-    if (config.transport) {
-      transport = config.transport;
-    } else if (config.maxRedirects === 0) {
-      transport = isHttpsRequest ? https__default["default"] : http__default["default"];
-    } else {
-      if (config.maxRedirects) {
-        options.maxRedirects = config.maxRedirects;
-      }
-      if (config.beforeRedirect) {
-        options.beforeRedirects.config = config.beforeRedirect;
-      }
-      transport = isHttpsRequest ? httpsFollow : httpFollow;
-    }
-
-    if (config.maxBodyLength > -1) {
-      options.maxBodyLength = config.maxBodyLength;
-    } else {
-      // follow-redirects does not skip comparison, so it should always succeed for axios -1 unlimited
-      options.maxBodyLength = Infinity;
-    }
-
-    if (config.insecureHTTPParser) {
-      options.insecureHTTPParser = config.insecureHTTPParser;
-    }
-
-    // Create the request
-    req = transport.request(options, function handleResponse(res) {
-      if (req.destroyed) return;
-
-      const streams = [res];
-
-      const responseLength = +res.headers['content-length'];
-
-      if (onDownloadProgress || maxDownloadRate) {
-        const transformStream = new AxiosTransformStream$1({
-          maxRate: utils$1.toFiniteNumber(maxDownloadRate)
-        });
-
-        onDownloadProgress && transformStream.on('progress', flushOnFinish(
-          transformStream,
-          progressEventDecorator(
-            responseLength,
-            progressEventReducer(asyncDecorator(onDownloadProgress), true, 3)
-          )
-        ));
-
-        streams.push(transformStream);
-      }
-
-      // decompress the response body transparently if required
-      let responseStream = res;
-
-      // return the last request in case of redirects
-      const lastRequest = res.req || req;
-
-      // if decompress disabled we should not decompress
-      if (config.decompress !== false && res.headers['content-encoding']) {
-        // if no content, but headers still say that it is encoded,
-        // remove the header not confuse downstream operations
-        if (method === 'HEAD' || res.statusCode === 204) {
-          delete res.headers['content-encoding'];
-        }
-
-        switch ((res.headers['content-encoding'] || '').toLowerCase()) {
-        /*eslint default-case:0*/
-        case 'gzip':
-        case 'x-gzip':
-        case 'compress':
-        case 'x-compress':
-          // add the unzipper to the body stream processing pipeline
-          streams.push(zlib__default["default"].createUnzip(zlibOptions));
-
-          // remove the content-encoding in order to not confuse downstream operations
-          delete res.headers['content-encoding'];
-          break;
-        case 'deflate':
-          streams.push(new ZlibHeaderTransformStream$1());
-
-          // add the unzipper to the body stream processing pipeline
-          streams.push(zlib__default["default"].createUnzip(zlibOptions));
-
-          // remove the content-encoding in order to not confuse downstream operations
-          delete res.headers['content-encoding'];
-          break;
-        case 'br':
-          if (isBrotliSupported) {
-            streams.push(zlib__default["default"].createBrotliDecompress(brotliOptions));
-            delete res.headers['content-encoding'];
-          }
-        }
-      }
-
-      responseStream = streams.length > 1 ? stream__default["default"].pipeline(streams, utils$1.noop) : streams[0];
-
-      const offListeners = stream__default["default"].finished(responseStream, () => {
-        offListeners();
-        onFinished();
-      });
-
-      const response = {
-        status: res.statusCode,
-        statusText: res.statusMessage,
-        headers: new AxiosHeaders$1(res.headers),
-        config,
-        request: lastRequest
+      const options = {
+        path,
+        method: method,
+        headers: headers.toJSON(),
+        agents: { http: config.httpAgent, https: config.httpsAgent },
+        auth,
+        protocol,
+        family,
+        beforeRedirect: dispatchBeforeRedirect,
+        beforeRedirects: {},
+        http2Options,
       };
 
-      if (responseType === 'stream') {
-        response.data = responseStream;
-        settle(resolve, reject, response);
+      // cacheable-lookup integration hotfix
+      !utils$1.isUndefined(lookup) && (options.lookup = lookup);
+
+      if (config.socketPath) {
+        options.socketPath = config.socketPath;
       } else {
-        const responseBuffer = [];
-        let totalResponseBytes = 0;
+        options.hostname = parsed.hostname.startsWith('[')
+          ? parsed.hostname.slice(1, -1)
+          : parsed.hostname;
+        options.port = parsed.port;
+        setProxy(
+          options,
+          config.proxy,
+          protocol + '//' + parsed.hostname + (parsed.port ? ':' + parsed.port : '') + options.path
+        );
+      }
 
-        responseStream.on('data', function handleStreamData(chunk) {
-          responseBuffer.push(chunk);
-          totalResponseBytes += chunk.length;
+      let transport;
+      const isHttpsRequest = isHttps.test(options.protocol);
+      options.agent = isHttpsRequest ? config.httpsAgent : config.httpAgent;
 
-          // make sure the content length is not over the maxContentLength if specified
-          if (config.maxContentLength > -1 && totalResponseBytes > config.maxContentLength) {
-            // stream.destroy() emit aborted event before calling reject() on Node.js v16
-            rejected = true;
-            responseStream.destroy();
-            reject(new AxiosError('maxContentLength size of ' + config.maxContentLength + ' exceeded',
-              AxiosError.ERR_BAD_RESPONSE, config, lastRequest));
+      if (isHttp2) {
+        transport = http2Transport;
+      } else {
+        if (config.transport) {
+          transport = config.transport;
+        } else if (config.maxRedirects === 0) {
+          transport = isHttpsRequest ? https__default["default"] : http__default["default"];
+        } else {
+          if (config.maxRedirects) {
+            options.maxRedirects = config.maxRedirects;
           }
-        });
+          if (config.beforeRedirect) {
+            options.beforeRedirects.config = config.beforeRedirect;
+          }
+          transport = isHttpsRequest ? httpsFollow : httpFollow;
+        }
+      }
 
-        responseStream.on('aborted', function handlerStreamAborted() {
-          if (rejected) {
-            return;
+      if (config.maxBodyLength > -1) {
+        options.maxBodyLength = config.maxBodyLength;
+      } else {
+        // follow-redirects does not skip comparison, so it should always succeed for axios -1 unlimited
+        options.maxBodyLength = Infinity;
+      }
+
+      if (config.insecureHTTPParser) {
+        options.insecureHTTPParser = config.insecureHTTPParser;
+      }
+
+      // Create the request
+      req = transport.request(options, function handleResponse(res) {
+        if (req.destroyed) return;
+
+        const streams = [res];
+
+        const responseLength = utils$1.toFiniteNumber(res.headers['content-length']);
+
+        if (onDownloadProgress || maxDownloadRate) {
+          const transformStream = new AxiosTransformStream$1({
+            maxRate: utils$1.toFiniteNumber(maxDownloadRate),
+          });
+
+          onDownloadProgress &&
+            transformStream.on(
+              'progress',
+              flushOnFinish(
+                transformStream,
+                progressEventDecorator(
+                  responseLength,
+                  progressEventReducer(asyncDecorator(onDownloadProgress), true, 3)
+                )
+              )
+            );
+
+          streams.push(transformStream);
+        }
+
+        // decompress the response body transparently if required
+        let responseStream = res;
+
+        // return the last request in case of redirects
+        const lastRequest = res.req || req;
+
+        // if decompress disabled we should not decompress
+        if (config.decompress !== false && res.headers['content-encoding']) {
+          // if no content, but headers still say that it is encoded,
+          // remove the header not confuse downstream operations
+          if (method === 'HEAD' || res.statusCode === 204) {
+            delete res.headers['content-encoding'];
           }
 
-          const err = new AxiosError(
-            'stream has been aborted',
-            AxiosError.ERR_BAD_RESPONSE,
-            config,
-            lastRequest
-          );
-          responseStream.destroy(err);
-          reject(err);
-        });
+          switch ((res.headers['content-encoding'] || '').toLowerCase()) {
+            /*eslint default-case:0*/
+            case 'gzip':
+            case 'x-gzip':
+            case 'compress':
+            case 'x-compress':
+              // add the unzipper to the body stream processing pipeline
+              streams.push(zlib__default["default"].createUnzip(zlibOptions));
 
-        responseStream.on('error', function handleStreamError(err) {
-          if (req.destroyed) return;
-          reject(AxiosError.from(err, null, config, lastRequest));
-        });
+              // remove the content-encoding in order to not confuse downstream operations
+              delete res.headers['content-encoding'];
+              break;
+            case 'deflate':
+              streams.push(new ZlibHeaderTransformStream$1());
 
-        responseStream.on('end', function handleStreamEnd() {
-          try {
-            let responseData = responseBuffer.length === 1 ? responseBuffer[0] : Buffer.concat(responseBuffer);
-            if (responseType !== 'arraybuffer') {
-              responseData = responseData.toString(responseEncoding);
-              if (!responseEncoding || responseEncoding === 'utf8') {
-                responseData = utils$1.stripBOM(responseData);
+              // add the unzipper to the body stream processing pipeline
+              streams.push(zlib__default["default"].createUnzip(zlibOptions));
+
+              // remove the content-encoding in order to not confuse downstream operations
+              delete res.headers['content-encoding'];
+              break;
+            case 'br':
+              if (isBrotliSupported) {
+                streams.push(zlib__default["default"].createBrotliDecompress(brotliOptions));
+                delete res.headers['content-encoding'];
               }
-            }
-            response.data = responseData;
-          } catch (err) {
-            return reject(AxiosError.from(err, null, config, response.request, response));
           }
+        }
+
+        responseStream = streams.length > 1 ? stream__default["default"].pipeline(streams, utils$1.noop) : streams[0];
+
+        const response = {
+          status: res.statusCode,
+          statusText: res.statusMessage,
+          headers: new AxiosHeaders$1(res.headers),
+          config,
+          request: lastRequest,
+        };
+
+        if (responseType === 'stream') {
+          response.data = responseStream;
           settle(resolve, reject, response);
+        } else {
+          const responseBuffer = [];
+          let totalResponseBytes = 0;
+
+          responseStream.on('data', function handleStreamData(chunk) {
+            responseBuffer.push(chunk);
+            totalResponseBytes += chunk.length;
+
+            // make sure the content length is not over the maxContentLength if specified
+            if (config.maxContentLength > -1 && totalResponseBytes > config.maxContentLength) {
+              // stream.destroy() emit aborted event before calling reject() on Node.js v16
+              rejected = true;
+              responseStream.destroy();
+              abort(
+                new AxiosError$1(
+                  'maxContentLength size of ' + config.maxContentLength + ' exceeded',
+                  AxiosError$1.ERR_BAD_RESPONSE,
+                  config,
+                  lastRequest
+                )
+              );
+            }
+          });
+
+          responseStream.on('aborted', function handlerStreamAborted() {
+            if (rejected) {
+              return;
+            }
+
+            const err = new AxiosError$1(
+              'stream has been aborted',
+              AxiosError$1.ERR_BAD_RESPONSE,
+              config,
+              lastRequest
+            );
+            responseStream.destroy(err);
+            reject(err);
+          });
+
+          responseStream.on('error', function handleStreamError(err) {
+            if (req.destroyed) return;
+            reject(AxiosError$1.from(err, null, config, lastRequest));
+          });
+
+          responseStream.on('end', function handleStreamEnd() {
+            try {
+              let responseData =
+                responseBuffer.length === 1 ? responseBuffer[0] : Buffer.concat(responseBuffer);
+              if (responseType !== 'arraybuffer') {
+                responseData = responseData.toString(responseEncoding);
+                if (!responseEncoding || responseEncoding === 'utf8') {
+                  responseData = utils$1.stripBOM(responseData);
+                }
+              }
+              response.data = responseData;
+            } catch (err) {
+              return reject(AxiosError$1.from(err, null, config, response.request, response));
+            }
+            settle(resolve, reject, response);
+          });
+        }
+
+        abortEmitter.once('abort', (err) => {
+          if (!responseStream.destroyed) {
+            responseStream.emit('error', err);
+            responseStream.destroy();
+          }
         });
+      });
+
+      abortEmitter.once('abort', (err) => {
+        if (req.close) {
+          req.close();
+        } else {
+          req.destroy(err);
+        }
+      });
+
+      // Handle errors
+      req.on('error', function handleRequestError(err) {
+        reject(AxiosError$1.from(err, null, config, req));
+      });
+
+      // set tcp keep alive to prevent drop connection by peer
+      req.on('socket', function handleRequestSocket(socket) {
+        // default interval of sending ack packet is 1 minute
+        socket.setKeepAlive(true, 1000 * 60);
+      });
+
+      // Handle request timeout
+      if (config.timeout) {
+        // This is forcing a int timeout to avoid problems if the `req` interface doesn't handle other types.
+        const timeout = parseInt(config.timeout, 10);
+
+        if (Number.isNaN(timeout)) {
+          abort(
+            new AxiosError$1(
+              'error trying to parse `config.timeout` to int',
+              AxiosError$1.ERR_BAD_OPTION_VALUE,
+              config,
+              req
+            )
+          );
+
+          return;
+        }
+
+        // Sometime, the response will be very slow, and does not respond, the connect event will be block by event loop system.
+        // And timer callback will be fired, and abort() will be invoked before connection, then get "socket hang up" and code ECONNRESET.
+        // At this time, if we have a large number of request, nodejs will hang up some socket on background. and the number will up and up.
+        // And then these socket which be hang up will devouring CPU little by little.
+        // ClientRequest.setTimeout will be fired on the specify milliseconds, and can make sure that abort() will be fired after connect.
+        req.setTimeout(timeout, function handleRequestTimeout() {
+          if (isDone) return;
+          let timeoutErrorMessage = config.timeout
+            ? 'timeout of ' + config.timeout + 'ms exceeded'
+            : 'timeout exceeded';
+          const transitional = config.transitional || transitionalDefaults;
+          if (config.timeoutErrorMessage) {
+            timeoutErrorMessage = config.timeoutErrorMessage;
+          }
+          abort(
+            new AxiosError$1(
+              timeoutErrorMessage,
+              transitional.clarifyTimeoutError ? AxiosError$1.ETIMEDOUT : AxiosError$1.ECONNABORTED,
+              config,
+              req
+            )
+          );
+        });
+      } else {
+        // explicitly reset the socket timeout value for a possible `keep-alive` request
+        req.setTimeout(0);
       }
 
-      emitter.once('abort', err => {
-        if (!responseStream.destroyed) {
-          responseStream.emit('error', err);
-          responseStream.destroy();
-        }
-      });
-    });
+      // Send the request
+      if (utils$1.isStream(data)) {
+        let ended = false;
+        let errored = false;
 
-    emitter.once('abort', err => {
-      reject(err);
-      req.destroy(err);
-    });
+        data.on('end', () => {
+          ended = true;
+        });
 
-    // Handle errors
-    req.on('error', function handleRequestError(err) {
-      // @todo remove
-      // if (req.aborted && err.code !== AxiosError.ERR_FR_TOO_MANY_REDIRECTS) return;
-      reject(AxiosError.from(err, null, config, req));
-    });
+        data.once('error', (err) => {
+          errored = true;
+          req.destroy(err);
+        });
 
-    // set tcp keep alive to prevent drop connection by peer
-    req.on('socket', function handleRequestSocket(socket) {
-      // default interval of sending ack packet is 1 minute
-      socket.setKeepAlive(true, 1000 * 60);
-    });
+        data.on('close', () => {
+          if (!ended && !errored) {
+            abort(new CanceledError$1('Request stream has been aborted', config, req));
+          }
+        });
 
-    // Handle request timeout
-    if (config.timeout) {
-      // This is forcing a int timeout to avoid problems if the `req` interface doesn't handle other types.
-      const timeout = parseInt(config.timeout, 10);
-
-      if (Number.isNaN(timeout)) {
-        reject(new AxiosError(
-          'error trying to parse `config.timeout` to int',
-          AxiosError.ERR_BAD_OPTION_VALUE,
-          config,
-          req
-        ));
-
-        return;
+        data.pipe(req);
+      } else {
+        data && req.write(data);
+        req.end();
       }
-
-      // Sometime, the response will be very slow, and does not respond, the connect event will be block by event loop system.
-      // And timer callback will be fired, and abort() will be invoked before connection, then get "socket hang up" and code ECONNRESET.
-      // At this time, if we have a large number of request, nodejs will hang up some socket on background. and the number will up and up.
-      // And then these socket which be hang up will devouring CPU little by little.
-      // ClientRequest.setTimeout will be fired on the specify milliseconds, and can make sure that abort() will be fired after connect.
-      req.setTimeout(timeout, function handleRequestTimeout() {
-        if (isDone) return;
-        let timeoutErrorMessage = config.timeout ? 'timeout of ' + config.timeout + 'ms exceeded' : 'timeout exceeded';
-        const transitional = config.transitional || transitionalDefaults;
-        if (config.timeoutErrorMessage) {
-          timeoutErrorMessage = config.timeoutErrorMessage;
-        }
-        reject(new AxiosError(
-          timeoutErrorMessage,
-          transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
-          config,
-          req
-        ));
-        abort();
-      });
-    }
-
-
-    // Send the request
-    if (utils$1.isStream(data)) {
-      let ended = false;
-      let errored = false;
-
-      data.on('end', () => {
-        ended = true;
-      });
-
-      data.once('error', err => {
-        errored = true;
-        req.destroy(err);
-      });
-
-      data.on('close', () => {
-        if (!ended && !errored) {
-          abort(new CanceledError('Request stream has been aborted', config, req));
-        }
-      });
-
-      data.pipe(req);
-    } else {
-      req.end(data);
-    }
-  });
-};
-
-const isURLSameOrigin = platform.hasStandardBrowserEnv ? ((origin, isMSIE) => (url) => {
-  url = new URL(url, platform.origin);
-
-  return (
-    origin.protocol === url.protocol &&
-    origin.host === url.host &&
-    (isMSIE || origin.port === url.port)
-  );
-})(
-  new URL(platform.origin),
-  platform.navigator && /(msie|trident)/i.test(platform.navigator.userAgent)
-) : () => true;
-
-const cookies = platform.hasStandardBrowserEnv ?
-
-  // Standard browser envs support document.cookie
-  {
-    write(name, value, expires, path, domain, secure) {
-      const cookie = [name + '=' + encodeURIComponent(value)];
-
-      utils$1.isNumber(expires) && cookie.push('expires=' + new Date(expires).toGMTString());
-
-      utils$1.isString(path) && cookie.push('path=' + path);
-
-      utils$1.isString(domain) && cookie.push('domain=' + domain);
-
-      secure === true && cookie.push('secure');
-
-      document.cookie = cookie.join('; ');
-    },
-
-    read(name) {
-      const match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-      return (match ? decodeURIComponent(match[3]) : null);
-    },
-
-    remove(name) {
-      this.write(name, '', Date.now() - 86400000);
-    }
-  }
-
-  :
-
-  // Non-standard browser env (web workers, react-native) lack needed support.
-  {
-    write() {},
-    read() {
-      return null;
-    },
-    remove() {}
+    });
   };
 
-const headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? { ...thing } : thing;
+const isURLSameOrigin = platform.hasStandardBrowserEnv
+  ? ((origin, isMSIE) => (url) => {
+      url = new URL(url, platform.origin);
+
+      return (
+        origin.protocol === url.protocol &&
+        origin.host === url.host &&
+        (isMSIE || origin.port === url.port)
+      );
+    })(
+      new URL(platform.origin),
+      platform.navigator && /(msie|trident)/i.test(platform.navigator.userAgent)
+    )
+  : () => true;
+
+const cookies = platform.hasStandardBrowserEnv
+  ? // Standard browser envs support document.cookie
+    {
+      write(name, value, expires, path, domain, secure, sameSite) {
+        if (typeof document === 'undefined') return;
+
+        const cookie = [`${name}=${encodeURIComponent(value)}`];
+
+        if (utils$1.isNumber(expires)) {
+          cookie.push(`expires=${new Date(expires).toUTCString()}`);
+        }
+        if (utils$1.isString(path)) {
+          cookie.push(`path=${path}`);
+        }
+        if (utils$1.isString(domain)) {
+          cookie.push(`domain=${domain}`);
+        }
+        if (secure === true) {
+          cookie.push('secure');
+        }
+        if (utils$1.isString(sameSite)) {
+          cookie.push(`SameSite=${sameSite}`);
+        }
+
+        document.cookie = cookie.join('; ');
+      },
+
+      read(name) {
+        if (typeof document === 'undefined') return null;
+        const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+        return match ? decodeURIComponent(match[1]) : null;
+      },
+
+      remove(name) {
+        this.write(name, '', Date.now() - 86400000, '/');
+      },
+    }
+  : // Non-standard browser env (web workers, react-native) lack needed support.
+    {
+      write() {},
+      read() {
+        return null;
+      },
+      remove() {},
+    };
+
+const headersToObject = (thing) => (thing instanceof AxiosHeaders$1 ? { ...thing } : thing);
 
 /**
  * Config-specific merge-function which creates a new config-object
@@ -39781,7 +41766,7 @@ function mergeConfig(config1, config2) {
 
   function getMergedValue(target, source, prop, caseless) {
     if (utils$1.isPlainObject(target) && utils$1.isPlainObject(source)) {
-      return utils$1.merge.call({caseless}, target, source);
+      return utils$1.merge.call({ caseless }, target, source);
     } else if (utils$1.isPlainObject(source)) {
       return utils$1.merge({}, source);
     } else if (utils$1.isArray(source)) {
@@ -39790,12 +41775,11 @@ function mergeConfig(config1, config2) {
     return source;
   }
 
-  // eslint-disable-next-line consistent-return
-  function mergeDeepProperties(a, b, prop , caseless) {
+  function mergeDeepProperties(a, b, prop, caseless) {
     if (!utils$1.isUndefined(b)) {
-      return getMergedValue(a, b, prop , caseless);
+      return getMergedValue(a, b, prop, caseless);
     } else if (!utils$1.isUndefined(a)) {
-      return getMergedValue(undefined, a, prop , caseless);
+      return getMergedValue(undefined, a, prop, caseless);
     }
   }
 
@@ -39853,11 +41837,13 @@ function mergeConfig(config1, config2) {
     socketPath: defaultToConfig2,
     responseEncoding: defaultToConfig2,
     validateStatus: mergeDirectKeys,
-    headers: (a, b , prop) => mergeDeepProperties(headersToObject(a), headersToObject(b),prop, true)
+    headers: (a, b, prop) =>
+      mergeDeepProperties(headersToObject(a), headersToObject(b), prop, true),
   };
 
-  utils$1.forEach(Object.keys(Object.assign({}, config1, config2)), function computeConfigValue(prop) {
-    const merge = mergeMap[prop] || mergeDeepProperties;
+  utils$1.forEach(Object.keys({ ...config1, ...config2 }), function computeConfigValue(prop) {
+    if (prop === '__proto__' || prop === 'constructor' || prop === 'prototype') return;
+    const merge = utils$1.hasOwnProp(mergeMap, prop) ? mergeMap[prop] : mergeDeepProperties;
     const configValue = merge(config1[prop], config2[prop], prop);
     (utils$1.isUndefined(configValue) && merge !== mergeDirectKeys) || (config[prop] = configValue);
   });
@@ -39868,28 +41854,42 @@ function mergeConfig(config1, config2) {
 const resolveConfig = (config) => {
   const newConfig = mergeConfig({}, config);
 
-  let {data, withXSRFToken, xsrfHeaderName, xsrfCookieName, headers, auth} = newConfig;
+  let { data, withXSRFToken, xsrfHeaderName, xsrfCookieName, headers, auth } = newConfig;
 
   newConfig.headers = headers = AxiosHeaders$1.from(headers);
 
-  newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url), config.params, config.paramsSerializer);
+  newConfig.url = buildURL(
+    buildFullPath(newConfig.baseURL, newConfig.url, newConfig.allowAbsoluteUrls),
+    config.params,
+    config.paramsSerializer
+  );
 
   // HTTP basic authentication
   if (auth) {
-    headers.set('Authorization', 'Basic ' +
-      btoa((auth.username || '') + ':' + (auth.password ? unescape(encodeURIComponent(auth.password)) : ''))
+    headers.set(
+      'Authorization',
+      'Basic ' +
+        btoa(
+          (auth.username || '') +
+            ':' +
+            (auth.password ? unescape(encodeURIComponent(auth.password)) : '')
+        )
     );
   }
 
-  let contentType;
-
   if (utils$1.isFormData(data)) {
     if (platform.hasStandardBrowserEnv || platform.hasStandardBrowserWebWorkerEnv) {
-      headers.setContentType(undefined); // Let the browser set it
-    } else if ((contentType = headers.getContentType()) !== false) {
-      // fix semicolon duplication issue for ReactNative FormData implementation
-      const [type, ...tokens] = contentType ? contentType.split(';').map(token => token.trim()).filter(Boolean) : [];
-      headers.setContentType([type || 'multipart/form-data', ...tokens].join('; '));
+      headers.setContentType(undefined); // browser handles it
+    } else if (utils$1.isFunction(data.getHeaders)) {
+      // Node.js FormData (like form-data package)
+      const formHeaders = data.getHeaders();
+      // Only set safe headers to avoid overwriting security headers
+      const allowedHeaders = ['content-type', 'content-length'];
+      Object.entries(formHeaders).forEach(([key, val]) => {
+        if (allowedHeaders.includes(key.toLowerCase())) {
+          headers.set(key, val);
+        }
+      });
     }
   }
 
@@ -39915,193 +41915,218 @@ const resolveConfig = (config) => {
 
 const isXHRAdapterSupported = typeof XMLHttpRequest !== 'undefined';
 
-const xhrAdapter = isXHRAdapterSupported && function (config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    const _config = resolveConfig(config);
-    let requestData = _config.data;
-    const requestHeaders = AxiosHeaders$1.from(_config.headers).normalize();
-    let {responseType, onUploadProgress, onDownloadProgress} = _config;
-    let onCanceled;
-    let uploadThrottled, downloadThrottled;
-    let flushUpload, flushDownload;
+const xhrAdapter = isXHRAdapterSupported &&
+  function (config) {
+    return new Promise(function dispatchXhrRequest(resolve, reject) {
+      const _config = resolveConfig(config);
+      let requestData = _config.data;
+      const requestHeaders = AxiosHeaders$1.from(_config.headers).normalize();
+      let { responseType, onUploadProgress, onDownloadProgress } = _config;
+      let onCanceled;
+      let uploadThrottled, downloadThrottled;
+      let flushUpload, flushDownload;
 
-    function done() {
-      flushUpload && flushUpload(); // flush events
-      flushDownload && flushDownload(); // flush events
+      function done() {
+        flushUpload && flushUpload(); // flush events
+        flushDownload && flushDownload(); // flush events
 
-      _config.cancelToken && _config.cancelToken.unsubscribe(onCanceled);
+        _config.cancelToken && _config.cancelToken.unsubscribe(onCanceled);
 
-      _config.signal && _config.signal.removeEventListener('abort', onCanceled);
-    }
-
-    let request = new XMLHttpRequest();
-
-    request.open(_config.method.toUpperCase(), _config.url, true);
-
-    // Set the request timeout in MS
-    request.timeout = _config.timeout;
-
-    function onloadend() {
-      if (!request) {
-        return;
-      }
-      // Prepare the response
-      const responseHeaders = AxiosHeaders$1.from(
-        'getAllResponseHeaders' in request && request.getAllResponseHeaders()
-      );
-      const responseData = !responseType || responseType === 'text' || responseType === 'json' ?
-        request.responseText : request.response;
-      const response = {
-        data: responseData,
-        status: request.status,
-        statusText: request.statusText,
-        headers: responseHeaders,
-        config,
-        request
-      };
-
-      settle(function _resolve(value) {
-        resolve(value);
-        done();
-      }, function _reject(err) {
-        reject(err);
-        done();
-      }, response);
-
-      // Clean up request
-      request = null;
-    }
-
-    if ('onloadend' in request) {
-      // Use onloadend if available
-      request.onloadend = onloadend;
-    } else {
-      // Listen for ready state to emulate onloadend
-      request.onreadystatechange = function handleLoad() {
-        if (!request || request.readyState !== 4) {
-          return;
-        }
-
-        // The request errored out and we didn't get a response, this will be
-        // handled by onerror instead
-        // With one exception: request that using file: protocol, most browsers
-        // will return status as 0 even though it's a successful request
-        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-          return;
-        }
-        // readystate handler is calling before onerror or ontimeout handlers,
-        // so we should call onloadend on the next 'tick'
-        setTimeout(onloadend);
-      };
-    }
-
-    // Handle browser request cancellation (as opposed to a manual cancellation)
-    request.onabort = function handleAbort() {
-      if (!request) {
-        return;
+        _config.signal && _config.signal.removeEventListener('abort', onCanceled);
       }
 
-      reject(new AxiosError('Request aborted', AxiosError.ECONNABORTED, config, request));
+      let request = new XMLHttpRequest();
 
-      // Clean up request
-      request = null;
-    };
+      request.open(_config.method.toUpperCase(), _config.url, true);
 
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request));
+      // Set the request timeout in MS
+      request.timeout = _config.timeout;
 
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      let timeoutErrorMessage = _config.timeout ? 'timeout of ' + _config.timeout + 'ms exceeded' : 'timeout exceeded';
-      const transitional = _config.transitional || transitionalDefaults;
-      if (_config.timeoutErrorMessage) {
-        timeoutErrorMessage = _config.timeoutErrorMessage;
-      }
-      reject(new AxiosError(
-        timeoutErrorMessage,
-        transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
-        config,
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Remove Content-Type if data is undefined
-    requestData === undefined && requestHeaders.setContentType(null);
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils$1.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
-        request.setRequestHeader(key, val);
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (!utils$1.isUndefined(_config.withCredentials)) {
-      request.withCredentials = !!_config.withCredentials;
-    }
-
-    // Add responseType to request if needed
-    if (responseType && responseType !== 'json') {
-      request.responseType = _config.responseType;
-    }
-
-    // Handle progress if needed
-    if (onDownloadProgress) {
-      ([downloadThrottled, flushDownload] = progressEventReducer(onDownloadProgress, true));
-      request.addEventListener('progress', downloadThrottled);
-    }
-
-    // Not all browsers support upload events
-    if (onUploadProgress && request.upload) {
-      ([uploadThrottled, flushUpload] = progressEventReducer(onUploadProgress));
-
-      request.upload.addEventListener('progress', uploadThrottled);
-
-      request.upload.addEventListener('loadend', flushUpload);
-    }
-
-    if (_config.cancelToken || _config.signal) {
-      // Handle cancellation
-      // eslint-disable-next-line func-names
-      onCanceled = cancel => {
+      function onloadend() {
         if (!request) {
           return;
         }
-        reject(!cancel || cancel.type ? new CanceledError(null, config, request) : cancel);
-        request.abort();
+        // Prepare the response
+        const responseHeaders = AxiosHeaders$1.from(
+          'getAllResponseHeaders' in request && request.getAllResponseHeaders()
+        );
+        const responseData =
+          !responseType || responseType === 'text' || responseType === 'json'
+            ? request.responseText
+            : request.response;
+        const response = {
+          data: responseData,
+          status: request.status,
+          statusText: request.statusText,
+          headers: responseHeaders,
+          config,
+          request,
+        };
+
+        settle(
+          function _resolve(value) {
+            resolve(value);
+            done();
+          },
+          function _reject(err) {
+            reject(err);
+            done();
+          },
+          response
+        );
+
+        // Clean up request
+        request = null;
+      }
+
+      if ('onloadend' in request) {
+        // Use onloadend if available
+        request.onloadend = onloadend;
+      } else {
+        // Listen for ready state to emulate onloadend
+        request.onreadystatechange = function handleLoad() {
+          if (!request || request.readyState !== 4) {
+            return;
+          }
+
+          // The request errored out and we didn't get a response, this will be
+          // handled by onerror instead
+          // With one exception: request that using file: protocol, most browsers
+          // will return status as 0 even though it's a successful request
+          if (
+            request.status === 0 &&
+            !(request.responseURL && request.responseURL.indexOf('file:') === 0)
+          ) {
+            return;
+          }
+          // readystate handler is calling before onerror or ontimeout handlers,
+          // so we should call onloadend on the next 'tick'
+          setTimeout(onloadend);
+        };
+      }
+
+      // Handle browser request cancellation (as opposed to a manual cancellation)
+      request.onabort = function handleAbort() {
+        if (!request) {
+          return;
+        }
+
+        reject(new AxiosError$1('Request aborted', AxiosError$1.ECONNABORTED, config, request));
+
+        // Clean up request
         request = null;
       };
 
-      _config.cancelToken && _config.cancelToken.subscribe(onCanceled);
-      if (_config.signal) {
-        _config.signal.aborted ? onCanceled() : _config.signal.addEventListener('abort', onCanceled);
+      // Handle low level network errors
+      request.onerror = function handleError(event) {
+        // Browsers deliver a ProgressEvent in XHR onerror
+        // (message may be empty; when present, surface it)
+        // See https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/error_event
+        const msg = event && event.message ? event.message : 'Network Error';
+        const err = new AxiosError$1(msg, AxiosError$1.ERR_NETWORK, config, request);
+        // attach the underlying event for consumers who want details
+        err.event = event || null;
+        reject(err);
+        request = null;
+      };
+
+      // Handle timeout
+      request.ontimeout = function handleTimeout() {
+        let timeoutErrorMessage = _config.timeout
+          ? 'timeout of ' + _config.timeout + 'ms exceeded'
+          : 'timeout exceeded';
+        const transitional = _config.transitional || transitionalDefaults;
+        if (_config.timeoutErrorMessage) {
+          timeoutErrorMessage = _config.timeoutErrorMessage;
+        }
+        reject(
+          new AxiosError$1(
+            timeoutErrorMessage,
+            transitional.clarifyTimeoutError ? AxiosError$1.ETIMEDOUT : AxiosError$1.ECONNABORTED,
+            config,
+            request
+          )
+        );
+
+        // Clean up request
+        request = null;
+      };
+
+      // Remove Content-Type if data is undefined
+      requestData === undefined && requestHeaders.setContentType(null);
+
+      // Add headers to the request
+      if ('setRequestHeader' in request) {
+        utils$1.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
+          request.setRequestHeader(key, val);
+        });
       }
-    }
 
-    const protocol = parseProtocol(_config.url);
+      // Add withCredentials to request if needed
+      if (!utils$1.isUndefined(_config.withCredentials)) {
+        request.withCredentials = !!_config.withCredentials;
+      }
 
-    if (protocol && platform.protocols.indexOf(protocol) === -1) {
-      reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
-      return;
-    }
+      // Add responseType to request if needed
+      if (responseType && responseType !== 'json') {
+        request.responseType = _config.responseType;
+      }
 
+      // Handle progress if needed
+      if (onDownloadProgress) {
+        [downloadThrottled, flushDownload] = progressEventReducer(onDownloadProgress, true);
+        request.addEventListener('progress', downloadThrottled);
+      }
 
-    // Send the request
-    request.send(requestData || null);
-  });
-};
+      // Not all browsers support upload events
+      if (onUploadProgress && request.upload) {
+        [uploadThrottled, flushUpload] = progressEventReducer(onUploadProgress);
+
+        request.upload.addEventListener('progress', uploadThrottled);
+
+        request.upload.addEventListener('loadend', flushUpload);
+      }
+
+      if (_config.cancelToken || _config.signal) {
+        // Handle cancellation
+        // eslint-disable-next-line func-names
+        onCanceled = (cancel) => {
+          if (!request) {
+            return;
+          }
+          reject(!cancel || cancel.type ? new CanceledError$1(null, config, request) : cancel);
+          request.abort();
+          request = null;
+        };
+
+        _config.cancelToken && _config.cancelToken.subscribe(onCanceled);
+        if (_config.signal) {
+          _config.signal.aborted
+            ? onCanceled()
+            : _config.signal.addEventListener('abort', onCanceled);
+        }
+      }
+
+      const protocol = parseProtocol(_config.url);
+
+      if (protocol && platform.protocols.indexOf(protocol) === -1) {
+        reject(
+          new AxiosError$1(
+            'Unsupported protocol ' + protocol + ':',
+            AxiosError$1.ERR_BAD_REQUEST,
+            config
+          )
+        );
+        return;
+      }
+
+      // Send the request
+      request.send(requestData || null);
+    });
+  };
 
 const composeSignals = (signals, timeout) => {
-  const {length} = (signals = signals ? signals.filter(Boolean) : []);
+  const { length } = (signals = signals ? signals.filter(Boolean) : []);
 
   if (timeout || length) {
     let controller = new AbortController();
@@ -40113,21 +42138,29 @@ const composeSignals = (signals, timeout) => {
         aborted = true;
         unsubscribe();
         const err = reason instanceof Error ? reason : this.reason;
-        controller.abort(err instanceof AxiosError ? err : new CanceledError(err instanceof Error ? err.message : err));
+        controller.abort(
+          err instanceof AxiosError$1
+            ? err
+            : new CanceledError$1(err instanceof Error ? err.message : err)
+        );
       }
     };
 
-    let timer = timeout && setTimeout(() => {
-      timer = null;
-      onabort(new AxiosError(`timeout ${timeout} of ms exceeded`, AxiosError.ETIMEDOUT));
-    }, timeout);
+    let timer =
+      timeout &&
+      setTimeout(() => {
+        timer = null;
+        onabort(new AxiosError$1(`timeout of ${timeout}ms exceeded`, AxiosError$1.ETIMEDOUT));
+      }, timeout);
 
     const unsubscribe = () => {
       if (signals) {
         timer && clearTimeout(timer);
         timer = null;
-        signals.forEach(signal => {
-          signal.unsubscribe ? signal.unsubscribe(onabort) : signal.removeEventListener('abort', onabort);
+        signals.forEach((signal) => {
+          signal.unsubscribe
+            ? signal.unsubscribe(onabort)
+            : signal.removeEventListener('abort', onabort);
         });
         signals = null;
       }
@@ -40135,7 +42168,7 @@ const composeSignals = (signals, timeout) => {
 
     signals.forEach((signal) => signal.addEventListener('abort', onabort));
 
-    const {signal} = controller;
+    const { signal } = controller;
 
     signal.unsubscribe = () => utils$1.asap(unsubscribe);
 
@@ -40178,7 +42211,7 @@ const readStream = async function* (stream) {
   const reader = stream.getReader();
   try {
     for (;;) {
-      const {done, value} = await reader.read();
+      const { done, value } = await reader.read();
       if (done) {
         break;
       }
@@ -40201,327 +42234,482 @@ const trackStream = (stream, chunkSize, onProgress, onFinish) => {
     }
   };
 
-  return new ReadableStream({
-    async pull(controller) {
-      try {
-        const {done, value} = await iterator.next();
+  return new ReadableStream(
+    {
+      async pull(controller) {
+        try {
+          const { done, value } = await iterator.next();
 
-        if (done) {
-         _onFinish();
-          controller.close();
-          return;
-        }
+          if (done) {
+            _onFinish();
+            controller.close();
+            return;
+          }
 
-        let len = value.byteLength;
-        if (onProgress) {
-          let loadedBytes = bytes += len;
-          onProgress(loadedBytes);
+          let len = value.byteLength;
+          if (onProgress) {
+            let loadedBytes = (bytes += len);
+            onProgress(loadedBytes);
+          }
+          controller.enqueue(new Uint8Array(value));
+        } catch (err) {
+          _onFinish(err);
+          throw err;
         }
-        controller.enqueue(new Uint8Array(value));
-      } catch (err) {
-        _onFinish(err);
-        throw err;
-      }
+      },
+      cancel(reason) {
+        _onFinish(reason);
+        return iterator.return();
+      },
     },
-    cancel(reason) {
-      _onFinish(reason);
-      return iterator.return();
+    {
+      highWaterMark: 2,
     }
-  }, {
-    highWaterMark: 2
-  })
+  );
 };
 
-const isFetchSupported = typeof fetch === 'function' && typeof Request === 'function' && typeof Response === 'function';
-const isReadableStreamSupported = isFetchSupported && typeof ReadableStream === 'function';
+const DEFAULT_CHUNK_SIZE = 64 * 1024;
 
-// used only inside the fetch adapter
-const encodeText = isFetchSupported && (typeof TextEncoder === 'function' ?
-    ((encoder) => (str) => encoder.encode(str))(new TextEncoder()) :
-    async (str) => new Uint8Array(await new Response(str).arrayBuffer())
-);
+const { isFunction } = utils$1;
+
+const globalFetchAPI = (({ Request, Response }) => ({
+  Request,
+  Response,
+}))(utils$1.global);
+
+const { ReadableStream: ReadableStream$1, TextEncoder: TextEncoder$1 } = utils$1.global;
 
 const test = (fn, ...args) => {
   try {
     return !!fn(...args);
   } catch (e) {
-    return false
+    return false;
   }
 };
 
-const supportsRequestStream = isReadableStreamSupported && test(() => {
-  let duplexAccessed = false;
-
-  const hasContentType = new Request(platform.origin, {
-    body: new ReadableStream(),
-    method: 'POST',
-    get duplex() {
-      duplexAccessed = true;
-      return 'half';
+const factory = (env) => {
+  env = utils$1.merge.call(
+    {
+      skipUndefined: true,
     },
-  }).headers.has('Content-Type');
+    globalFetchAPI,
+    env
+  );
 
-  return duplexAccessed && !hasContentType;
-});
+  const { fetch: envFetch, Request, Response } = env;
+  const isFetchSupported = envFetch ? isFunction(envFetch) : typeof fetch === 'function';
+  const isRequestSupported = isFunction(Request);
+  const isResponseSupported = isFunction(Response);
 
-const DEFAULT_CHUNK_SIZE = 64 * 1024;
-
-const supportsResponseStream = isReadableStreamSupported &&
-  test(() => utils$1.isReadableStream(new Response('').body));
-
-
-const resolvers = {
-  stream: supportsResponseStream && ((res) => res.body)
-};
-
-isFetchSupported && (((res) => {
-  ['text', 'arrayBuffer', 'blob', 'formData', 'stream'].forEach(type => {
-    !resolvers[type] && (resolvers[type] = utils$1.isFunction(res[type]) ? (res) => res[type]() :
-      (_, config) => {
-        throw new AxiosError(`Response type '${type}' is not supported`, AxiosError.ERR_NOT_SUPPORT, config);
-      });
-  });
-})(new Response));
-
-const getBodyLength = async (body) => {
-  if (body == null) {
-    return 0;
+  if (!isFetchSupported) {
+    return false;
   }
 
-  if(utils$1.isBlob(body)) {
-    return body.size;
-  }
+  const isReadableStreamSupported = isFetchSupported && isFunction(ReadableStream$1);
 
-  if(utils$1.isSpecCompliantForm(body)) {
-    const _request = new Request(platform.origin, {
-      method: 'POST',
-      body,
-    });
-    return (await _request.arrayBuffer()).byteLength;
-  }
+  const encodeText =
+    isFetchSupported &&
+    (typeof TextEncoder$1 === 'function'
+      ? (
+          (encoder) => (str) =>
+            encoder.encode(str)
+        )(new TextEncoder$1())
+      : async (str) => new Uint8Array(await new Request(str).arrayBuffer()));
 
-  if(utils$1.isArrayBufferView(body) || utils$1.isArrayBuffer(body)) {
-    return body.byteLength;
-  }
+  const supportsRequestStream =
+    isRequestSupported &&
+    isReadableStreamSupported &&
+    test(() => {
+      let duplexAccessed = false;
 
-  if(utils$1.isURLSearchParams(body)) {
-    body = body + '';
-  }
-
-  if(utils$1.isString(body)) {
-    return (await encodeText(body)).byteLength;
-  }
-};
-
-const resolveBodyLength = async (headers, body) => {
-  const length = utils$1.toFiniteNumber(headers.getContentLength());
-
-  return length == null ? getBodyLength(body) : length;
-};
-
-const fetchAdapter = isFetchSupported && (async (config) => {
-  let {
-    url,
-    method,
-    data,
-    signal,
-    cancelToken,
-    timeout,
-    onDownloadProgress,
-    onUploadProgress,
-    responseType,
-    headers,
-    withCredentials = 'same-origin',
-    fetchOptions
-  } = resolveConfig(config);
-
-  responseType = responseType ? (responseType + '').toLowerCase() : 'text';
-
-  let composedSignal = composeSignals$1([signal, cancelToken && cancelToken.toAbortSignal()], timeout);
-
-  let request;
-
-  const unsubscribe = composedSignal && composedSignal.unsubscribe && (() => {
-      composedSignal.unsubscribe();
-  });
-
-  let requestContentLength;
-
-  try {
-    if (
-      onUploadProgress && supportsRequestStream && method !== 'get' && method !== 'head' &&
-      (requestContentLength = await resolveBodyLength(headers, data)) !== 0
-    ) {
-      let _request = new Request(url, {
+      const hasContentType = new Request(platform.origin, {
+        body: new ReadableStream$1(),
         method: 'POST',
-        body: data,
-        duplex: "half"
-      });
+        get duplex() {
+          duplexAccessed = true;
+          return 'half';
+        },
+      }).headers.has('Content-Type');
 
-      let contentTypeHeader;
-
-      if (utils$1.isFormData(data) && (contentTypeHeader = _request.headers.get('content-type'))) {
-        headers.setContentType(contentTypeHeader);
-      }
-
-      if (_request.body) {
-        const [onProgress, flush] = progressEventDecorator(
-          requestContentLength,
-          progressEventReducer(asyncDecorator(onUploadProgress))
-        );
-
-        data = trackStream(_request.body, DEFAULT_CHUNK_SIZE, onProgress, flush);
-      }
-    }
-
-    if (!utils$1.isString(withCredentials)) {
-      withCredentials = withCredentials ? 'include' : 'omit';
-    }
-
-    // Cloudflare Workers throws when credentials are defined
-    // see https://github.com/cloudflare/workerd/issues/902
-    const isCredentialsSupported = "credentials" in Request.prototype;
-    request = new Request(url, {
-      ...fetchOptions,
-      signal: composedSignal,
-      method: method.toUpperCase(),
-      headers: headers.normalize().toJSON(),
-      body: data,
-      duplex: "half",
-      credentials: isCredentialsSupported ? withCredentials : undefined
+      return duplexAccessed && !hasContentType;
     });
 
-    let response = await fetch(request);
+  const supportsResponseStream =
+    isResponseSupported &&
+    isReadableStreamSupported &&
+    test(() => utils$1.isReadableStream(new Response('').body));
 
-    const isStreamResponse = supportsResponseStream && (responseType === 'stream' || responseType === 'response');
+  const resolvers = {
+    stream: supportsResponseStream && ((res) => res.body),
+  };
 
-    if (supportsResponseStream && (onDownloadProgress || (isStreamResponse && unsubscribe))) {
-      const options = {};
+  isFetchSupported &&
+    (() => {
+      ['text', 'arrayBuffer', 'blob', 'formData', 'stream'].forEach((type) => {
+        !resolvers[type] &&
+          (resolvers[type] = (res, config) => {
+            let method = res && res[type];
 
-      ['status', 'statusText', 'headers'].forEach(prop => {
-        options[prop] = response[prop];
+            if (method) {
+              return method.call(res);
+            }
+
+            throw new AxiosError$1(
+              `Response type '${type}' is not supported`,
+              AxiosError$1.ERR_NOT_SUPPORT,
+              config
+            );
+          });
       });
+    })();
 
-      const responseContentLength = utils$1.toFiniteNumber(response.headers.get('content-length'));
-
-      const [onProgress, flush] = onDownloadProgress && progressEventDecorator(
-        responseContentLength,
-        progressEventReducer(asyncDecorator(onDownloadProgress), true)
-      ) || [];
-
-      response = new Response(
-        trackStream(response.body, DEFAULT_CHUNK_SIZE, onProgress, () => {
-          flush && flush();
-          unsubscribe && unsubscribe();
-        }),
-        options
-      );
+  const getBodyLength = async (body) => {
+    if (body == null) {
+      return 0;
     }
 
-    responseType = responseType || 'text';
+    if (utils$1.isBlob(body)) {
+      return body.size;
+    }
 
-    let responseData = await resolvers[utils$1.findKey(resolvers, responseType) || 'text'](response, config);
-
-    !isStreamResponse && unsubscribe && unsubscribe();
-
-    return await new Promise((resolve, reject) => {
-      settle(resolve, reject, {
-        data: responseData,
-        headers: AxiosHeaders$1.from(response.headers),
-        status: response.status,
-        statusText: response.statusText,
-        config,
-        request
+    if (utils$1.isSpecCompliantForm(body)) {
+      const _request = new Request(platform.origin, {
+        method: 'POST',
+        body,
       });
-    })
-  } catch (err) {
-    unsubscribe && unsubscribe();
+      return (await _request.arrayBuffer()).byteLength;
+    }
 
-    if (err && err.name === 'TypeError' && /fetch/i.test(err.message)) {
-      throw Object.assign(
-        new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request),
-        {
-          cause: err.cause || err
+    if (utils$1.isArrayBufferView(body) || utils$1.isArrayBuffer(body)) {
+      return body.byteLength;
+    }
+
+    if (utils$1.isURLSearchParams(body)) {
+      body = body + '';
+    }
+
+    if (utils$1.isString(body)) {
+      return (await encodeText(body)).byteLength;
+    }
+  };
+
+  const resolveBodyLength = async (headers, body) => {
+    const length = utils$1.toFiniteNumber(headers.getContentLength());
+
+    return length == null ? getBodyLength(body) : length;
+  };
+
+  return async (config) => {
+    let {
+      url,
+      method,
+      data,
+      signal,
+      cancelToken,
+      timeout,
+      onDownloadProgress,
+      onUploadProgress,
+      responseType,
+      headers,
+      withCredentials = 'same-origin',
+      fetchOptions,
+    } = resolveConfig(config);
+
+    let _fetch = envFetch || fetch;
+
+    responseType = responseType ? (responseType + '').toLowerCase() : 'text';
+
+    let composedSignal = composeSignals$1(
+      [signal, cancelToken && cancelToken.toAbortSignal()],
+      timeout
+    );
+
+    let request = null;
+
+    const unsubscribe =
+      composedSignal &&
+      composedSignal.unsubscribe &&
+      (() => {
+        composedSignal.unsubscribe();
+      });
+
+    let requestContentLength;
+
+    try {
+      if (
+        onUploadProgress &&
+        supportsRequestStream &&
+        method !== 'get' &&
+        method !== 'head' &&
+        (requestContentLength = await resolveBodyLength(headers, data)) !== 0
+      ) {
+        let _request = new Request(url, {
+          method: 'POST',
+          body: data,
+          duplex: 'half',
+        });
+
+        let contentTypeHeader;
+
+        if (utils$1.isFormData(data) && (contentTypeHeader = _request.headers.get('content-type'))) {
+          headers.setContentType(contentTypeHeader);
         }
-      )
+
+        if (_request.body) {
+          const [onProgress, flush] = progressEventDecorator(
+            requestContentLength,
+            progressEventReducer(asyncDecorator(onUploadProgress))
+          );
+
+          data = trackStream(_request.body, DEFAULT_CHUNK_SIZE, onProgress, flush);
+        }
+      }
+
+      if (!utils$1.isString(withCredentials)) {
+        withCredentials = withCredentials ? 'include' : 'omit';
+      }
+
+      // Cloudflare Workers throws when credentials are defined
+      // see https://github.com/cloudflare/workerd/issues/902
+      const isCredentialsSupported = isRequestSupported && 'credentials' in Request.prototype;
+
+      const resolvedOptions = {
+        ...fetchOptions,
+        signal: composedSignal,
+        method: method.toUpperCase(),
+        headers: headers.normalize().toJSON(),
+        body: data,
+        duplex: 'half',
+        credentials: isCredentialsSupported ? withCredentials : undefined,
+      };
+
+      request = isRequestSupported && new Request(url, resolvedOptions);
+
+      let response = await (isRequestSupported
+        ? _fetch(request, fetchOptions)
+        : _fetch(url, resolvedOptions));
+
+      const isStreamResponse =
+        supportsResponseStream && (responseType === 'stream' || responseType === 'response');
+
+      if (supportsResponseStream && (onDownloadProgress || (isStreamResponse && unsubscribe))) {
+        const options = {};
+
+        ['status', 'statusText', 'headers'].forEach((prop) => {
+          options[prop] = response[prop];
+        });
+
+        const responseContentLength = utils$1.toFiniteNumber(response.headers.get('content-length'));
+
+        const [onProgress, flush] =
+          (onDownloadProgress &&
+            progressEventDecorator(
+              responseContentLength,
+              progressEventReducer(asyncDecorator(onDownloadProgress), true)
+            )) ||
+          [];
+
+        response = new Response(
+          trackStream(response.body, DEFAULT_CHUNK_SIZE, onProgress, () => {
+            flush && flush();
+            unsubscribe && unsubscribe();
+          }),
+          options
+        );
+      }
+
+      responseType = responseType || 'text';
+
+      let responseData = await resolvers[utils$1.findKey(resolvers, responseType) || 'text'](
+        response,
+        config
+      );
+
+      !isStreamResponse && unsubscribe && unsubscribe();
+
+      return await new Promise((resolve, reject) => {
+        settle(resolve, reject, {
+          data: responseData,
+          headers: AxiosHeaders$1.from(response.headers),
+          status: response.status,
+          statusText: response.statusText,
+          config,
+          request,
+        });
+      });
+    } catch (err) {
+      unsubscribe && unsubscribe();
+
+      if (err && err.name === 'TypeError' && /Load failed|fetch/i.test(err.message)) {
+        throw Object.assign(
+          new AxiosError$1(
+            'Network Error',
+            AxiosError$1.ERR_NETWORK,
+            config,
+            request,
+            err && err.response
+          ),
+          {
+            cause: err.cause || err,
+          }
+        );
+      }
+
+      throw AxiosError$1.from(err, err && err.code, config, request, err && err.response);
     }
+  };
+};
 
-    throw AxiosError.from(err, err && err.code, config, request);
+const seedCache = new Map();
+
+const getFetch = (config) => {
+  let env = (config && config.env) || {};
+  const { fetch, Request, Response } = env;
+  const seeds = [Request, Response, fetch];
+
+  let len = seeds.length,
+    i = len,
+    seed,
+    target,
+    map = seedCache;
+
+  while (i--) {
+    seed = seeds[i];
+    target = map.get(seed);
+
+    target === undefined && map.set(seed, (target = i ? new Map() : factory(env)));
+
+    map = target;
   }
-});
 
+  return target;
+};
+
+getFetch();
+
+/**
+ * Known adapters mapping.
+ * Provides environment-specific adapters for Axios:
+ * - `http` for Node.js
+ * - `xhr` for browsers
+ * - `fetch` for fetch API-based requests
+ *
+ * @type {Object<string, Function|Object>}
+ */
 const knownAdapters = {
   http: httpAdapter,
   xhr: xhrAdapter,
-  fetch: fetchAdapter
+  fetch: {
+    get: getFetch,
+  },
 };
 
+// Assign adapter names for easier debugging and identification
 utils$1.forEach(knownAdapters, (fn, value) => {
   if (fn) {
     try {
-      Object.defineProperty(fn, 'name', {value});
+      Object.defineProperty(fn, 'name', { value });
     } catch (e) {
       // eslint-disable-next-line no-empty
     }
-    Object.defineProperty(fn, 'adapterName', {value});
+    Object.defineProperty(fn, 'adapterName', { value });
   }
 });
 
+/**
+ * Render a rejection reason string for unknown or unsupported adapters
+ *
+ * @param {string} reason
+ * @returns {string}
+ */
 const renderReason = (reason) => `- ${reason}`;
 
-const isResolvedHandle = (adapter) => utils$1.isFunction(adapter) || adapter === null || adapter === false;
+/**
+ * Check if the adapter is resolved (function, null, or false)
+ *
+ * @param {Function|null|false} adapter
+ * @returns {boolean}
+ */
+const isResolvedHandle = (adapter) =>
+  utils$1.isFunction(adapter) || adapter === null || adapter === false;
 
+/**
+ * Get the first suitable adapter from the provided list.
+ * Tries each adapter in order until a supported one is found.
+ * Throws an AxiosError if no adapter is suitable.
+ *
+ * @param {Array<string|Function>|string|Function} adapters - Adapter(s) by name or function.
+ * @param {Object} config - Axios request configuration
+ * @throws {AxiosError} If no suitable adapter is available
+ * @returns {Function} The resolved adapter function
+ */
+function getAdapter(adapters, config) {
+  adapters = utils$1.isArray(adapters) ? adapters : [adapters];
+
+  const { length } = adapters;
+  let nameOrAdapter;
+  let adapter;
+
+  const rejectedReasons = {};
+
+  for (let i = 0; i < length; i++) {
+    nameOrAdapter = adapters[i];
+    let id;
+
+    adapter = nameOrAdapter;
+
+    if (!isResolvedHandle(nameOrAdapter)) {
+      adapter = knownAdapters[(id = String(nameOrAdapter)).toLowerCase()];
+
+      if (adapter === undefined) {
+        throw new AxiosError$1(`Unknown adapter '${id}'`);
+      }
+    }
+
+    if (adapter && (utils$1.isFunction(adapter) || (adapter = adapter.get(config)))) {
+      break;
+    }
+
+    rejectedReasons[id || '#' + i] = adapter;
+  }
+
+  if (!adapter) {
+    const reasons = Object.entries(rejectedReasons).map(
+      ([id, state]) =>
+        `adapter ${id} ` +
+        (state === false ? 'is not supported by the environment' : 'is not available in the build')
+    );
+
+    let s = length
+      ? reasons.length > 1
+        ? 'since :\n' + reasons.map(renderReason).join('\n')
+        : ' ' + renderReason(reasons[0])
+      : 'as no adapter specified';
+
+    throw new AxiosError$1(
+      `There is no suitable adapter to dispatch the request ` + s,
+      'ERR_NOT_SUPPORT'
+    );
+  }
+
+  return adapter;
+}
+
+/**
+ * Exports Axios adapters and utility to resolve an adapter
+ */
 const adapters = {
-  getAdapter: (adapters) => {
-    adapters = utils$1.isArray(adapters) ? adapters : [adapters];
+  /**
+   * Resolve an adapter from a list of adapter names or functions.
+   * @type {Function}
+   */
+  getAdapter,
 
-    const {length} = adapters;
-    let nameOrAdapter;
-    let adapter;
-
-    const rejectedReasons = {};
-
-    for (let i = 0; i < length; i++) {
-      nameOrAdapter = adapters[i];
-      let id;
-
-      adapter = nameOrAdapter;
-
-      if (!isResolvedHandle(nameOrAdapter)) {
-        adapter = knownAdapters[(id = String(nameOrAdapter)).toLowerCase()];
-
-        if (adapter === undefined) {
-          throw new AxiosError(`Unknown adapter '${id}'`);
-        }
-      }
-
-      if (adapter) {
-        break;
-      }
-
-      rejectedReasons[id || '#' + i] = adapter;
-    }
-
-    if (!adapter) {
-
-      const reasons = Object.entries(rejectedReasons)
-        .map(([id, state]) => `adapter ${id} ` +
-          (state === false ? 'is not supported by the environment' : 'is not available in the build')
-        );
-
-      let s = length ?
-        (reasons.length > 1 ? 'since :\n' + reasons.map(renderReason).join('\n') : ' ' + renderReason(reasons[0])) :
-        'as no adapter specified';
-
-      throw new AxiosError(
-        `There is no suitable adapter to dispatch the request ` + s,
-        'ERR_NOT_SUPPORT'
-      );
-    }
-
-    return adapter;
-  },
-  adapters: knownAdapters
+  /**
+   * Exposes all known adapters
+   * @type {Object<string, Function|Object>}
+   */
+  adapters: knownAdapters,
 };
 
 /**
@@ -40537,7 +42725,7 @@ function throwIfCancellationRequested(config) {
   }
 
   if (config.signal && config.signal.aborted) {
-    throw new CanceledError(null, config);
+    throw new CanceledError$1(null, config);
   }
 }
 
@@ -40554,47 +42742,43 @@ function dispatchRequest(config) {
   config.headers = AxiosHeaders$1.from(config.headers);
 
   // Transform request data
-  config.data = transformData.call(
-    config,
-    config.transformRequest
-  );
+  config.data = transformData.call(config, config.transformRequest);
 
   if (['post', 'put', 'patch'].indexOf(config.method) !== -1) {
     config.headers.setContentType('application/x-www-form-urlencoded', false);
   }
 
-  const adapter = adapters.getAdapter(config.adapter || defaults$1.adapter);
+  const adapter = adapters.getAdapter(config.adapter || defaults$1.adapter, config);
 
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData.call(
-      config,
-      config.transformResponse,
-      response
-    );
-
-    response.headers = AxiosHeaders$1.from(response.headers);
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
+  return adapter(config).then(
+    function onAdapterResolution(response) {
       throwIfCancellationRequested(config);
 
       // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData.call(
-          config,
-          config.transformResponse,
-          reason.response
-        );
-        reason.response.headers = AxiosHeaders$1.from(reason.response.headers);
-      }
-    }
+      response.data = transformData.call(config, config.transformResponse, response);
 
-    return Promise.reject(reason);
-  });
+      response.headers = AxiosHeaders$1.from(response.headers);
+
+      return response;
+    },
+    function onAdapterRejection(reason) {
+      if (!isCancel(reason)) {
+        throwIfCancellationRequested(config);
+
+        // Transform response data
+        if (reason && reason.response) {
+          reason.response.data = transformData.call(
+            config,
+            config.transformResponse,
+            reason.response
+          );
+          reason.response.headers = AxiosHeaders$1.from(reason.response.headers);
+        }
+      }
+
+      return Promise.reject(reason);
+    }
+  );
 }
 
 const validators$1 = {};
@@ -40619,15 +42803,23 @@ const deprecatedWarnings = {};
  */
 validators$1.transitional = function transitional(validator, version, message) {
   function formatMessage(opt, desc) {
-    return '[Axios v' + VERSION + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
+    return (
+      '[Axios v' +
+      VERSION +
+      "] Transitional option '" +
+      opt +
+      "'" +
+      desc +
+      (message ? '. ' + message : '')
+    );
   }
 
   // eslint-disable-next-line func-names
   return (value, opt, opts) => {
     if (validator === false) {
-      throw new AxiosError(
+      throw new AxiosError$1(
         formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')),
-        AxiosError.ERR_DEPRECATED
+        AxiosError$1.ERR_DEPRECATED
       );
     }
 
@@ -40651,7 +42843,7 @@ validators$1.spelling = function spelling(correctSpelling) {
     // eslint-disable-next-line no-console
     console.warn(`${opt} is likely a misspelling of ${correctSpelling}`);
     return true;
-  }
+  };
 };
 
 /**
@@ -40666,7 +42858,7 @@ validators$1.spelling = function spelling(correctSpelling) {
 
 function assertOptions(options, schema, allowUnknown) {
   if (typeof options !== 'object') {
-    throw new AxiosError('options must be an object', AxiosError.ERR_BAD_OPTION_VALUE);
+    throw new AxiosError$1('options must be an object', AxiosError$1.ERR_BAD_OPTION_VALUE);
   }
   const keys = Object.keys(options);
   let i = keys.length;
@@ -40677,19 +42869,22 @@ function assertOptions(options, schema, allowUnknown) {
       const value = options[opt];
       const result = value === undefined || validator(value, opt, options);
       if (result !== true) {
-        throw new AxiosError('option ' + opt + ' must be ' + result, AxiosError.ERR_BAD_OPTION_VALUE);
+        throw new AxiosError$1(
+          'option ' + opt + ' must be ' + result,
+          AxiosError$1.ERR_BAD_OPTION_VALUE
+        );
       }
       continue;
     }
     if (allowUnknown !== true) {
-      throw new AxiosError('Unknown option ' + opt, AxiosError.ERR_BAD_OPTION);
+      throw new AxiosError$1('Unknown option ' + opt, AxiosError$1.ERR_BAD_OPTION);
     }
   }
 }
 
 const validator = {
   assertOptions,
-  validators: validators$1
+  validators: validators$1,
 };
 
 const validators = validator.validators;
@@ -40703,10 +42898,10 @@ const validators = validator.validators;
  */
 class Axios {
   constructor(instanceConfig) {
-    this.defaults = instanceConfig;
+    this.defaults = instanceConfig || {};
     this.interceptors = {
       request: new InterceptorManager$1(),
-      response: new InterceptorManager$1()
+      response: new InterceptorManager$1(),
     };
   }
 
@@ -40757,49 +42952,64 @@ class Axios {
 
     config = mergeConfig(this.defaults, config);
 
-    const {transitional, paramsSerializer, headers} = config;
+    const { transitional, paramsSerializer, headers } = config;
 
     if (transitional !== undefined) {
-      validator.assertOptions(transitional, {
-        silentJSONParsing: validators.transitional(validators.boolean),
-        forcedJSONParsing: validators.transitional(validators.boolean),
-        clarifyTimeoutError: validators.transitional(validators.boolean)
-      }, false);
+      validator.assertOptions(
+        transitional,
+        {
+          silentJSONParsing: validators.transitional(validators.boolean),
+          forcedJSONParsing: validators.transitional(validators.boolean),
+          clarifyTimeoutError: validators.transitional(validators.boolean),
+          legacyInterceptorReqResOrdering: validators.transitional(validators.boolean),
+        },
+        false
+      );
     }
 
     if (paramsSerializer != null) {
       if (utils$1.isFunction(paramsSerializer)) {
         config.paramsSerializer = {
-          serialize: paramsSerializer
+          serialize: paramsSerializer,
         };
       } else {
-        validator.assertOptions(paramsSerializer, {
-          encode: validators.function,
-          serialize: validators.function
-        }, true);
+        validator.assertOptions(
+          paramsSerializer,
+          {
+            encode: validators.function,
+            serialize: validators.function,
+          },
+          true
+        );
       }
     }
 
-    validator.assertOptions(config, {
-      baseUrl: validators.spelling('baseURL'),
-      withXsrfToken: validators.spelling('withXSRFToken')
-    }, true);
+    // Set config.allowAbsoluteUrls
+    if (config.allowAbsoluteUrls !== undefined) ; else if (this.defaults.allowAbsoluteUrls !== undefined) {
+      config.allowAbsoluteUrls = this.defaults.allowAbsoluteUrls;
+    } else {
+      config.allowAbsoluteUrls = true;
+    }
+
+    validator.assertOptions(
+      config,
+      {
+        baseUrl: validators.spelling('baseURL'),
+        withXsrfToken: validators.spelling('withXSRFToken'),
+      },
+      true
+    );
 
     // Set config.method
     config.method = (config.method || this.defaults.method || 'get').toLowerCase();
 
     // Flatten headers
-    let contextHeaders = headers && utils$1.merge(
-      headers.common,
-      headers[config.method]
-    );
+    let contextHeaders = headers && utils$1.merge(headers.common, headers[config.method]);
 
-    headers && utils$1.forEach(
-      ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-      (method) => {
+    headers &&
+      utils$1.forEach(['delete', 'get', 'head', 'post', 'put', 'patch', 'common'], (method) => {
         delete headers[method];
-      }
-    );
+      });
 
     config.headers = AxiosHeaders$1.concat(contextHeaders, headers);
 
@@ -40813,7 +43023,15 @@ class Axios {
 
       synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
 
-      requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
+      const transitional = config.transitional || transitionalDefaults;
+      const legacyInterceptorReqResOrdering =
+        transitional && transitional.legacyInterceptorReqResOrdering;
+
+      if (legacyInterceptorReqResOrdering) {
+        requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
+      } else {
+        requestInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
+      }
     });
 
     const responseInterceptorChain = [];
@@ -40827,8 +43045,8 @@ class Axios {
 
     if (!synchronousRequestInterceptors) {
       const chain = [dispatchRequest.bind(this), undefined];
-      chain.unshift.apply(chain, requestInterceptorChain);
-      chain.push.apply(chain, responseInterceptorChain);
+      chain.unshift(...requestInterceptorChain);
+      chain.push(...responseInterceptorChain);
       len = chain.length;
 
       promise = Promise.resolve(config);
@@ -40843,8 +43061,6 @@ class Axios {
     len = requestInterceptorChain.length;
 
     let newConfig = config;
-
-    i = 0;
 
     while (i < len) {
       const onFulfilled = requestInterceptorChain[i++];
@@ -40875,7 +43091,7 @@ class Axios {
 
   getUri(config) {
     config = mergeConfig(this.defaults, config);
-    const fullPath = buildFullPath(config.baseURL, config.url);
+    const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
     return buildURL(fullPath, config.params, config.paramsSerializer);
   }
 }
@@ -40883,12 +43099,14 @@ class Axios {
 // Provide aliases for supported request methods
 utils$1.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
   /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(mergeConfig(config || {}, {
-      method,
-      url,
-      data: (config || {}).data
-    }));
+  Axios.prototype[method] = function (url, config) {
+    return this.request(
+      mergeConfig(config || {}, {
+        method,
+        url,
+        data: (config || {}).data,
+      })
+    );
   };
 });
 
@@ -40897,14 +43115,18 @@ utils$1.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method)
 
   function generateHTTPMethod(isForm) {
     return function httpMethod(url, data, config) {
-      return this.request(mergeConfig(config || {}, {
-        method,
-        headers: isForm ? {
-          'Content-Type': 'multipart/form-data'
-        } : {},
-        url,
-        data
-      }));
+      return this.request(
+        mergeConfig(config || {}, {
+          method,
+          headers: isForm
+            ? {
+                'Content-Type': 'multipart/form-data',
+              }
+            : {},
+          url,
+          data,
+        })
+      );
     };
   }
 
@@ -40937,7 +43159,7 @@ class CancelToken {
     const token = this;
 
     // eslint-disable-next-line func-names
-    this.promise.then(cancel => {
+    this.promise.then((cancel) => {
       if (!token._listeners) return;
 
       let i = token._listeners.length;
@@ -40949,10 +43171,10 @@ class CancelToken {
     });
 
     // eslint-disable-next-line func-names
-    this.promise.then = onfulfilled => {
+    this.promise.then = (onfulfilled) => {
       let _resolve;
       // eslint-disable-next-line func-names
-      const promise = new Promise(resolve => {
+      const promise = new Promise((resolve) => {
         token.subscribe(resolve);
         _resolve = resolve;
       }).then(onfulfilled);
@@ -40970,7 +43192,7 @@ class CancelToken {
         return;
       }
 
-      token.reason = new CanceledError(message, config, request);
+      token.reason = new CanceledError$1(message, config, request);
       resolvePromise(token.reason);
     });
   }
@@ -41040,7 +43262,7 @@ class CancelToken {
     });
     return {
       token,
-      cancel
+      cancel,
     };
   }
 }
@@ -41054,7 +43276,7 @@ const CancelToken$1 = CancelToken;
  *
  *  ```js
  *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
+ *  const args = [1, 2, 3];
  *  f.apply(null, args);
  *  ```
  *
@@ -41082,7 +43304,7 @@ function spread(callback) {
  * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
  */
 function isAxiosError(payload) {
-  return utils$1.isObject(payload) && (payload.isAxiosError === true);
+  return utils$1.isObject(payload) && payload.isAxiosError === true;
 }
 
 const HttpStatusCode = {
@@ -41149,6 +43371,12 @@ const HttpStatusCode = {
   LoopDetected: 508,
   NotExtended: 510,
   NetworkAuthenticationRequired: 511,
+  WebServerIsDown: 521,
+  ConnectionTimedOut: 522,
+  OriginIsUnreachable: 523,
+  TimeoutOccurred: 524,
+  SslHandshakeFailed: 525,
+  InvalidSslCertificate: 526,
 };
 
 Object.entries(HttpStatusCode).forEach(([key, value]) => {
@@ -41169,10 +43397,10 @@ function createInstance(defaultConfig) {
   const instance = bind(Axios$1.prototype.request, context);
 
   // Copy axios.prototype to instance
-  utils$1.extend(instance, Axios$1.prototype, context, {allOwnKeys: true});
+  utils$1.extend(instance, Axios$1.prototype, context, { allOwnKeys: true });
 
   // Copy context to instance
-  utils$1.extend(instance, context, null, {allOwnKeys: true});
+  utils$1.extend(instance, context, null, { allOwnKeys: true });
 
   // Factory for creating new instances
   instance.create = function create(instanceConfig) {
@@ -41189,14 +43417,14 @@ const axios = createInstance(defaults$1);
 axios.Axios = Axios$1;
 
 // Expose Cancel & CancelToken
-axios.CanceledError = CanceledError;
+axios.CanceledError = CanceledError$1;
 axios.CancelToken = CancelToken$1;
 axios.isCancel = isCancel;
 axios.VERSION = VERSION;
 axios.toFormData = toFormData;
 
 // Expose AxiosError class
-axios.AxiosError = AxiosError;
+axios.AxiosError = AxiosError$1;
 
 // alias for CanceledError for backward compatibility
 axios.Cancel = axios.CanceledError;
@@ -41216,7 +43444,7 @@ axios.mergeConfig = mergeConfig;
 
 axios.AxiosHeaders = AxiosHeaders$1;
 
-axios.formToJSON = thing => formDataToJSON(utils$1.isHTMLForm(thing) ? new FormData(thing) : thing);
+axios.formToJSON = (thing) => formDataToJSON(utils$1.isHTMLForm(thing) ? new FormData(thing) : thing);
 
 axios.getAdapter = adapters.getAdapter;
 
