@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/ServiceNow/servicenow-devops-test-report#readme",
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@vercel/ncc": "^0.38.3",
-    "axios": "^1.8.4",
-    "follow-redirects": "^1.15.9",
-    "xml2js": "^0.6.2"
+    "@actions/core": "1.11.1",
+    "@vercel/ncc": "0.38.3",
+    "axios": "1.8.4",
+    "follow-redirects": "1.15.9",
+    "xml2js": "0.6.2"
   }
 }
