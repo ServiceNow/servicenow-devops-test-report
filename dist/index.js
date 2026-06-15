@@ -3636,6 +3636,83 @@ function descending(a, b)
 
 /***/ }),
 
+/***/ 2639:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var bind = __nccwpck_require__(7564);
+
+var $apply = __nccwpck_require__(3945);
+var $call = __nccwpck_require__(8093);
+var $reflectApply = __nccwpck_require__(1330);
+
+/** @type {import('./actualApply')} */
+module.exports = $reflectApply || bind.call($call, $apply);
+
+
+/***/ }),
+
+/***/ 3945:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./functionApply')} */
+module.exports = Function.prototype.apply;
+
+
+/***/ }),
+
+/***/ 8093:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./functionCall')} */
+module.exports = Function.prototype.call;
+
+
+/***/ }),
+
+/***/ 8705:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var bind = __nccwpck_require__(7564);
+var $TypeError = __nccwpck_require__(3314);
+
+var $call = __nccwpck_require__(8093);
+var $actualApply = __nccwpck_require__(2639);
+
+/** @type {(args: [Function, thisArg?: unknown, ...args: unknown[]]) => Function} TODO FIXME, find a way to use import('.') */
+module.exports = function callBindBasic(args) {
+	if (args.length < 1 || typeof args[0] !== 'function') {
+		throw new $TypeError('a function is required');
+	}
+	return $actualApply(bind, $call, args);
+};
+
+
+/***/ }),
+
+/***/ 1330:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./reflectApply')} */
+module.exports = typeof Reflect !== 'undefined' && Reflect && Reflect.apply;
+
+
+/***/ }),
+
 /***/ 5630:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -3960,6 +4037,205 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
   var message =
     'DelayedStream#maxDataSize of ' + this.maxDataSize + ' bytes exceeded.'
   this.emit('error', new Error(message));
+};
+
+
+/***/ }),
+
+/***/ 6669:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var callBind = __nccwpck_require__(8705);
+var gOPD = __nccwpck_require__(3170);
+
+var hasProtoAccessor;
+try {
+	// eslint-disable-next-line no-extra-parens, no-proto
+	hasProtoAccessor = /** @type {{ __proto__?: typeof Array.prototype }} */ ([]).__proto__ === Array.prototype;
+} catch (e) {
+	if (!e || typeof e !== 'object' || !('code' in e) || e.code !== 'ERR_PROTO_ACCESS') {
+		throw e;
+	}
+}
+
+// eslint-disable-next-line no-extra-parens
+var desc = !!hasProtoAccessor && gOPD && gOPD(Object.prototype, /** @type {keyof typeof Object.prototype} */ ('__proto__'));
+
+var $Object = Object;
+var $getPrototypeOf = $Object.getPrototypeOf;
+
+/** @type {import('./get')} */
+module.exports = desc && typeof desc.get === 'function'
+	? callBind([desc.get])
+	: typeof $getPrototypeOf === 'function'
+		? /** @type {import('./get')} */ function getDunder(value) {
+			// eslint-disable-next-line eqeqeq
+			return $getPrototypeOf(value == null ? value : $Object(value));
+		}
+		: false;
+
+
+/***/ }),
+
+/***/ 9094:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+var $defineProperty = Object.defineProperty || false;
+if ($defineProperty) {
+	try {
+		$defineProperty({}, 'a', { value: 1 });
+	} catch (e) {
+		// IE 8 has a broken defineProperty
+		$defineProperty = false;
+	}
+}
+
+module.exports = $defineProperty;
+
+
+/***/ }),
+
+/***/ 3056:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./eval')} */
+module.exports = EvalError;
+
+
+/***/ }),
+
+/***/ 1620:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+module.exports = Error;
+
+
+/***/ }),
+
+/***/ 4585:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./range')} */
+module.exports = RangeError;
+
+
+/***/ }),
+
+/***/ 6905:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./ref')} */
+module.exports = ReferenceError;
+
+
+/***/ }),
+
+/***/ 105:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./syntax')} */
+module.exports = SyntaxError;
+
+
+/***/ }),
+
+/***/ 3314:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./type')} */
+module.exports = TypeError;
+
+
+/***/ }),
+
+/***/ 2578:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./uri')} */
+module.exports = URIError;
+
+
+/***/ }),
+
+/***/ 5399:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+module.exports = Object;
+
+
+/***/ }),
+
+/***/ 8700:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var GetIntrinsic = __nccwpck_require__(470);
+
+var $defineProperty = GetIntrinsic('%Object.defineProperty%', true);
+
+var hasToStringTag = __nccwpck_require__(5479)();
+var hasOwn = __nccwpck_require__(4076);
+var $TypeError = __nccwpck_require__(3314);
+
+var toStringTag = hasToStringTag ? Symbol.toStringTag : null;
+
+/** @type {import('.')} */
+module.exports = function setToStringTag(object, value) {
+	var overrideIfSet = arguments.length > 2 && !!arguments[2] && arguments[2].force;
+	var nonConfigurable = arguments.length > 2 && !!arguments[2] && arguments[2].nonConfigurable;
+	if (
+		(typeof overrideIfSet !== 'undefined' && typeof overrideIfSet !== 'boolean')
+		|| (typeof nonConfigurable !== 'undefined' && typeof nonConfigurable !== 'boolean')
+	) {
+		throw new $TypeError('if provided, the `overrideIfSet` and `nonConfigurable` options must be booleans');
+	}
+	if (toStringTag && (overrideIfSet || !hasOwn(object, toStringTag))) {
+		if ($defineProperty) {
+			$defineProperty(object, toStringTag, {
+				configurable: !nonConfigurable,
+				enumerable: false,
+				value: value,
+				writable: false
+			});
+		} else {
+			object[toStringTag] = value; // eslint-disable-line no-param-reassign
+		}
+	}
 };
 
 
@@ -4683,6 +4959,9 @@ module.exports.wrap = wrap;
 /***/ 6454:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 var CombinedStream = __nccwpck_require__(5630);
 var util = __nccwpck_require__(9023);
 var path = __nccwpck_require__(6928);
@@ -4691,15 +4970,12 @@ var https = __nccwpck_require__(5692);
 var parseUrl = (__nccwpck_require__(7016).parse);
 var fs = __nccwpck_require__(9896);
 var Stream = (__nccwpck_require__(2203).Stream);
+var crypto = __nccwpck_require__(6982);
 var mime = __nccwpck_require__(4096);
 var asynckit = __nccwpck_require__(1324);
+var setToStringTag = __nccwpck_require__(8700);
+var hasOwn = __nccwpck_require__(4076);
 var populate = __nccwpck_require__(1835);
-
-// Public API
-module.exports = FormData;
-
-// make it a Stream
-util.inherits(FormData, CombinedStream);
 
 /**
  * Create readable "multipart/form-data" streams.
@@ -4707,7 +4983,7 @@ util.inherits(FormData, CombinedStream);
  * and file uploads to other web applications.
  *
  * @constructor
- * @param {Object} options - Properties to be added/overriden for FormData and CombinedStream
+ * @param {object} options - Properties to be added/overriden for FormData and CombinedStream
  */
 function FormData(options) {
   if (!(this instanceof FormData)) {
@@ -4720,35 +4996,39 @@ function FormData(options) {
 
   CombinedStream.call(this);
 
-  options = options || {};
-  for (var option in options) {
+  options = options || {}; // eslint-disable-line no-param-reassign
+  for (var option in options) { // eslint-disable-line no-restricted-syntax
     this[option] = options[option];
   }
 }
 
+// make it a Stream
+util.inherits(FormData, CombinedStream);
+
 FormData.LINE_BREAK = '\r\n';
 FormData.DEFAULT_CONTENT_TYPE = 'application/octet-stream';
 
-FormData.prototype.append = function(field, value, options) {
-
-  options = options || {};
+FormData.prototype.append = function (field, value, options) {
+  options = options || {}; // eslint-disable-line no-param-reassign
 
   // allow filename as single option
-  if (typeof options == 'string') {
-    options = {filename: options};
+  if (typeof options === 'string') {
+    options = { filename: options }; // eslint-disable-line no-param-reassign
   }
 
   var append = CombinedStream.prototype.append.bind(this);
 
   // all that streamy business can't handle numbers
-  if (typeof value == 'number') {
-    value = '' + value;
+  if (typeof value === 'number' || value == null) {
+    value = String(value); // eslint-disable-line no-param-reassign
   }
 
   // https://github.com/felixge/node-form-data/issues/38
   if (Array.isArray(value)) {
-    // Please convert your array into string
-    // the way web server expects it
+    /*
+     * Please convert your array into string
+     * the way web server expects it
+     */
     this._error(new Error('Arrays are not supported.'));
     return;
   }
@@ -4764,15 +5044,17 @@ FormData.prototype.append = function(field, value, options) {
   this._trackLength(header, value, options);
 };
 
-FormData.prototype._trackLength = function(header, value, options) {
+FormData.prototype._trackLength = function (header, value, options) {
   var valueLength = 0;
 
-  // used w/ getLengthSync(), when length is known.
-  // e.g. for streaming directly from a remote server,
-  // w/ a known file a size, and not wanting to wait for
-  // incoming file to finish to get its size.
+  /*
+   * used w/ getLengthSync(), when length is known.
+   * e.g. for streaming directly from a remote server,
+   * w/ a known file a size, and not wanting to wait for
+   * incoming file to finish to get its size.
+   */
   if (options.knownLength != null) {
-    valueLength += +options.knownLength;
+    valueLength += Number(options.knownLength);
   } else if (Buffer.isBuffer(value)) {
     valueLength = value.length;
   } else if (typeof value === 'string') {
@@ -4782,12 +5064,10 @@ FormData.prototype._trackLength = function(header, value, options) {
   this._valueLength += valueLength;
 
   // @check why add CRLF? does this account for custom/multiple CRLFs?
-  this._overheadLength +=
-    Buffer.byteLength(header) +
-    FormData.LINE_BREAK.length;
+  this._overheadLength += Buffer.byteLength(header) + FormData.LINE_BREAK.length;
 
   // empty or either doesn't have path or not an http response or not a stream
-  if (!value || ( !value.path && !(value.readable && value.hasOwnProperty('httpVersion')) && !(value instanceof Stream))) {
+  if (!value || (!value.path && !(value.readable && hasOwn(value, 'httpVersion')) && !(value instanceof Stream))) {
     return;
   }
 
@@ -4797,10 +5077,8 @@ FormData.prototype._trackLength = function(header, value, options) {
   }
 };
 
-FormData.prototype._lengthRetriever = function(value, callback) {
-
-  if (value.hasOwnProperty('fd')) {
-
+FormData.prototype._lengthRetriever = function (value, callback) {
+  if (hasOwn(value, 'fd')) {
     // take read range into a account
     // `end` = Infinity –> read file till the end
     //
@@ -4809,54 +5087,52 @@ FormData.prototype._lengthRetriever = function(value, callback) {
     // Fix it when node fixes it.
     // https://github.com/joyent/node/issues/7819
     if (value.end != undefined && value.end != Infinity && value.start != undefined) {
-
       // when end specified
       // no need to calculate range
       // inclusive, starts with 0
-      callback(null, value.end + 1 - (value.start ? value.start : 0));
+      callback(null, value.end + 1 - (value.start ? value.start : 0)); // eslint-disable-line callback-return
 
-    // not that fast snoopy
+      // not that fast snoopy
     } else {
       // still need to fetch file size from fs
-      fs.stat(value.path, function(err, stat) {
-
-        var fileSize;
-
+      fs.stat(value.path, function (err, stat) {
         if (err) {
           callback(err);
           return;
         }
 
         // update final size based on the range options
-        fileSize = stat.size - (value.start ? value.start : 0);
+        var fileSize = stat.size - (value.start ? value.start : 0);
         callback(null, fileSize);
       });
     }
 
-  // or http response
-  } else if (value.hasOwnProperty('httpVersion')) {
-    callback(null, +value.headers['content-length']);
+    // or http response
+  } else if (hasOwn(value, 'httpVersion')) {
+    callback(null, Number(value.headers['content-length'])); // eslint-disable-line callback-return
 
-  // or request stream http://github.com/mikeal/request
-  } else if (value.hasOwnProperty('httpModule')) {
+    // or request stream http://github.com/mikeal/request
+  } else if (hasOwn(value, 'httpModule')) {
     // wait till response come back
-    value.on('response', function(response) {
+    value.on('response', function (response) {
       value.pause();
-      callback(null, +response.headers['content-length']);
+      callback(null, Number(response.headers['content-length']));
     });
     value.resume();
 
-  // something else
+    // something else
   } else {
-    callback('Unknown stream');
+    callback('Unknown stream'); // eslint-disable-line callback-return
   }
 };
 
-FormData.prototype._multiPartHeader = function(field, value, options) {
-  // custom header specified (as string)?
-  // it becomes responsible for boundary
-  // (e.g. to handle extra CRLFs on .NET servers)
-  if (typeof options.header == 'string') {
+FormData.prototype._multiPartHeader = function (field, value, options) {
+  /*
+   * custom header specified (as string)?
+   * it becomes responsible for boundary
+   * (e.g. to handle extra CRLFs on .NET servers)
+   */
+  if (typeof options.header === 'string') {
     return options.header;
   }
 
@@ -4864,7 +5140,7 @@ FormData.prototype._multiPartHeader = function(field, value, options) {
   var contentType = this._getContentType(value, options);
 
   var contents = '';
-  var headers  = {
+  var headers = {
     // add custom disposition as third element or keep it two elements if not
     'Content-Disposition': ['form-data', 'name="' + field + '"'].concat(contentDisposition || []),
     // if no content type. allow it to be empty array
@@ -4872,77 +5148,74 @@ FormData.prototype._multiPartHeader = function(field, value, options) {
   };
 
   // allow custom headers.
-  if (typeof options.header == 'object') {
+  if (typeof options.header === 'object') {
     populate(headers, options.header);
   }
 
   var header;
-  for (var prop in headers) {
-    if (!headers.hasOwnProperty(prop)) continue;
-    header = headers[prop];
+  for (var prop in headers) { // eslint-disable-line no-restricted-syntax
+    if (hasOwn(headers, prop)) {
+      header = headers[prop];
 
-    // skip nullish headers.
-    if (header == null) {
-      continue;
-    }
+      // skip nullish headers.
+      if (header == null) {
+        continue; // eslint-disable-line no-restricted-syntax, no-continue
+      }
 
-    // convert all headers to arrays.
-    if (!Array.isArray(header)) {
-      header = [header];
-    }
+      // convert all headers to arrays.
+      if (!Array.isArray(header)) {
+        header = [header];
+      }
 
-    // add non-empty headers.
-    if (header.length) {
-      contents += prop + ': ' + header.join('; ') + FormData.LINE_BREAK;
+      // add non-empty headers.
+      if (header.length) {
+        contents += prop + ': ' + header.join('; ') + FormData.LINE_BREAK;
+      }
     }
   }
 
   return '--' + this.getBoundary() + FormData.LINE_BREAK + contents + FormData.LINE_BREAK;
 };
 
-FormData.prototype._getContentDisposition = function(value, options) {
-
-  var filename
-    , contentDisposition
-    ;
+FormData.prototype._getContentDisposition = function (value, options) { // eslint-disable-line consistent-return
+  var filename;
 
   if (typeof options.filepath === 'string') {
     // custom filepath for relative paths
     filename = path.normalize(options.filepath).replace(/\\/g, '/');
-  } else if (options.filename || value.name || value.path) {
-    // custom filename take precedence
-    // formidable and the browser add a name property
-    // fs- and request- streams have path property
-    filename = path.basename(options.filename || value.name || value.path);
-  } else if (value.readable && value.hasOwnProperty('httpVersion')) {
+  } else if (options.filename || (value && (value.name || value.path))) {
+    /*
+     * custom filename take precedence
+     * formidable and the browser add a name property
+     * fs- and request- streams have path property
+     */
+    filename = path.basename(options.filename || (value && (value.name || value.path)));
+  } else if (value && value.readable && hasOwn(value, 'httpVersion')) {
     // or try http response
     filename = path.basename(value.client._httpMessage.path || '');
   }
 
   if (filename) {
-    contentDisposition = 'filename="' + filename + '"';
+    return 'filename="' + filename + '"';
   }
-
-  return contentDisposition;
 };
 
-FormData.prototype._getContentType = function(value, options) {
-
+FormData.prototype._getContentType = function (value, options) {
   // use custom content-type above all
   var contentType = options.contentType;
 
   // or try `name` from formidable, browser
-  if (!contentType && value.name) {
+  if (!contentType && value && value.name) {
     contentType = mime.lookup(value.name);
   }
 
   // or try `path` from fs-, request- streams
-  if (!contentType && value.path) {
+  if (!contentType && value && value.path) {
     contentType = mime.lookup(value.path);
   }
 
   // or if it's http-reponse
-  if (!contentType && value.readable && value.hasOwnProperty('httpVersion')) {
+  if (!contentType && value && value.readable && hasOwn(value, 'httpVersion')) {
     contentType = value.headers['content-type'];
   }
 
@@ -4952,18 +5225,18 @@ FormData.prototype._getContentType = function(value, options) {
   }
 
   // fallback to the default content type if `value` is not simple value
-  if (!contentType && typeof value == 'object') {
+  if (!contentType && value && typeof value === 'object') {
     contentType = FormData.DEFAULT_CONTENT_TYPE;
   }
 
   return contentType;
 };
 
-FormData.prototype._multiPartFooter = function() {
-  return function(next) {
+FormData.prototype._multiPartFooter = function () {
+  return function (next) {
     var footer = FormData.LINE_BREAK;
 
-    var lastPart = (this._streams.length === 0);
+    var lastPart = this._streams.length === 0;
     if (lastPart) {
       footer += this._lastBoundary();
     }
@@ -4972,18 +5245,18 @@ FormData.prototype._multiPartFooter = function() {
   }.bind(this);
 };
 
-FormData.prototype._lastBoundary = function() {
+FormData.prototype._lastBoundary = function () {
   return '--' + this.getBoundary() + '--' + FormData.LINE_BREAK;
 };
 
-FormData.prototype.getHeaders = function(userHeaders) {
+FormData.prototype.getHeaders = function (userHeaders) {
   var header;
   var formHeaders = {
     'content-type': 'multipart/form-data; boundary=' + this.getBoundary()
   };
 
-  for (header in userHeaders) {
-    if (userHeaders.hasOwnProperty(header)) {
+  for (header in userHeaders) { // eslint-disable-line no-restricted-syntax
+    if (hasOwn(userHeaders, header)) {
       formHeaders[header.toLowerCase()] = userHeaders[header];
     }
   }
@@ -4991,11 +5264,14 @@ FormData.prototype.getHeaders = function(userHeaders) {
   return formHeaders;
 };
 
-FormData.prototype.setBoundary = function(boundary) {
+FormData.prototype.setBoundary = function (boundary) {
+  if (typeof boundary !== 'string') {
+    throw new TypeError('FormData boundary must be a string');
+  }
   this._boundary = boundary;
 };
 
-FormData.prototype.getBoundary = function() {
+FormData.prototype.getBoundary = function () {
   if (!this._boundary) {
     this._generateBoundary();
   }
@@ -5003,60 +5279,55 @@ FormData.prototype.getBoundary = function() {
   return this._boundary;
 };
 
-FormData.prototype.getBuffer = function() {
-  var dataBuffer = new Buffer.alloc( 0 );
+FormData.prototype.getBuffer = function () {
+  var dataBuffer = new Buffer.alloc(0); // eslint-disable-line new-cap
   var boundary = this.getBoundary();
 
   // Create the form content. Add Line breaks to the end of data.
   for (var i = 0, len = this._streams.length; i < len; i++) {
     if (typeof this._streams[i] !== 'function') {
-
       // Add content to the buffer.
-      if(Buffer.isBuffer(this._streams[i])) {
-        dataBuffer = Buffer.concat( [dataBuffer, this._streams[i]]);
-      }else {
-        dataBuffer = Buffer.concat( [dataBuffer, Buffer.from(this._streams[i])]);
+      if (Buffer.isBuffer(this._streams[i])) {
+        dataBuffer = Buffer.concat([dataBuffer, this._streams[i]]);
+      } else {
+        dataBuffer = Buffer.concat([dataBuffer, Buffer.from(this._streams[i])]);
       }
 
       // Add break after content.
-      if (typeof this._streams[i] !== 'string' || this._streams[i].substring( 2, boundary.length + 2 ) !== boundary) {
-        dataBuffer = Buffer.concat( [dataBuffer, Buffer.from(FormData.LINE_BREAK)] );
+      if (typeof this._streams[i] !== 'string' || this._streams[i].substring(2, boundary.length + 2) !== boundary) {
+        dataBuffer = Buffer.concat([dataBuffer, Buffer.from(FormData.LINE_BREAK)]);
       }
     }
   }
 
   // Add the footer and return the Buffer object.
-  return Buffer.concat( [dataBuffer, Buffer.from(this._lastBoundary())] );
+  return Buffer.concat([dataBuffer, Buffer.from(this._lastBoundary())]);
 };
 
-FormData.prototype._generateBoundary = function() {
+FormData.prototype._generateBoundary = function () {
   // This generates a 50 character boundary similar to those used by Firefox.
-  // They are optimized for boyer-moore parsing.
-  var boundary = '--------------------------';
-  for (var i = 0; i < 24; i++) {
-    boundary += Math.floor(Math.random() * 10).toString(16);
-  }
 
-  this._boundary = boundary;
+  // They are optimized for boyer-moore parsing.
+  this._boundary = '--------------------------' + crypto.randomBytes(12).toString('hex');
 };
 
 // Note: getLengthSync DOESN'T calculate streams length
-// As workaround one can calculate file size manually
-// and add it as knownLength option
-FormData.prototype.getLengthSync = function() {
+// As workaround one can calculate file size manually and add it as knownLength option
+FormData.prototype.getLengthSync = function () {
   var knownLength = this._overheadLength + this._valueLength;
 
-  // Don't get confused, there are 3 "internal" streams for each keyval pair
-  // so it basically checks if there is any value added to the form
+  // Don't get confused, there are 3 "internal" streams for each keyval pair so it basically checks if there is any value added to the form
   if (this._streams.length) {
     knownLength += this._lastBoundary().length;
   }
 
   // https://github.com/form-data/form-data/issues/40
   if (!this.hasKnownLength()) {
-    // Some async length retrievers are present
-    // therefore synchronous length calculation is false.
-    // Please use getLength(callback) to get proper length
+    /*
+     * Some async length retrievers are present
+     * therefore synchronous length calculation is false.
+     * Please use getLength(callback) to get proper length
+     */
     this._error(new Error('Cannot calculate proper length in synchronous way.'));
   }
 
@@ -5066,7 +5337,7 @@ FormData.prototype.getLengthSync = function() {
 // Public API to check if length of added values is known
 // https://github.com/form-data/form-data/issues/196
 // https://github.com/form-data/form-data/issues/262
-FormData.prototype.hasKnownLength = function() {
+FormData.prototype.hasKnownLength = function () {
   var hasKnownLength = true;
 
   if (this._valuesToMeasure.length) {
@@ -5076,7 +5347,7 @@ FormData.prototype.hasKnownLength = function() {
   return hasKnownLength;
 };
 
-FormData.prototype.getLength = function(cb) {
+FormData.prototype.getLength = function (cb) {
   var knownLength = this._overheadLength + this._valueLength;
 
   if (this._streams.length) {
@@ -5088,13 +5359,13 @@ FormData.prototype.getLength = function(cb) {
     return;
   }
 
-  asynckit.parallel(this._valuesToMeasure, this._lengthRetriever, function(err, values) {
+  asynckit.parallel(this._valuesToMeasure, this._lengthRetriever, function (err, values) {
     if (err) {
       cb(err);
       return;
     }
 
-    values.forEach(function(length) {
+    values.forEach(function (length) {
       knownLength += length;
     });
 
@@ -5102,31 +5373,26 @@ FormData.prototype.getLength = function(cb) {
   });
 };
 
-FormData.prototype.submit = function(params, cb) {
-  var request
-    , options
-    , defaults = {method: 'post'}
-    ;
+FormData.prototype.submit = function (params, cb) {
+  var request;
+  var options;
+  var defaults = { method: 'post' };
 
-  // parse provided url if it's string
-  // or treat it as options object
-  if (typeof params == 'string') {
-
-    params = parseUrl(params);
+  // parse provided url if it's string or treat it as options object
+  if (typeof params === 'string') {
+    params = parseUrl(params); // eslint-disable-line no-param-reassign
+    /* eslint sort-keys: 0 */
     options = populate({
       port: params.port,
       path: params.pathname,
       host: params.hostname,
       protocol: params.protocol
     }, defaults);
-
-  // use custom params
-  } else {
-
+  } else { // use custom params
     options = populate(params, defaults);
     // if no port provided use default one
     if (!options.port) {
-      options.port = options.protocol == 'https:' ? 443 : 80;
+      options.port = options.protocol === 'https:' ? 443 : 80;
     }
   }
 
@@ -5134,14 +5400,14 @@ FormData.prototype.submit = function(params, cb) {
   options.headers = this.getHeaders(params.headers);
 
   // https if specified, fallback to http in any other case
-  if (options.protocol == 'https:') {
+  if (options.protocol === 'https:') {
     request = https.request(options);
   } else {
     request = http.request(options);
   }
 
   // get content length and fire away
-  this.getLength(function(err, length) {
+  this.getLength(function (err, length) {
     if (err && err !== 'Unknown stream') {
       this._error(err);
       return;
@@ -5173,7 +5439,7 @@ FormData.prototype.submit = function(params, cb) {
   return request;
 };
 
-FormData.prototype._error = function(err) {
+FormData.prototype._error = function (err) {
   if (!this.error) {
     this.error = err;
     this.pause();
@@ -5184,6 +5450,10 @@ FormData.prototype._error = function(err) {
 FormData.prototype.toString = function () {
   return '[object FormData]';
 };
+setToStringTag(FormData.prototype, 'FormData');
+
+// Public API
+module.exports = FormData;
 
 
 /***/ }),
@@ -5191,15 +5461,815 @@ FormData.prototype.toString = function () {
 /***/ 1835:
 /***/ ((module) => {
 
-// populates missing values
-module.exports = function(dst, src) {
+"use strict";
 
-  Object.keys(src).forEach(function(prop)
-  {
-    dst[prop] = dst[prop] || src[prop];
+
+// populates missing values
+module.exports = function (dst, src) {
+  Object.keys(src).forEach(function (prop) {
+    dst[prop] = dst[prop] || src[prop]; // eslint-disable-line no-param-reassign
   });
 
   return dst;
+};
+
+
+/***/ }),
+
+/***/ 9808:
+/***/ ((module) => {
+
+"use strict";
+
+
+/* eslint no-invalid-this: 1 */
+
+var ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
+var toStr = Object.prototype.toString;
+var max = Math.max;
+var funcType = '[object Function]';
+
+var concatty = function concatty(a, b) {
+    var arr = [];
+
+    for (var i = 0; i < a.length; i += 1) {
+        arr[i] = a[i];
+    }
+    for (var j = 0; j < b.length; j += 1) {
+        arr[j + a.length] = b[j];
+    }
+
+    return arr;
+};
+
+var slicy = function slicy(arrLike, offset) {
+    var arr = [];
+    for (var i = offset || 0, j = 0; i < arrLike.length; i += 1, j += 1) {
+        arr[j] = arrLike[i];
+    }
+    return arr;
+};
+
+var joiny = function (arr, joiner) {
+    var str = '';
+    for (var i = 0; i < arr.length; i += 1) {
+        str += arr[i];
+        if (i + 1 < arr.length) {
+            str += joiner;
+        }
+    }
+    return str;
+};
+
+module.exports = function bind(that) {
+    var target = this;
+    if (typeof target !== 'function' || toStr.apply(target) !== funcType) {
+        throw new TypeError(ERROR_MESSAGE + target);
+    }
+    var args = slicy(arguments, 1);
+
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                concatty(args, arguments)
+            );
+            if (Object(result) === result) {
+                return result;
+            }
+            return this;
+        }
+        return target.apply(
+            that,
+            concatty(args, arguments)
+        );
+
+    };
+
+    var boundLength = max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i < boundLength; i++) {
+        boundArgs[i] = '$' + i;
+    }
+
+    bound = Function('binder', 'return function (' + joiny(boundArgs, ',') + '){ return binder.apply(this,arguments); }')(binder);
+
+    if (target.prototype) {
+        var Empty = function Empty() {};
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+
+    return bound;
+};
+
+
+/***/ }),
+
+/***/ 7564:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var implementation = __nccwpck_require__(9808);
+
+module.exports = Function.prototype.bind || implementation;
+
+
+/***/ }),
+
+/***/ 470:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var undefined;
+
+var $Object = __nccwpck_require__(5399);
+
+var $Error = __nccwpck_require__(1620);
+var $EvalError = __nccwpck_require__(3056);
+var $RangeError = __nccwpck_require__(4585);
+var $ReferenceError = __nccwpck_require__(6905);
+var $SyntaxError = __nccwpck_require__(105);
+var $TypeError = __nccwpck_require__(3314);
+var $URIError = __nccwpck_require__(2578);
+
+var abs = __nccwpck_require__(5641);
+var floor = __nccwpck_require__(6171);
+var max = __nccwpck_require__(7147);
+var min = __nccwpck_require__(1017);
+var pow = __nccwpck_require__(6947);
+var round = __nccwpck_require__(2621);
+var sign = __nccwpck_require__(156);
+
+var $Function = Function;
+
+// eslint-disable-next-line consistent-return
+var getEvalledConstructor = function (expressionSyntax) {
+	try {
+		return $Function('"use strict"; return (' + expressionSyntax + ').constructor;')();
+	} catch (e) {}
+};
+
+var $gOPD = __nccwpck_require__(3170);
+var $defineProperty = __nccwpck_require__(9094);
+
+var throwTypeError = function () {
+	throw new $TypeError();
+};
+var ThrowTypeError = $gOPD
+	? (function () {
+		try {
+			// eslint-disable-next-line no-unused-expressions, no-caller, no-restricted-properties
+			arguments.callee; // IE 8 does not throw here
+			return throwTypeError;
+		} catch (calleeThrows) {
+			try {
+				// IE 8 throws on Object.getOwnPropertyDescriptor(arguments, '')
+				return $gOPD(arguments, 'callee').get;
+			} catch (gOPDthrows) {
+				return throwTypeError;
+			}
+		}
+	}())
+	: throwTypeError;
+
+var hasSymbols = __nccwpck_require__(3336)();
+
+var getProto = __nccwpck_require__(1967);
+var $ObjectGPO = __nccwpck_require__(1311);
+var $ReflectGPO = __nccwpck_require__(8681);
+
+var $apply = __nccwpck_require__(3945);
+var $call = __nccwpck_require__(8093);
+
+var needsEval = {};
+
+var TypedArray = typeof Uint8Array === 'undefined' || !getProto ? undefined : getProto(Uint8Array);
+
+var INTRINSICS = {
+	__proto__: null,
+	'%AggregateError%': typeof AggregateError === 'undefined' ? undefined : AggregateError,
+	'%Array%': Array,
+	'%ArrayBuffer%': typeof ArrayBuffer === 'undefined' ? undefined : ArrayBuffer,
+	'%ArrayIteratorPrototype%': hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined,
+	'%AsyncFromSyncIteratorPrototype%': undefined,
+	'%AsyncFunction%': needsEval,
+	'%AsyncGenerator%': needsEval,
+	'%AsyncGeneratorFunction%': needsEval,
+	'%AsyncIteratorPrototype%': needsEval,
+	'%Atomics%': typeof Atomics === 'undefined' ? undefined : Atomics,
+	'%BigInt%': typeof BigInt === 'undefined' ? undefined : BigInt,
+	'%BigInt64Array%': typeof BigInt64Array === 'undefined' ? undefined : BigInt64Array,
+	'%BigUint64Array%': typeof BigUint64Array === 'undefined' ? undefined : BigUint64Array,
+	'%Boolean%': Boolean,
+	'%DataView%': typeof DataView === 'undefined' ? undefined : DataView,
+	'%Date%': Date,
+	'%decodeURI%': decodeURI,
+	'%decodeURIComponent%': decodeURIComponent,
+	'%encodeURI%': encodeURI,
+	'%encodeURIComponent%': encodeURIComponent,
+	'%Error%': $Error,
+	'%eval%': eval, // eslint-disable-line no-eval
+	'%EvalError%': $EvalError,
+	'%Float16Array%': typeof Float16Array === 'undefined' ? undefined : Float16Array,
+	'%Float32Array%': typeof Float32Array === 'undefined' ? undefined : Float32Array,
+	'%Float64Array%': typeof Float64Array === 'undefined' ? undefined : Float64Array,
+	'%FinalizationRegistry%': typeof FinalizationRegistry === 'undefined' ? undefined : FinalizationRegistry,
+	'%Function%': $Function,
+	'%GeneratorFunction%': needsEval,
+	'%Int8Array%': typeof Int8Array === 'undefined' ? undefined : Int8Array,
+	'%Int16Array%': typeof Int16Array === 'undefined' ? undefined : Int16Array,
+	'%Int32Array%': typeof Int32Array === 'undefined' ? undefined : Int32Array,
+	'%isFinite%': isFinite,
+	'%isNaN%': isNaN,
+	'%IteratorPrototype%': hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined,
+	'%JSON%': typeof JSON === 'object' ? JSON : undefined,
+	'%Map%': typeof Map === 'undefined' ? undefined : Map,
+	'%MapIteratorPrototype%': typeof Map === 'undefined' || !hasSymbols || !getProto ? undefined : getProto(new Map()[Symbol.iterator]()),
+	'%Math%': Math,
+	'%Number%': Number,
+	'%Object%': $Object,
+	'%Object.getOwnPropertyDescriptor%': $gOPD,
+	'%parseFloat%': parseFloat,
+	'%parseInt%': parseInt,
+	'%Promise%': typeof Promise === 'undefined' ? undefined : Promise,
+	'%Proxy%': typeof Proxy === 'undefined' ? undefined : Proxy,
+	'%RangeError%': $RangeError,
+	'%ReferenceError%': $ReferenceError,
+	'%Reflect%': typeof Reflect === 'undefined' ? undefined : Reflect,
+	'%RegExp%': RegExp,
+	'%Set%': typeof Set === 'undefined' ? undefined : Set,
+	'%SetIteratorPrototype%': typeof Set === 'undefined' || !hasSymbols || !getProto ? undefined : getProto(new Set()[Symbol.iterator]()),
+	'%SharedArrayBuffer%': typeof SharedArrayBuffer === 'undefined' ? undefined : SharedArrayBuffer,
+	'%String%': String,
+	'%StringIteratorPrototype%': hasSymbols && getProto ? getProto(''[Symbol.iterator]()) : undefined,
+	'%Symbol%': hasSymbols ? Symbol : undefined,
+	'%SyntaxError%': $SyntaxError,
+	'%ThrowTypeError%': ThrowTypeError,
+	'%TypedArray%': TypedArray,
+	'%TypeError%': $TypeError,
+	'%Uint8Array%': typeof Uint8Array === 'undefined' ? undefined : Uint8Array,
+	'%Uint8ClampedArray%': typeof Uint8ClampedArray === 'undefined' ? undefined : Uint8ClampedArray,
+	'%Uint16Array%': typeof Uint16Array === 'undefined' ? undefined : Uint16Array,
+	'%Uint32Array%': typeof Uint32Array === 'undefined' ? undefined : Uint32Array,
+	'%URIError%': $URIError,
+	'%WeakMap%': typeof WeakMap === 'undefined' ? undefined : WeakMap,
+	'%WeakRef%': typeof WeakRef === 'undefined' ? undefined : WeakRef,
+	'%WeakSet%': typeof WeakSet === 'undefined' ? undefined : WeakSet,
+
+	'%Function.prototype.call%': $call,
+	'%Function.prototype.apply%': $apply,
+	'%Object.defineProperty%': $defineProperty,
+	'%Object.getPrototypeOf%': $ObjectGPO,
+	'%Math.abs%': abs,
+	'%Math.floor%': floor,
+	'%Math.max%': max,
+	'%Math.min%': min,
+	'%Math.pow%': pow,
+	'%Math.round%': round,
+	'%Math.sign%': sign,
+	'%Reflect.getPrototypeOf%': $ReflectGPO
+};
+
+if (getProto) {
+	try {
+		null.error; // eslint-disable-line no-unused-expressions
+	} catch (e) {
+		// https://github.com/tc39/proposal-shadowrealm/pull/384#issuecomment-1364264229
+		var errorProto = getProto(getProto(e));
+		INTRINSICS['%Error.prototype%'] = errorProto;
+	}
+}
+
+var doEval = function doEval(name) {
+	var value;
+	if (name === '%AsyncFunction%') {
+		value = getEvalledConstructor('async function () {}');
+	} else if (name === '%GeneratorFunction%') {
+		value = getEvalledConstructor('function* () {}');
+	} else if (name === '%AsyncGeneratorFunction%') {
+		value = getEvalledConstructor('async function* () {}');
+	} else if (name === '%AsyncGenerator%') {
+		var fn = doEval('%AsyncGeneratorFunction%');
+		if (fn) {
+			value = fn.prototype;
+		}
+	} else if (name === '%AsyncIteratorPrototype%') {
+		var gen = doEval('%AsyncGenerator%');
+		if (gen && getProto) {
+			value = getProto(gen.prototype);
+		}
+	}
+
+	INTRINSICS[name] = value;
+
+	return value;
+};
+
+var LEGACY_ALIASES = {
+	__proto__: null,
+	'%ArrayBufferPrototype%': ['ArrayBuffer', 'prototype'],
+	'%ArrayPrototype%': ['Array', 'prototype'],
+	'%ArrayProto_entries%': ['Array', 'prototype', 'entries'],
+	'%ArrayProto_forEach%': ['Array', 'prototype', 'forEach'],
+	'%ArrayProto_keys%': ['Array', 'prototype', 'keys'],
+	'%ArrayProto_values%': ['Array', 'prototype', 'values'],
+	'%AsyncFunctionPrototype%': ['AsyncFunction', 'prototype'],
+	'%AsyncGenerator%': ['AsyncGeneratorFunction', 'prototype'],
+	'%AsyncGeneratorPrototype%': ['AsyncGeneratorFunction', 'prototype', 'prototype'],
+	'%BooleanPrototype%': ['Boolean', 'prototype'],
+	'%DataViewPrototype%': ['DataView', 'prototype'],
+	'%DatePrototype%': ['Date', 'prototype'],
+	'%ErrorPrototype%': ['Error', 'prototype'],
+	'%EvalErrorPrototype%': ['EvalError', 'prototype'],
+	'%Float32ArrayPrototype%': ['Float32Array', 'prototype'],
+	'%Float64ArrayPrototype%': ['Float64Array', 'prototype'],
+	'%FunctionPrototype%': ['Function', 'prototype'],
+	'%Generator%': ['GeneratorFunction', 'prototype'],
+	'%GeneratorPrototype%': ['GeneratorFunction', 'prototype', 'prototype'],
+	'%Int8ArrayPrototype%': ['Int8Array', 'prototype'],
+	'%Int16ArrayPrototype%': ['Int16Array', 'prototype'],
+	'%Int32ArrayPrototype%': ['Int32Array', 'prototype'],
+	'%JSONParse%': ['JSON', 'parse'],
+	'%JSONStringify%': ['JSON', 'stringify'],
+	'%MapPrototype%': ['Map', 'prototype'],
+	'%NumberPrototype%': ['Number', 'prototype'],
+	'%ObjectPrototype%': ['Object', 'prototype'],
+	'%ObjProto_toString%': ['Object', 'prototype', 'toString'],
+	'%ObjProto_valueOf%': ['Object', 'prototype', 'valueOf'],
+	'%PromisePrototype%': ['Promise', 'prototype'],
+	'%PromiseProto_then%': ['Promise', 'prototype', 'then'],
+	'%Promise_all%': ['Promise', 'all'],
+	'%Promise_reject%': ['Promise', 'reject'],
+	'%Promise_resolve%': ['Promise', 'resolve'],
+	'%RangeErrorPrototype%': ['RangeError', 'prototype'],
+	'%ReferenceErrorPrototype%': ['ReferenceError', 'prototype'],
+	'%RegExpPrototype%': ['RegExp', 'prototype'],
+	'%SetPrototype%': ['Set', 'prototype'],
+	'%SharedArrayBufferPrototype%': ['SharedArrayBuffer', 'prototype'],
+	'%StringPrototype%': ['String', 'prototype'],
+	'%SymbolPrototype%': ['Symbol', 'prototype'],
+	'%SyntaxErrorPrototype%': ['SyntaxError', 'prototype'],
+	'%TypedArrayPrototype%': ['TypedArray', 'prototype'],
+	'%TypeErrorPrototype%': ['TypeError', 'prototype'],
+	'%Uint8ArrayPrototype%': ['Uint8Array', 'prototype'],
+	'%Uint8ClampedArrayPrototype%': ['Uint8ClampedArray', 'prototype'],
+	'%Uint16ArrayPrototype%': ['Uint16Array', 'prototype'],
+	'%Uint32ArrayPrototype%': ['Uint32Array', 'prototype'],
+	'%URIErrorPrototype%': ['URIError', 'prototype'],
+	'%WeakMapPrototype%': ['WeakMap', 'prototype'],
+	'%WeakSetPrototype%': ['WeakSet', 'prototype']
+};
+
+var bind = __nccwpck_require__(7564);
+var hasOwn = __nccwpck_require__(4076);
+var $concat = bind.call($call, Array.prototype.concat);
+var $spliceApply = bind.call($apply, Array.prototype.splice);
+var $replace = bind.call($call, String.prototype.replace);
+var $strSlice = bind.call($call, String.prototype.slice);
+var $exec = bind.call($call, RegExp.prototype.exec);
+
+/* adapted from https://github.com/lodash/lodash/blob/4.17.15/dist/lodash.js#L6735-L6744 */
+var rePropName = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g;
+var reEscapeChar = /\\(\\)?/g; /** Used to match backslashes in property paths. */
+var stringToPath = function stringToPath(string) {
+	var first = $strSlice(string, 0, 1);
+	var last = $strSlice(string, -1);
+	if (first === '%' && last !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected closing `%`');
+	} else if (last === '%' && first !== '%') {
+		throw new $SyntaxError('invalid intrinsic syntax, expected opening `%`');
+	}
+	var result = [];
+	$replace(string, rePropName, function (match, number, quote, subString) {
+		result[result.length] = quote ? $replace(subString, reEscapeChar, '$1') : number || match;
+	});
+	return result;
+};
+/* end adaptation */
+
+var getBaseIntrinsic = function getBaseIntrinsic(name, allowMissing) {
+	var intrinsicName = name;
+	var alias;
+	if (hasOwn(LEGACY_ALIASES, intrinsicName)) {
+		alias = LEGACY_ALIASES[intrinsicName];
+		intrinsicName = '%' + alias[0] + '%';
+	}
+
+	if (hasOwn(INTRINSICS, intrinsicName)) {
+		var value = INTRINSICS[intrinsicName];
+		if (value === needsEval) {
+			value = doEval(intrinsicName);
+		}
+		if (typeof value === 'undefined' && !allowMissing) {
+			throw new $TypeError('intrinsic ' + name + ' exists, but is not available. Please file an issue!');
+		}
+
+		return {
+			alias: alias,
+			name: intrinsicName,
+			value: value
+		};
+	}
+
+	throw new $SyntaxError('intrinsic ' + name + ' does not exist!');
+};
+
+module.exports = function GetIntrinsic(name, allowMissing) {
+	if (typeof name !== 'string' || name.length === 0) {
+		throw new $TypeError('intrinsic name must be a non-empty string');
+	}
+	if (arguments.length > 1 && typeof allowMissing !== 'boolean') {
+		throw new $TypeError('"allowMissing" argument must be a boolean');
+	}
+
+	if ($exec(/^%?[^%]*%?$/, name) === null) {
+		throw new $SyntaxError('`%` may not be present anywhere but at the beginning and end of the intrinsic name');
+	}
+	var parts = stringToPath(name);
+	var intrinsicBaseName = parts.length > 0 ? parts[0] : '';
+
+	var intrinsic = getBaseIntrinsic('%' + intrinsicBaseName + '%', allowMissing);
+	var intrinsicRealName = intrinsic.name;
+	var value = intrinsic.value;
+	var skipFurtherCaching = false;
+
+	var alias = intrinsic.alias;
+	if (alias) {
+		intrinsicBaseName = alias[0];
+		$spliceApply(parts, $concat([0, 1], alias));
+	}
+
+	for (var i = 1, isOwn = true; i < parts.length; i += 1) {
+		var part = parts[i];
+		var first = $strSlice(part, 0, 1);
+		var last = $strSlice(part, -1);
+		if (
+			(
+				(first === '"' || first === "'" || first === '`')
+				|| (last === '"' || last === "'" || last === '`')
+			)
+			&& first !== last
+		) {
+			throw new $SyntaxError('property names with quotes must have matching quotes');
+		}
+		if (part === 'constructor' || !isOwn) {
+			skipFurtherCaching = true;
+		}
+
+		intrinsicBaseName += '.' + part;
+		intrinsicRealName = '%' + intrinsicBaseName + '%';
+
+		if (hasOwn(INTRINSICS, intrinsicRealName)) {
+			value = INTRINSICS[intrinsicRealName];
+		} else if (value != null) {
+			if (!(part in value)) {
+				if (!allowMissing) {
+					throw new $TypeError('base intrinsic for ' + name + ' exists, but the property is not available.');
+				}
+				return void undefined;
+			}
+			if ($gOPD && (i + 1) >= parts.length) {
+				var desc = $gOPD(value, part);
+				isOwn = !!desc;
+
+				// By convention, when a data property is converted to an accessor
+				// property to emulate a data property that does not suffer from
+				// the override mistake, that accessor's getter is marked with
+				// an `originalValue` property. Here, when we detect this, we
+				// uphold the illusion by pretending to see that original data
+				// property, i.e., returning the value rather than the getter
+				// itself.
+				if (isOwn && 'get' in desc && !('originalValue' in desc.get)) {
+					value = desc.get;
+				} else {
+					value = value[part];
+				}
+			} else {
+				isOwn = hasOwn(value, part);
+				value = value[part];
+			}
+
+			if (isOwn && !skipFurtherCaching) {
+				INTRINSICS[intrinsicRealName] = value;
+			}
+		}
+	}
+	return value;
+};
+
+
+/***/ }),
+
+/***/ 1311:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var $Object = __nccwpck_require__(5399);
+
+/** @type {import('./Object.getPrototypeOf')} */
+module.exports = $Object.getPrototypeOf || null;
+
+
+/***/ }),
+
+/***/ 8681:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./Reflect.getPrototypeOf')} */
+module.exports = (typeof Reflect !== 'undefined' && Reflect.getPrototypeOf) || null;
+
+
+/***/ }),
+
+/***/ 1967:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var reflectGetProto = __nccwpck_require__(8681);
+var originalGetProto = __nccwpck_require__(1311);
+
+var getDunderProto = __nccwpck_require__(6669);
+
+/** @type {import('.')} */
+module.exports = reflectGetProto
+	? function getProto(O) {
+		// @ts-expect-error TS can't narrow inside a closure, for some reason
+		return reflectGetProto(O);
+	}
+	: originalGetProto
+		? function getProto(O) {
+			if (!O || (typeof O !== 'object' && typeof O !== 'function')) {
+				throw new TypeError('getProto: not an object');
+			}
+			// @ts-expect-error TS can't narrow inside a closure, for some reason
+			return originalGetProto(O);
+		}
+		: getDunderProto
+			? function getProto(O) {
+				// @ts-expect-error TS can't narrow inside a closure, for some reason
+				return getDunderProto(O);
+			}
+			: null;
+
+
+/***/ }),
+
+/***/ 1174:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./gOPD')} */
+module.exports = Object.getOwnPropertyDescriptor;
+
+
+/***/ }),
+
+/***/ 3170:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+/** @type {import('.')} */
+var $gOPD = __nccwpck_require__(1174);
+
+if ($gOPD) {
+	try {
+		$gOPD([], 'length');
+	} catch (e) {
+		// IE 8 has a broken gOPD
+		$gOPD = null;
+	}
+}
+
+module.exports = $gOPD;
+
+
+/***/ }),
+
+/***/ 3336:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var origSymbol = typeof Symbol !== 'undefined' && Symbol;
+var hasSymbolSham = __nccwpck_require__(1114);
+
+/** @type {import('.')} */
+module.exports = function hasNativeSymbols() {
+	if (typeof origSymbol !== 'function') { return false; }
+	if (typeof Symbol !== 'function') { return false; }
+	if (typeof origSymbol('foo') !== 'symbol') { return false; }
+	if (typeof Symbol('bar') !== 'symbol') { return false; }
+
+	return hasSymbolSham();
+};
+
+
+/***/ }),
+
+/***/ 1114:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./shams')} */
+/* eslint complexity: [2, 18], max-statements: [2, 33] */
+module.exports = function hasSymbols() {
+	if (typeof Symbol !== 'function' || typeof Object.getOwnPropertySymbols !== 'function') { return false; }
+	if (typeof Symbol.iterator === 'symbol') { return true; }
+
+	/** @type {{ [k in symbol]?: unknown }} */
+	var obj = {};
+	var sym = Symbol('test');
+	var symObj = Object(sym);
+	if (typeof sym === 'string') { return false; }
+
+	if (Object.prototype.toString.call(sym) !== '[object Symbol]') { return false; }
+	if (Object.prototype.toString.call(symObj) !== '[object Symbol]') { return false; }
+
+	// temp disabled per https://github.com/ljharb/object.assign/issues/17
+	// if (sym instanceof Symbol) { return false; }
+	// temp disabled per https://github.com/WebReflection/get-own-property-symbols/issues/4
+	// if (!(symObj instanceof Symbol)) { return false; }
+
+	// if (typeof Symbol.prototype.toString !== 'function') { return false; }
+	// if (String(sym) !== Symbol.prototype.toString.call(sym)) { return false; }
+
+	var symVal = 42;
+	obj[sym] = symVal;
+	for (var _ in obj) { return false; } // eslint-disable-line no-restricted-syntax, no-unreachable-loop
+	if (typeof Object.keys === 'function' && Object.keys(obj).length !== 0) { return false; }
+
+	if (typeof Object.getOwnPropertyNames === 'function' && Object.getOwnPropertyNames(obj).length !== 0) { return false; }
+
+	var syms = Object.getOwnPropertySymbols(obj);
+	if (syms.length !== 1 || syms[0] !== sym) { return false; }
+
+	if (!Object.prototype.propertyIsEnumerable.call(obj, sym)) { return false; }
+
+	if (typeof Object.getOwnPropertyDescriptor === 'function') {
+		// eslint-disable-next-line no-extra-parens
+		var descriptor = /** @type {PropertyDescriptor} */ (Object.getOwnPropertyDescriptor(obj, sym));
+		if (descriptor.value !== symVal || descriptor.enumerable !== true) { return false; }
+	}
+
+	return true;
+};
+
+
+/***/ }),
+
+/***/ 5479:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var hasSymbols = __nccwpck_require__(1114);
+
+/** @type {import('.')} */
+module.exports = function hasToStringTagShams() {
+	return hasSymbols() && !!Symbol.toStringTag;
+};
+
+
+/***/ }),
+
+/***/ 4076:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var call = Function.prototype.call;
+var $hasOwn = Object.prototype.hasOwnProperty;
+var bind = __nccwpck_require__(7564);
+
+/** @type {import('.')} */
+module.exports = bind.call(call, $hasOwn);
+
+
+/***/ }),
+
+/***/ 5641:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./abs')} */
+module.exports = Math.abs;
+
+
+/***/ }),
+
+/***/ 6171:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./floor')} */
+module.exports = Math.floor;
+
+
+/***/ }),
+
+/***/ 7044:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./isNaN')} */
+module.exports = Number.isNaN || function isNaN(a) {
+	return a !== a;
+};
+
+
+/***/ }),
+
+/***/ 7147:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./max')} */
+module.exports = Math.max;
+
+
+/***/ }),
+
+/***/ 1017:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./min')} */
+module.exports = Math.min;
+
+
+/***/ }),
+
+/***/ 6947:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./pow')} */
+module.exports = Math.pow;
+
+
+/***/ }),
+
+/***/ 2621:
+/***/ ((module) => {
+
+"use strict";
+
+
+/** @type {import('./round')} */
+module.exports = Math.round;
+
+
+/***/ }),
+
+/***/ 156:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var $isNaN = __nccwpck_require__(7044);
+
+/** @type {import('./sign')} */
+module.exports = function sign(number) {
+	if ($isNaN(number) || number === 0) {
+		return number;
+	}
+	return number < 0 ? -1 : +1;
 };
 
 
@@ -5539,8 +6609,11 @@ exports.getProxyForUrl = getProxyForUrl;
 /***/ 2560:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-;(function (sax) { // wrapper for non-node envs
-  sax.parser = function (strict, opt) { return new SAXParser(strict, opt) }
+;(function (sax) {
+  // wrapper for non-node envs
+  sax.parser = function (strict, opt) {
+    return new SAXParser(strict, opt)
+  }
   sax.SAXParser = SAXParser
   sax.SAXStream = SAXStream
   sax.createStream = createStream
@@ -5557,9 +6630,18 @@ exports.getProxyForUrl = getProxyForUrl;
   sax.MAX_BUFFER_LENGTH = 64 * 1024
 
   var buffers = [
-    'comment', 'sgmlDecl', 'textNode', 'tagName', 'doctype',
-    'procInstName', 'procInstBody', 'entity', 'attribName',
-    'attribValue', 'cdata', 'script'
+    'comment',
+    'sgmlDecl',
+    'textNode',
+    'tagName',
+    'doctype',
+    'procInstName',
+    'procInstBody',
+    'entity',
+    'attribName',
+    'attribValue',
+    'cdata',
+    'script',
   ]
 
   sax.EVENTS = [
@@ -5580,10 +6662,10 @@ exports.getProxyForUrl = getProxyForUrl;
     'ready',
     'script',
     'opennamespace',
-    'closenamespace'
+    'closenamespace',
   ]
 
-  function SAXParser (strict, opt) {
+  function SAXParser(strict, opt) {
     if (!(this instanceof SAXParser)) {
       return new SAXParser(strict, opt)
     }
@@ -5592,9 +6674,13 @@ exports.getProxyForUrl = getProxyForUrl;
     clearBuffers(parser)
     parser.q = parser.c = ''
     parser.bufferCheckPosition = sax.MAX_BUFFER_LENGTH
+    parser.encoding = null;
     parser.opt = opt || {}
     parser.opt.lowercase = parser.opt.lowercase || parser.opt.lowercasetags
     parser.looseCase = parser.opt.lowercase ? 'toLowerCase' : 'toUpperCase'
+    parser.opt.maxEntityCount = parser.opt.maxEntityCount || 512
+    parser.opt.maxEntityDepth = parser.opt.maxEntityDepth || 4
+    parser.entityCount = parser.entityDepth = 0
     parser.tags = []
     parser.closed = parser.closedRoot = parser.sawRoot = false
     parser.tag = parser.error = null
@@ -5602,7 +6688,10 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.noscript = !!(strict || parser.opt.noscript)
     parser.state = S.BEGIN
     parser.strictEntities = parser.opt.strictEntities
-    parser.ENTITIES = parser.strictEntities ? Object.create(sax.XML_ENTITIES) : Object.create(sax.ENTITIES)
+    parser.ENTITIES =
+      parser.strictEntities ?
+        Object.create(sax.XML_ENTITIES)
+      : Object.create(sax.ENTITIES)
     parser.attribList = []
 
     // namespaces form a prototype chain.
@@ -5615,7 +6704,7 @@ exports.getProxyForUrl = getProxyForUrl;
     // disallow unquoted attribute values if not otherwise configured
     // and strict mode is true
     if (parser.opt.unquotedAttributeValues === undefined) {
-      parser.opt.unquotedAttributeValues = !strict;
+      parser.opt.unquotedAttributeValues = !strict
     }
 
     // mostly just for error reporting
@@ -5628,7 +6717,7 @@ exports.getProxyForUrl = getProxyForUrl;
 
   if (!Object.create) {
     Object.create = function (o) {
-      function F () {}
+      function F() {}
       F.prototype = o
       var newf = new F()
       return newf
@@ -5643,7 +6732,7 @@ exports.getProxyForUrl = getProxyForUrl;
     }
   }
 
-  function checkBufferLength (parser) {
+  function checkBufferLength(parser) {
     var maxAllowed = Math.max(sax.MAX_BUFFER_LENGTH, 10)
     var maxActual = 0
     for (var i = 0, l = buffers.length; i < l; i++) {
@@ -5679,13 +6768,13 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.bufferCheckPosition = m + parser.position
   }
 
-  function clearBuffers (parser) {
+  function clearBuffers(parser) {
     for (var i = 0, l = buffers.length; i < l; i++) {
       parser[buffers[i]] = ''
     }
   }
 
-  function flushBuffers (parser) {
+  function flushBuffers(parser) {
     closeText(parser)
     if (parser.cdata !== '') {
       emitNode(parser, 'oncdata', parser.cdata)
@@ -5698,11 +6787,20 @@ exports.getProxyForUrl = getProxyForUrl;
   }
 
   SAXParser.prototype = {
-    end: function () { end(this) },
+    end: function () {
+      end(this)
+    },
     write: write,
-    resume: function () { this.error = null; return this },
-    close: function () { return this.write(null) },
-    flush: function () { flushBuffers(this) }
+    resume: function () {
+      this.error = null
+      return this
+    },
+    close: function () {
+      return this.write(null)
+    },
+    flush: function () {
+      flushBuffers(this)
+    },
   }
 
   var Stream
@@ -5717,11 +6815,44 @@ exports.getProxyForUrl = getProxyForUrl;
     return ev !== 'error' && ev !== 'end'
   })
 
-  function createStream (strict, opt) {
+  function createStream(strict, opt) {
     return new SAXStream(strict, opt)
   }
 
-  function SAXStream (strict, opt) {
+  function determineBufferEncoding(data, isEnd) {
+    // BOM-based detection is the most reliable signal when present.
+    if (data.length >= 2) {
+      if (data[0] === 0xff && data[1] === 0xfe) {
+        return 'utf-16le'
+      }
+
+      if (data[0] === 0xfe && data[1] === 0xff) {
+        return 'utf-16be'
+      }
+    }
+
+    if (data.length >= 3 && data[0] === 0xef && data[1] === 0xbb && data[2] === 0xbf) {
+      return 'utf8'
+    }
+
+    if (data.length >= 4) {
+      // XML documents without a BOM still start with "<?xml", which is enough
+      // to distinguish UTF-16LE/BE from UTF-8 by looking at the zero bytes.
+      if (data[0] === 0x3c && data[1] === 0x00 && data[2] === 0x3f && data[3] === 0x00) {
+        return 'utf-16le'
+      }
+
+      if (data[0] === 0x00 && data[1] === 0x3c && data[2] === 0x00 && data[3] === 0x3f) {
+        return 'utf-16be'
+      }
+
+      return 'utf8'
+    }
+
+    return isEnd ? 'utf8' : null
+  }
+
+  function SAXStream(strict, opt) {
     if (!(this instanceof SAXStream)) {
       return new SAXStream(strict, opt)
     }
@@ -5747,7 +6878,7 @@ exports.getProxyForUrl = getProxyForUrl;
     }
 
     this._decoder = null
-
+    this._decoderBuffer = null
     streamWraps.forEach(function (ev) {
       Object.defineProperty(me, 'on' + ev, {
         get: function () {
@@ -5762,26 +6893,58 @@ exports.getProxyForUrl = getProxyForUrl;
           me.on(ev, h)
         },
         enumerable: true,
-        configurable: false
+        configurable: false,
       })
     })
   }
 
   SAXStream.prototype = Object.create(Stream.prototype, {
     constructor: {
-      value: SAXStream
-    }
+      value: SAXStream,
+    },
   })
 
-  SAXStream.prototype.write = function (data) {
-    if (typeof Buffer === 'function' &&
-      typeof Buffer.isBuffer === 'function' &&
-      Buffer.isBuffer(data)) {
-      if (!this._decoder) {
-        var SD = (__nccwpck_require__(3193).StringDecoder)
-        this._decoder = new SD('utf8')
+  SAXStream.prototype._decodeBuffer = function (data, isEnd) {
+    if (this._decoderBuffer) {
+      // Keep incomplete leading bytes until we have enough data to infer the
+      // stream encoding, then decode the buffered prefix together with the next chunk.
+      data = Buffer.concat([this._decoderBuffer, data])
+      this._decoderBuffer = null
+    }
+
+    if (!this._decoder) {
+      var encoding = determineBufferEncoding(data, isEnd)
+      if (!encoding) {
+        // A very short first chunk may not contain enough bytes to detect the
+        // encoding yet, so defer decoding until the next write/end call.
+        this._decoderBuffer = data
+        return ''
       }
-      data = this._decoder.write(data)
+
+      // Store the detected transport encoding so strict mode can compare it
+      // with the optional encoding declared in the XML prolog later on.
+      this._parser.encoding = encoding
+      this._decoder = new TextDecoder(encoding)
+    }
+
+    return this._decoder.decode(data, { stream: !isEnd })
+  }
+
+  SAXStream.prototype.write = function (data) {
+    if (
+      typeof Buffer === 'function' &&
+      typeof Buffer.isBuffer === 'function' &&
+      Buffer.isBuffer(data)
+    ) {
+      data = this._decodeBuffer(data, false)
+    } else if (this._decoderBuffer) {
+      // Flush any buffered binary prefix before handling a string chunk.
+      // This only matters if the caller mixes Buffer and string writes (used in test).
+      var remaining = this._decodeBuffer(Buffer.alloc(0), true)
+      if (remaining) {
+        this._parser.write(remaining)
+        this.emit('data', remaining)
+      }
     }
 
     this._parser.write(data.toString())
@@ -5793,6 +6956,20 @@ exports.getProxyForUrl = getProxyForUrl;
     if (chunk && chunk.length) {
       this.write(chunk)
     }
+    // Flush any remaining decoded data from the TextDecoder
+    if (this._decoderBuffer) {
+      var finalChunk = this._decodeBuffer(Buffer.alloc(0), true)
+      if (finalChunk) {
+        this._parser.write(finalChunk)
+        this.emit('data', finalChunk)
+      }
+    } else if (this._decoder) {
+      var remaining = this._decoder.decode()
+      if (remaining) {
+        this._parser.write(remaining)
+        this.emit('data', remaining)
+      }
+    }
     this._parser.end()
     return true
   }
@@ -5801,7 +6978,10 @@ exports.getProxyForUrl = getProxyForUrl;
     var me = this
     if (!me._parser['on' + ev] && streamWraps.indexOf(ev) !== -1) {
       me._parser['on' + ev] = function () {
-        var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+        var args =
+          arguments.length === 1 ?
+            [arguments[0]]
+          : Array.apply(null, arguments)
         args.splice(0, 0, ev)
         me.emit.apply(me, args)
       }
@@ -5824,30 +7004,34 @@ exports.getProxyForUrl = getProxyForUrl;
   // without a significant breaking change to either this  parser, or the
   // JavaScript language.  Implementation of an emoji-capable xml parser
   // is left as an exercise for the reader.
-  var nameStart = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+  var nameStart =
+    /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
 
-  var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
+  var nameBody =
+    /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
 
-  var entityStart = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
-  var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
+  var entityStart =
+    /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
+  var entityBody =
+    /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
 
-  function isWhitespace (c) {
+  function isWhitespace(c) {
     return c === ' ' || c === '\n' || c === '\r' || c === '\t'
   }
 
-  function isQuote (c) {
-    return c === '"' || c === '\''
+  function isQuote(c) {
+    return c === '"' || c === "'"
   }
 
-  function isAttribEnd (c) {
+  function isAttribEnd(c) {
     return c === '>' || isWhitespace(c)
   }
 
-  function isMatch (regex, c) {
+  function isMatch(regex, c) {
     return regex.test(c)
   }
 
-  function notMatch (regex, c) {
+  function notMatch(regex, c) {
     return !isMatch(regex, c)
   }
 
@@ -5888,271 +7072,271 @@ exports.getProxyForUrl = getProxyForUrl;
     CLOSE_TAG: S++, // </a
     CLOSE_TAG_SAW_WHITE: S++, // </a   >
     SCRIPT: S++, // <script> ...
-    SCRIPT_ENDING: S++ // <script> ... <
+    SCRIPT_ENDING: S++, // <script> ... <
   }
 
   sax.XML_ENTITIES = {
-    'amp': '&',
-    'gt': '>',
-    'lt': '<',
-    'quot': '"',
-    'apos': "'"
+    amp: '&',
+    gt: '>',
+    lt: '<',
+    quot: '"',
+    apos: "'",
   }
 
   sax.ENTITIES = {
-    'amp': '&',
-    'gt': '>',
-    'lt': '<',
-    'quot': '"',
-    'apos': "'",
-    'AElig': 198,
-    'Aacute': 193,
-    'Acirc': 194,
-    'Agrave': 192,
-    'Aring': 197,
-    'Atilde': 195,
-    'Auml': 196,
-    'Ccedil': 199,
-    'ETH': 208,
-    'Eacute': 201,
-    'Ecirc': 202,
-    'Egrave': 200,
-    'Euml': 203,
-    'Iacute': 205,
-    'Icirc': 206,
-    'Igrave': 204,
-    'Iuml': 207,
-    'Ntilde': 209,
-    'Oacute': 211,
-    'Ocirc': 212,
-    'Ograve': 210,
-    'Oslash': 216,
-    'Otilde': 213,
-    'Ouml': 214,
-    'THORN': 222,
-    'Uacute': 218,
-    'Ucirc': 219,
-    'Ugrave': 217,
-    'Uuml': 220,
-    'Yacute': 221,
-    'aacute': 225,
-    'acirc': 226,
-    'aelig': 230,
-    'agrave': 224,
-    'aring': 229,
-    'atilde': 227,
-    'auml': 228,
-    'ccedil': 231,
-    'eacute': 233,
-    'ecirc': 234,
-    'egrave': 232,
-    'eth': 240,
-    'euml': 235,
-    'iacute': 237,
-    'icirc': 238,
-    'igrave': 236,
-    'iuml': 239,
-    'ntilde': 241,
-    'oacute': 243,
-    'ocirc': 244,
-    'ograve': 242,
-    'oslash': 248,
-    'otilde': 245,
-    'ouml': 246,
-    'szlig': 223,
-    'thorn': 254,
-    'uacute': 250,
-    'ucirc': 251,
-    'ugrave': 249,
-    'uuml': 252,
-    'yacute': 253,
-    'yuml': 255,
-    'copy': 169,
-    'reg': 174,
-    'nbsp': 160,
-    'iexcl': 161,
-    'cent': 162,
-    'pound': 163,
-    'curren': 164,
-    'yen': 165,
-    'brvbar': 166,
-    'sect': 167,
-    'uml': 168,
-    'ordf': 170,
-    'laquo': 171,
-    'not': 172,
-    'shy': 173,
-    'macr': 175,
-    'deg': 176,
-    'plusmn': 177,
-    'sup1': 185,
-    'sup2': 178,
-    'sup3': 179,
-    'acute': 180,
-    'micro': 181,
-    'para': 182,
-    'middot': 183,
-    'cedil': 184,
-    'ordm': 186,
-    'raquo': 187,
-    'frac14': 188,
-    'frac12': 189,
-    'frac34': 190,
-    'iquest': 191,
-    'times': 215,
-    'divide': 247,
-    'OElig': 338,
-    'oelig': 339,
-    'Scaron': 352,
-    'scaron': 353,
-    'Yuml': 376,
-    'fnof': 402,
-    'circ': 710,
-    'tilde': 732,
-    'Alpha': 913,
-    'Beta': 914,
-    'Gamma': 915,
-    'Delta': 916,
-    'Epsilon': 917,
-    'Zeta': 918,
-    'Eta': 919,
-    'Theta': 920,
-    'Iota': 921,
-    'Kappa': 922,
-    'Lambda': 923,
-    'Mu': 924,
-    'Nu': 925,
-    'Xi': 926,
-    'Omicron': 927,
-    'Pi': 928,
-    'Rho': 929,
-    'Sigma': 931,
-    'Tau': 932,
-    'Upsilon': 933,
-    'Phi': 934,
-    'Chi': 935,
-    'Psi': 936,
-    'Omega': 937,
-    'alpha': 945,
-    'beta': 946,
-    'gamma': 947,
-    'delta': 948,
-    'epsilon': 949,
-    'zeta': 950,
-    'eta': 951,
-    'theta': 952,
-    'iota': 953,
-    'kappa': 954,
-    'lambda': 955,
-    'mu': 956,
-    'nu': 957,
-    'xi': 958,
-    'omicron': 959,
-    'pi': 960,
-    'rho': 961,
-    'sigmaf': 962,
-    'sigma': 963,
-    'tau': 964,
-    'upsilon': 965,
-    'phi': 966,
-    'chi': 967,
-    'psi': 968,
-    'omega': 969,
-    'thetasym': 977,
-    'upsih': 978,
-    'piv': 982,
-    'ensp': 8194,
-    'emsp': 8195,
-    'thinsp': 8201,
-    'zwnj': 8204,
-    'zwj': 8205,
-    'lrm': 8206,
-    'rlm': 8207,
-    'ndash': 8211,
-    'mdash': 8212,
-    'lsquo': 8216,
-    'rsquo': 8217,
-    'sbquo': 8218,
-    'ldquo': 8220,
-    'rdquo': 8221,
-    'bdquo': 8222,
-    'dagger': 8224,
-    'Dagger': 8225,
-    'bull': 8226,
-    'hellip': 8230,
-    'permil': 8240,
-    'prime': 8242,
-    'Prime': 8243,
-    'lsaquo': 8249,
-    'rsaquo': 8250,
-    'oline': 8254,
-    'frasl': 8260,
-    'euro': 8364,
-    'image': 8465,
-    'weierp': 8472,
-    'real': 8476,
-    'trade': 8482,
-    'alefsym': 8501,
-    'larr': 8592,
-    'uarr': 8593,
-    'rarr': 8594,
-    'darr': 8595,
-    'harr': 8596,
-    'crarr': 8629,
-    'lArr': 8656,
-    'uArr': 8657,
-    'rArr': 8658,
-    'dArr': 8659,
-    'hArr': 8660,
-    'forall': 8704,
-    'part': 8706,
-    'exist': 8707,
-    'empty': 8709,
-    'nabla': 8711,
-    'isin': 8712,
-    'notin': 8713,
-    'ni': 8715,
-    'prod': 8719,
-    'sum': 8721,
-    'minus': 8722,
-    'lowast': 8727,
-    'radic': 8730,
-    'prop': 8733,
-    'infin': 8734,
-    'ang': 8736,
-    'and': 8743,
-    'or': 8744,
-    'cap': 8745,
-    'cup': 8746,
-    'int': 8747,
-    'there4': 8756,
-    'sim': 8764,
-    'cong': 8773,
-    'asymp': 8776,
-    'ne': 8800,
-    'equiv': 8801,
-    'le': 8804,
-    'ge': 8805,
-    'sub': 8834,
-    'sup': 8835,
-    'nsub': 8836,
-    'sube': 8838,
-    'supe': 8839,
-    'oplus': 8853,
-    'otimes': 8855,
-    'perp': 8869,
-    'sdot': 8901,
-    'lceil': 8968,
-    'rceil': 8969,
-    'lfloor': 8970,
-    'rfloor': 8971,
-    'lang': 9001,
-    'rang': 9002,
-    'loz': 9674,
-    'spades': 9824,
-    'clubs': 9827,
-    'hearts': 9829,
-    'diams': 9830
+    amp: '&',
+    gt: '>',
+    lt: '<',
+    quot: '"',
+    apos: "'",
+    AElig: 198,
+    Aacute: 193,
+    Acirc: 194,
+    Agrave: 192,
+    Aring: 197,
+    Atilde: 195,
+    Auml: 196,
+    Ccedil: 199,
+    ETH: 208,
+    Eacute: 201,
+    Ecirc: 202,
+    Egrave: 200,
+    Euml: 203,
+    Iacute: 205,
+    Icirc: 206,
+    Igrave: 204,
+    Iuml: 207,
+    Ntilde: 209,
+    Oacute: 211,
+    Ocirc: 212,
+    Ograve: 210,
+    Oslash: 216,
+    Otilde: 213,
+    Ouml: 214,
+    THORN: 222,
+    Uacute: 218,
+    Ucirc: 219,
+    Ugrave: 217,
+    Uuml: 220,
+    Yacute: 221,
+    aacute: 225,
+    acirc: 226,
+    aelig: 230,
+    agrave: 224,
+    aring: 229,
+    atilde: 227,
+    auml: 228,
+    ccedil: 231,
+    eacute: 233,
+    ecirc: 234,
+    egrave: 232,
+    eth: 240,
+    euml: 235,
+    iacute: 237,
+    icirc: 238,
+    igrave: 236,
+    iuml: 239,
+    ntilde: 241,
+    oacute: 243,
+    ocirc: 244,
+    ograve: 242,
+    oslash: 248,
+    otilde: 245,
+    ouml: 246,
+    szlig: 223,
+    thorn: 254,
+    uacute: 250,
+    ucirc: 251,
+    ugrave: 249,
+    uuml: 252,
+    yacute: 253,
+    yuml: 255,
+    copy: 169,
+    reg: 174,
+    nbsp: 160,
+    iexcl: 161,
+    cent: 162,
+    pound: 163,
+    curren: 164,
+    yen: 165,
+    brvbar: 166,
+    sect: 167,
+    uml: 168,
+    ordf: 170,
+    laquo: 171,
+    not: 172,
+    shy: 173,
+    macr: 175,
+    deg: 176,
+    plusmn: 177,
+    sup1: 185,
+    sup2: 178,
+    sup3: 179,
+    acute: 180,
+    micro: 181,
+    para: 182,
+    middot: 183,
+    cedil: 184,
+    ordm: 186,
+    raquo: 187,
+    frac14: 188,
+    frac12: 189,
+    frac34: 190,
+    iquest: 191,
+    times: 215,
+    divide: 247,
+    OElig: 338,
+    oelig: 339,
+    Scaron: 352,
+    scaron: 353,
+    Yuml: 376,
+    fnof: 402,
+    circ: 710,
+    tilde: 732,
+    Alpha: 913,
+    Beta: 914,
+    Gamma: 915,
+    Delta: 916,
+    Epsilon: 917,
+    Zeta: 918,
+    Eta: 919,
+    Theta: 920,
+    Iota: 921,
+    Kappa: 922,
+    Lambda: 923,
+    Mu: 924,
+    Nu: 925,
+    Xi: 926,
+    Omicron: 927,
+    Pi: 928,
+    Rho: 929,
+    Sigma: 931,
+    Tau: 932,
+    Upsilon: 933,
+    Phi: 934,
+    Chi: 935,
+    Psi: 936,
+    Omega: 937,
+    alpha: 945,
+    beta: 946,
+    gamma: 947,
+    delta: 948,
+    epsilon: 949,
+    zeta: 950,
+    eta: 951,
+    theta: 952,
+    iota: 953,
+    kappa: 954,
+    lambda: 955,
+    mu: 956,
+    nu: 957,
+    xi: 958,
+    omicron: 959,
+    pi: 960,
+    rho: 961,
+    sigmaf: 962,
+    sigma: 963,
+    tau: 964,
+    upsilon: 965,
+    phi: 966,
+    chi: 967,
+    psi: 968,
+    omega: 969,
+    thetasym: 977,
+    upsih: 978,
+    piv: 982,
+    ensp: 8194,
+    emsp: 8195,
+    thinsp: 8201,
+    zwnj: 8204,
+    zwj: 8205,
+    lrm: 8206,
+    rlm: 8207,
+    ndash: 8211,
+    mdash: 8212,
+    lsquo: 8216,
+    rsquo: 8217,
+    sbquo: 8218,
+    ldquo: 8220,
+    rdquo: 8221,
+    bdquo: 8222,
+    dagger: 8224,
+    Dagger: 8225,
+    bull: 8226,
+    hellip: 8230,
+    permil: 8240,
+    prime: 8242,
+    Prime: 8243,
+    lsaquo: 8249,
+    rsaquo: 8250,
+    oline: 8254,
+    frasl: 8260,
+    euro: 8364,
+    image: 8465,
+    weierp: 8472,
+    real: 8476,
+    trade: 8482,
+    alefsym: 8501,
+    larr: 8592,
+    uarr: 8593,
+    rarr: 8594,
+    darr: 8595,
+    harr: 8596,
+    crarr: 8629,
+    lArr: 8656,
+    uArr: 8657,
+    rArr: 8658,
+    dArr: 8659,
+    hArr: 8660,
+    forall: 8704,
+    part: 8706,
+    exist: 8707,
+    empty: 8709,
+    nabla: 8711,
+    isin: 8712,
+    notin: 8713,
+    ni: 8715,
+    prod: 8719,
+    sum: 8721,
+    minus: 8722,
+    lowast: 8727,
+    radic: 8730,
+    prop: 8733,
+    infin: 8734,
+    ang: 8736,
+    and: 8743,
+    or: 8744,
+    cap: 8745,
+    cup: 8746,
+    int: 8747,
+    there4: 8756,
+    sim: 8764,
+    cong: 8773,
+    asymp: 8776,
+    ne: 8800,
+    equiv: 8801,
+    le: 8804,
+    ge: 8805,
+    sub: 8834,
+    sup: 8835,
+    nsub: 8836,
+    sube: 8838,
+    supe: 8839,
+    oplus: 8853,
+    otimes: 8855,
+    perp: 8869,
+    sdot: 8901,
+    lceil: 8968,
+    rceil: 8969,
+    lfloor: 8970,
+    rfloor: 8971,
+    lang: 9001,
+    rang: 9002,
+    loz: 9674,
+    spades: 9824,
+    clubs: 9827,
+    hearts: 9829,
+    diams: 9830,
   }
 
   Object.keys(sax.ENTITIES).forEach(function (key) {
@@ -6168,33 +7352,90 @@ exports.getProxyForUrl = getProxyForUrl;
   // shorthand
   S = sax.STATE
 
-  function emit (parser, event, data) {
+  function emit(parser, event, data) {
     parser[event] && parser[event](data)
   }
 
-  function emitNode (parser, nodeType, data) {
+  function getDeclaredEncoding(body) {
+    var match = body && body.match(/(?:^|\s)encoding\s*=\s*(['"])([^'"]+)\1/i)
+    return match ? match[2] : null
+  }
+
+  function normalizeEncodingName(encoding) {
+    if (!encoding) {
+      return null
+    }
+
+    return encoding.toLowerCase().replace(/[^a-z0-9]/g, '')
+  }
+
+  function encodingsMatch(detectedEncoding, declaredEncoding) {
+    const detected = normalizeEncodingName(detectedEncoding)
+    const declared = normalizeEncodingName(declaredEncoding)
+
+    if (!detected || !declared) {
+      return true
+    }
+
+    if (declared === 'utf16') {
+      return detected === 'utf16le' || detected === 'utf16be'
+    }
+
+    return detected === declared
+  }
+
+  function validateXmlDeclarationEncoding(parser, data) {
+    if (
+      !parser.strict ||
+      !parser.encoding ||
+      !data ||
+      data.name !== 'xml'
+    ) {
+      return
+    }
+
+    var declaredEncoding = getDeclaredEncoding(data.body)
+    if (
+      declaredEncoding &&
+      !encodingsMatch(parser.encoding, declaredEncoding)
+    ) {
+      strictFail(
+        parser,
+        'XML declaration encoding ' +
+          declaredEncoding +
+          ' does not match detected stream encoding ' +
+          parser.encoding.toUpperCase()
+      )
+    }
+  }
+
+  function emitNode(parser, nodeType, data) {
     if (parser.textNode) closeText(parser)
     emit(parser, nodeType, data)
   }
 
-  function closeText (parser) {
+  function closeText(parser) {
     parser.textNode = textopts(parser.opt, parser.textNode)
     if (parser.textNode) emit(parser, 'ontext', parser.textNode)
     parser.textNode = ''
   }
 
-  function textopts (opt, text) {
+  function textopts(opt, text) {
     if (opt.trim) text = text.trim()
     if (opt.normalize) text = text.replace(/\s+/g, ' ')
     return text
   }
 
-  function error (parser, er) {
+  function error(parser, er) {
     closeText(parser)
     if (parser.trackPosition) {
-      er += '\nLine: ' + parser.line +
-        '\nColumn: ' + parser.column +
-        '\nChar: ' + parser.c
+      er +=
+        '\nLine: ' +
+        parser.line +
+        '\nColumn: ' +
+        parser.column +
+        '\nChar: ' +
+        parser.c
     }
     er = new Error(er)
     parser.error = er
@@ -6202,11 +7443,14 @@ exports.getProxyForUrl = getProxyForUrl;
     return parser
   }
 
-  function end (parser) {
-    if (parser.sawRoot && !parser.closedRoot) strictFail(parser, 'Unclosed root tag')
-    if ((parser.state !== S.BEGIN) &&
-      (parser.state !== S.BEGIN_WHITESPACE) &&
-      (parser.state !== S.TEXT)) {
+  function end(parser) {
+    if (parser.sawRoot && !parser.closedRoot)
+      strictFail(parser, 'Unclosed root tag')
+    if (
+      parser.state !== S.BEGIN &&
+      parser.state !== S.BEGIN_WHITESPACE &&
+      parser.state !== S.TEXT
+    ) {
       error(parser, 'Unexpected end')
     }
     closeText(parser)
@@ -6217,7 +7461,7 @@ exports.getProxyForUrl = getProxyForUrl;
     return parser
   }
 
-  function strictFail (parser, message) {
+  function strictFail(parser, message) {
     if (typeof parser !== 'object' || !(parser instanceof SAXParser)) {
       throw new Error('bad call to strictFail')
     }
@@ -6226,10 +7470,10 @@ exports.getProxyForUrl = getProxyForUrl;
     }
   }
 
-  function newTag (parser) {
+  function newTag(parser) {
     if (!parser.strict) parser.tagName = parser.tagName[parser.looseCase]()
     var parent = parser.tags[parser.tags.length - 1] || parser
-    var tag = parser.tag = { name: parser.tagName, attributes: {} }
+    var tag = (parser.tag = { name: parser.tagName, attributes: {} })
 
     // will be overridden if tag contails an xmlns="foo" or xmlns:foo="bar"
     if (parser.opt.xmlns) {
@@ -6239,9 +7483,9 @@ exports.getProxyForUrl = getProxyForUrl;
     emitNode(parser, 'onopentagstart', tag)
   }
 
-  function qname (name, attribute) {
+  function qname(name, attribute) {
     var i = name.indexOf(':')
-    var qualName = i < 0 ? [ '', name ] : name.split(':')
+    var qualName = i < 0 ? ['', name] : name.split(':')
     var prefix = qualName[0]
     var local = qualName[1]
 
@@ -6254,13 +7498,15 @@ exports.getProxyForUrl = getProxyForUrl;
     return { prefix: prefix, local: local }
   }
 
-  function attrib (parser) {
+  function attrib(parser) {
     if (!parser.strict) {
       parser.attribName = parser.attribName[parser.looseCase]()
     }
 
-    if (parser.attribList.indexOf(parser.attribName) !== -1 ||
-      parser.tag.attributes.hasOwnProperty(parser.attribName)) {
+    if (
+      parser.attribList.indexOf(parser.attribName) !== -1 ||
+      parser.tag.attributes.hasOwnProperty(parser.attribName)
+    ) {
       parser.attribName = parser.attribValue = ''
       return
     }
@@ -6273,13 +7519,26 @@ exports.getProxyForUrl = getProxyForUrl;
       if (prefix === 'xmlns') {
         // namespace binding attribute. push the binding into scope
         if (local === 'xml' && parser.attribValue !== XML_NAMESPACE) {
-          strictFail(parser,
-            'xml: prefix must be bound to ' + XML_NAMESPACE + '\n' +
-            'Actual: ' + parser.attribValue)
-        } else if (local === 'xmlns' && parser.attribValue !== XMLNS_NAMESPACE) {
-          strictFail(parser,
-            'xmlns: prefix must be bound to ' + XMLNS_NAMESPACE + '\n' +
-            'Actual: ' + parser.attribValue)
+          strictFail(
+            parser,
+            'xml: prefix must be bound to ' +
+              XML_NAMESPACE +
+              '\n' +
+              'Actual: ' +
+              parser.attribValue
+          )
+        } else if (
+          local === 'xmlns' &&
+          parser.attribValue !== XMLNS_NAMESPACE
+        ) {
+          strictFail(
+            parser,
+            'xmlns: prefix must be bound to ' +
+              XMLNS_NAMESPACE +
+              '\n' +
+              'Actual: ' +
+              parser.attribValue
+          )
         } else {
           var tag = parser.tag
           var parent = parser.tags[parser.tags.length - 1] || parser
@@ -6299,14 +7558,14 @@ exports.getProxyForUrl = getProxyForUrl;
       parser.tag.attributes[parser.attribName] = parser.attribValue
       emitNode(parser, 'onattribute', {
         name: parser.attribName,
-        value: parser.attribValue
+        value: parser.attribValue,
       })
     }
 
     parser.attribName = parser.attribValue = ''
   }
 
-  function openTag (parser, selfClosing) {
+  function openTag(parser, selfClosing) {
     if (parser.opt.xmlns) {
       // emit namespace binding events
       var tag = parser.tag
@@ -6318,8 +7577,10 @@ exports.getProxyForUrl = getProxyForUrl;
       tag.uri = tag.ns[qn.prefix] || ''
 
       if (tag.prefix && !tag.uri) {
-        strictFail(parser, 'Unbound namespace prefix: ' +
-          JSON.stringify(parser.tagName))
+        strictFail(
+          parser,
+          'Unbound namespace prefix: ' + JSON.stringify(parser.tagName)
+        )
         tag.uri = qn.prefix
       }
 
@@ -6328,7 +7589,7 @@ exports.getProxyForUrl = getProxyForUrl;
         Object.keys(tag.ns).forEach(function (p) {
           emitNode(parser, 'onopennamespace', {
             prefix: p,
-            uri: tag.ns[p]
+            uri: tag.ns[p],
           })
         })
       }
@@ -6343,20 +7604,22 @@ exports.getProxyForUrl = getProxyForUrl;
         var qualName = qname(name, true)
         var prefix = qualName.prefix
         var local = qualName.local
-        var uri = prefix === '' ? '' : (tag.ns[prefix] || '')
+        var uri = prefix === '' ? '' : tag.ns[prefix] || ''
         var a = {
           name: name,
           value: value,
           prefix: prefix,
           local: local,
-          uri: uri
+          uri: uri,
         }
 
         // if there's any attributes with an undefined namespace,
         // then fail on them now.
         if (prefix && prefix !== 'xmlns' && !uri) {
-          strictFail(parser, 'Unbound namespace prefix: ' +
-            JSON.stringify(prefix))
+          strictFail(
+            parser,
+            'Unbound namespace prefix: ' + JSON.stringify(prefix)
+          )
           a.uri = prefix
         }
         parser.tag.attributes[name] = a
@@ -6385,7 +7648,7 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.attribList.length = 0
   }
 
-  function closeTag (parser) {
+  function closeTag(parser) {
     if (!parser.tagName) {
       strictFail(parser, 'Weird empty close tag.')
       parser.textNode += '</>'
@@ -6432,7 +7695,7 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.tagName = tagName
     var s = parser.tags.length
     while (s-- > t) {
-      var tag = parser.tag = parser.tags.pop()
+      var tag = (parser.tag = parser.tags.pop())
       parser.tagName = parser.tag.name
       emitNode(parser, 'onclosetag', parser.tagName)
 
@@ -6456,7 +7719,7 @@ exports.getProxyForUrl = getProxyForUrl;
     parser.state = S.TEXT
   }
 
-  function parseEntity (parser) {
+  function parseEntity(parser) {
     var entity = parser.entity
     var entityLC = entity.toLowerCase()
     var num
@@ -6481,7 +7744,12 @@ exports.getProxyForUrl = getProxyForUrl;
       }
     }
     entity = entity.replace(/^0+/, '')
-    if (isNaN(num) || numStr.toLowerCase() !== entity) {
+    if (
+      isNaN(num) ||
+      numStr.toLowerCase() !== entity ||
+      num < 0 ||
+      num > 0x10ffff
+    ) {
       strictFail(parser, 'Invalid character entity')
       return '&' + parser.entity + ';'
     }
@@ -6489,7 +7757,7 @@ exports.getProxyForUrl = getProxyForUrl;
     return String.fromCodePoint(num)
   }
 
-  function beginWhiteSpace (parser, c) {
+  function beginWhiteSpace(parser, c) {
     if (c === '<') {
       parser.state = S.OPEN_WAKA
       parser.startTagPosition = parser.position
@@ -6502,7 +7770,7 @@ exports.getProxyForUrl = getProxyForUrl;
     }
   }
 
-  function charAt (chunk, i) {
+  function charAt(chunk, i) {
     var result = ''
     if (i < chunk.length) {
       result = chunk.charAt(i)
@@ -6510,14 +7778,16 @@ exports.getProxyForUrl = getProxyForUrl;
     return result
   }
 
-  function write (chunk) {
+  function write(chunk) {
     var parser = this
     if (this.error) {
       throw this.error
     }
     if (parser.closed) {
-      return error(parser,
-        'Cannot write after close. Assign an onready handler.')
+      return error(
+        parser,
+        'Cannot write after close. Assign an onready handler.'
+      )
     }
     if (chunk === null) {
       return end(parser)
@@ -6575,11 +7845,17 @@ exports.getProxyForUrl = getProxyForUrl;
             }
             parser.textNode += chunk.substring(starti, i - 1)
           }
-          if (c === '<' && !(parser.sawRoot && parser.closedRoot && !parser.strict)) {
+          if (
+            c === '<' &&
+            !(parser.sawRoot && parser.closedRoot && !parser.strict)
+          ) {
             parser.state = S.OPEN_WAKA
             parser.startTagPosition = parser.position
           } else {
-            if (!isWhitespace(c) && (!parser.sawRoot || parser.closedRoot)) {
+            if (
+              !isWhitespace(c) &&
+              (!parser.sawRoot || parser.closedRoot)
+            ) {
               strictFail(parser, 'Text data outside of root node.')
             }
             if (c === '&') {
@@ -6641,10 +7917,14 @@ exports.getProxyForUrl = getProxyForUrl;
             parser.state = S.COMMENT
             parser.comment = ''
             parser.sgmlDecl = ''
-            continue;
+            continue
           }
 
-          if (parser.doctype && parser.doctype !== true && parser.sgmlDecl) {
+          if (
+            parser.doctype &&
+            parser.doctype !== true &&
+            parser.sgmlDecl
+          ) {
             parser.state = S.DOCTYPE_DTD
             parser.doctype += '<!' + parser.sgmlDecl + c
             parser.sgmlDecl = ''
@@ -6656,8 +7936,10 @@ exports.getProxyForUrl = getProxyForUrl;
           } else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
             parser.state = S.DOCTYPE
             if (parser.doctype || parser.sawRoot) {
-              strictFail(parser,
-                'Inappropriately located doctype declaration')
+              strictFail(
+                parser,
+                'Inappropriately located doctype declaration'
+              )
             }
             parser.doctype = ''
             parser.sgmlDecl = ''
@@ -6766,10 +8048,22 @@ exports.getProxyForUrl = getProxyForUrl;
           continue
 
         case S.CDATA:
+          var starti = i - 1
+          while (c && c !== ']') {
+            c = charAt(chunk, i++)
+            if (c && parser.trackPosition) {
+              parser.position++
+              if (c === '\n') {
+                parser.line++
+                parser.column = 0
+              } else {
+                parser.column++
+              }
+            }
+          }
+          parser.cdata += chunk.substring(starti, i - 1)
           if (c === ']') {
             parser.state = S.CDATA_ENDING
-          } else {
-            parser.cdata += c
           }
           continue
 
@@ -6820,10 +8114,12 @@ exports.getProxyForUrl = getProxyForUrl;
 
         case S.PROC_INST_ENDING:
           if (c === '>') {
-            emitNode(parser, 'onprocessinginstruction', {
+            const procInstEndData = {
               name: parser.procInstName,
-              body: parser.procInstBody
-            })
+              body: parser.procInstBody,
+            }
+            validateXmlDeclarationEncoding(parser, procInstEndData)
+            emitNode(parser, 'onprocessinginstruction', procInstEndData)
             parser.procInstName = parser.procInstBody = ''
             parser.state = S.TEXT
           } else {
@@ -6855,7 +8151,10 @@ exports.getProxyForUrl = getProxyForUrl;
             openTag(parser, true)
             closeTag(parser)
           } else {
-            strictFail(parser, 'Forward-slash in opening tag not followed by >')
+            strictFail(
+              parser,
+              'Forward-slash in opening tag not followed by >'
+            )
             parser.state = S.ATTRIB
           }
           continue
@@ -6905,7 +8204,7 @@ exports.getProxyForUrl = getProxyForUrl;
             parser.attribValue = ''
             emitNode(parser, 'onattribute', {
               name: parser.attribName,
-              value: ''
+              value: '',
             })
             parser.attribName = ''
             if (c === '>') {
@@ -7002,7 +8301,7 @@ exports.getProxyForUrl = getProxyForUrl;
           } else if (isMatch(nameBody, c)) {
             parser.tagName += c
           } else if (parser.script) {
-            parser.script += '</' + parser.tagName
+            parser.script += '</' + parser.tagName + c
             parser.tagName = ''
             parser.state = S.SCRIPT
           } else {
@@ -7048,16 +8347,36 @@ exports.getProxyForUrl = getProxyForUrl;
 
           if (c === ';') {
             var parsedEntity = parseEntity(parser)
-            if (parser.opt.unparsedEntities && !Object.values(sax.XML_ENTITIES).includes(parsedEntity)) {
+            if (
+              parser.opt.unparsedEntities &&
+              !Object.values(sax.XML_ENTITIES).includes(parsedEntity)
+            ) {
+              if ((parser.entityCount += 1) > parser.opt.maxEntityCount) {
+                error(
+                  parser,
+                  'Parsed entity count exceeds max entity count'
+                )
+              }
+
+              if ((parser.entityDepth += 1) > parser.opt.maxEntityDepth) {
+                error(
+                  parser,
+                  'Parsed entity depth exceeds max entity depth'
+                )
+              }
+
               parser.entity = ''
               parser.state = returnState
               parser.write(parsedEntity)
+              parser.entityDepth -= 1
             } else {
               parser[buffer] += parsedEntity
               parser.entity = ''
               parser.state = returnState
             }
-          } else if (isMatch(parser.entity.length ? entityBody : entityStart, c)) {
+          } else if (
+            isMatch(parser.entity.length ? entityBody : entityStart, c)
+          ) {
             parser.entity += c
           } else {
             strictFail(parser, 'Invalid character in entity name')
@@ -7083,7 +8402,7 @@ exports.getProxyForUrl = getProxyForUrl;
   /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
   /* istanbul ignore next */
   if (!String.fromCodePoint) {
-    (function () {
+    ;(function () {
       var stringFromCharCode = String.fromCharCode
       var floor = Math.floor
       var fromCodePoint = function () {
@@ -7102,18 +8421,20 @@ exports.getProxyForUrl = getProxyForUrl;
           if (
             !isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
             codePoint < 0 || // not a valid Unicode code point
-            codePoint > 0x10FFFF || // not a valid Unicode code point
+            codePoint > 0x10ffff || // not a valid Unicode code point
             floor(codePoint) !== codePoint // not an integer
           ) {
             throw RangeError('Invalid code point: ' + codePoint)
           }
-          if (codePoint <= 0xFFFF) { // BMP code point
+          if (codePoint <= 0xffff) {
+            // BMP code point
             codeUnits.push(codePoint)
-          } else { // Astral code point; split in surrogate halves
+          } else {
+            // Astral code point; split in surrogate halves
             // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
             codePoint -= 0x10000
-            highSurrogate = (codePoint >> 10) + 0xD800
-            lowSurrogate = (codePoint % 0x400) + 0xDC00
+            highSurrogate = (codePoint >> 10) + 0xd800
+            lowSurrogate = (codePoint % 0x400) + 0xdc00
             codeUnits.push(highSurrogate, lowSurrogate)
           }
           if (index + 1 === length || codeUnits.length > MAX_SIZE) {
@@ -7128,14 +8449,14 @@ exports.getProxyForUrl = getProxyForUrl;
         Object.defineProperty(String, 'fromCodePoint', {
           value: fromCodePoint,
           configurable: true,
-          writable: true
+          writable: true,
         })
       } else {
         String.fromCodePoint = fromCodePoint
       }
-    }())
+    })()
   }
-})( false ? 0 : exports)
+})( false ? (0) : exports)
 
 
 /***/ }),
@@ -12748,7 +14069,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(8915)
-const { stringify, getHeadersList } = __nccwpck_require__(3834)
+const { stringify } = __nccwpck_require__(3834)
 const { webidl } = __nccwpck_require__(4222)
 const { Headers } = __nccwpck_require__(6349)
 
@@ -12824,14 +14145,13 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = getHeadersList(headers).cookies
+  const cookies = headers.getSetCookie()
 
   if (!cookies) {
     return []
   }
 
-  // In older versions of undici, cookies is a list of name:value.
-  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
+  return cookies.map((pair) => parseSetCookie(pair))
 }
 
 /**
@@ -13259,14 +14579,15 @@ module.exports = {
 /***/ }),
 
 /***/ 3834:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
 "use strict";
 
 
-const assert = __nccwpck_require__(2613)
-const { kHeadersList } = __nccwpck_require__(6443)
-
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -13527,31 +14848,13 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
-let kHeadersListNode
-
-function getHeadersList (headers) {
-  if (headers[kHeadersList]) {
-    return headers[kHeadersList]
-  }
-
-  if (!kHeadersListNode) {
-    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
-      (symbol) => symbol.description === 'headers list'
-    )
-
-    assert(kHeadersListNode, 'Headers cannot be parsed')
-  }
-
-  const headersList = headers[kHeadersListNode]
-  assert(headersList)
-
-  return headersList
-}
-
 module.exports = {
   isCTLExcludingHtab,
-  stringify,
-  getHeadersList
+  validateCookieName,
+  validateCookiePath,
+  validateCookieValue,
+  toIMFDate,
+  stringify
 }
 
 
@@ -15480,6 +16783,14 @@ const { isUint8Array, isArrayBuffer } = __nccwpck_require__(8253)
 const { File: UndiciFile } = __nccwpck_require__(3041)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(4322)
 
+let random
+try {
+  const crypto = __nccwpck_require__(7598)
+  random = (max) => crypto.randomInt(0, max)
+} catch {
+  random = (max) => Math.floor(Math.random(max))
+}
+
 let ReadableStream = globalThis.ReadableStream
 
 /** @type {globalThis['File']} */
@@ -15565,7 +16876,7 @@ function extractBody (object, keepalive = false) {
     // Set source to a copy of the bytes held by object.
     source = new Uint8Array(object.buffer.slice(object.byteOffset, object.byteOffset + object.byteLength))
   } else if (util.isFormDataLike(object)) {
-    const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, '0')}`
+    const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, '0')}`
     const prefix = `--${boundary}\r\nContent-Disposition: form-data`
 
     /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
@@ -17547,6 +18858,7 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(5523)
+const util = __nccwpck_require__(9023)
 const { webidl } = __nccwpck_require__(4222)
 const assert = __nccwpck_require__(2613)
 
@@ -18100,6 +19412,9 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
+  },
+  [util.inspect.custom]: {
+    enumerable: false
   }
 })
 
@@ -27276,6 +28591,20 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
+
+    this.on('connectionError', (origin, targets, error) => {
+      // If a connection error occurs, we remove the client from the pool,
+      // and emit a connectionError event. They will not be re-used.
+      // Fixes https://github.com/nodejs/undici/issues/3895
+      for (const target of targets) {
+        // Do not use kRemoveClient here, as it will close the client,
+        // but the client cannot be closed in this state.
+        const idx = this[kClients].indexOf(target)
+        if (idx !== -1) {
+          this[kClients].splice(idx, 1)
+        }
+      }
+    })
   }
 
   [kGetDispatcher] () {
@@ -34709,6 +36038,14 @@ module.exports = require("net");
 
 /***/ }),
 
+/***/ 7598:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:crypto");
+
+/***/ }),
+
 /***/ 8474:
 /***/ ((module) => {
 
@@ -36474,10 +37811,11 @@ module.exports = parseParams
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
-// Axios v1.7.8 Copyright (c) 2024 Matt Zabriskie and contributors
+/*! Axios v1.8.4 Copyright (c) 2025 Matt Zabriskie and contributors */
 
 
 const FormData$1 = __nccwpck_require__(6454);
+const crypto = __nccwpck_require__(6982);
 const url = __nccwpck_require__(7016);
 const proxyFromEnv = __nccwpck_require__(7777);
 const http = __nccwpck_require__(8611);
@@ -36491,6 +37829,7 @@ const events = __nccwpck_require__(4434);
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 const FormData__default = /*#__PURE__*/_interopDefaultLegacy(FormData$1);
+const crypto__default = /*#__PURE__*/_interopDefaultLegacy(crypto);
 const url__default = /*#__PURE__*/_interopDefaultLegacy(url);
 const proxyFromEnv__default = /*#__PURE__*/_interopDefaultLegacy(proxyFromEnv);
 const http__default = /*#__PURE__*/_interopDefaultLegacy(http);
@@ -37106,26 +38445,6 @@ const toFiniteNumber = (value, defaultValue) => {
   return value != null && Number.isFinite(value = +value) ? value : defaultValue;
 };
 
-const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
-
-const DIGIT = '0123456789';
-
-const ALPHABET = {
-  DIGIT,
-  ALPHA,
-  ALPHA_DIGIT: ALPHA + ALPHA.toUpperCase() + DIGIT
-};
-
-const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
-  let str = '';
-  const {length} = alphabet;
-  while (size--) {
-    str += alphabet[Math.random() * length|0];
-  }
-
-  return str;
-};
-
 /**
  * If the thing is a FormData object, return true, otherwise return false.
  *
@@ -37253,8 +38572,6 @@ const utils$1 = {
   findKey,
   global: _global,
   isContextDefined,
-  ALPHABET,
-  generateString,
   isSpecCompliantForm,
   toJSONObject,
   isAsyncFn,
@@ -37766,6 +39083,29 @@ const transitionalDefaults = {
 
 const URLSearchParams = url__default["default"].URLSearchParams;
 
+const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
+
+const DIGIT = '0123456789';
+
+const ALPHABET = {
+  DIGIT,
+  ALPHA,
+  ALPHA_DIGIT: ALPHA + ALPHA.toUpperCase() + DIGIT
+};
+
+const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
+  let str = '';
+  const {length} = alphabet;
+  const randomValues = new Uint32Array(size);
+  crypto__default["default"].randomFillSync(randomValues);
+  for (let i = 0; i < size; i++) {
+    str += alphabet[randomValues[i] % length];
+  }
+
+  return str;
+};
+
+
 const platform$1 = {
   isNode: true,
   classes: {
@@ -37773,6 +39113,8 @@ const platform$1 = {
     FormData: FormData__default["default"],
     Blob: typeof Blob !== 'undefined' && Blob || null
   },
+  ALPHABET,
+  generateString,
   protocols: [ 'http', 'https', 'file', 'data' ]
 };
 
@@ -38547,14 +39889,15 @@ function combineURLs(baseURL, relativeURL) {
  *
  * @returns {string} The combined full path
  */
-function buildFullPath(baseURL, requestedURL) {
-  if (baseURL && !isAbsoluteURL(requestedURL)) {
+function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls) {
+  let isRelativeUrl = !isAbsoluteURL(requestedURL);
+  if (baseURL && (isRelativeUrl || allowAbsoluteUrls == false)) {
     return combineURLs(baseURL, requestedURL);
   }
   return requestedURL;
 }
 
-const VERSION = "1.7.8";
+const VERSION = "1.8.4";
 
 function parseProtocol(url) {
   const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
@@ -38764,7 +40107,7 @@ const readBlob = async function* (blob) {
 
 const readBlob$1 = readBlob;
 
-const BOUNDARY_ALPHABET = utils$1.ALPHABET.ALPHA_DIGIT + '-_';
+const BOUNDARY_ALPHABET = platform.ALPHABET.ALPHA_DIGIT + '-_';
 
 const textEncoder = typeof TextEncoder === 'function' ? new TextEncoder() : new util__default["default"].TextEncoder();
 
@@ -38824,7 +40167,7 @@ const formDataToStream = (form, headersHandler, options) => {
   const {
     tag = 'form-data-boundary',
     size = 25,
-    boundary = tag + '-' + utils$1.generateString(size, BOUNDARY_ALPHABET)
+    boundary = tag + '-' + platform.generateString(size, BOUNDARY_ALPHABET)
   } = options || {};
 
   if(!utils$1.isFormData(form)) {
@@ -39249,7 +40592,7 @@ const httpAdapter = isHttpAdapterSupported && function httpAdapter(config) {
     }
 
     // Parse url
-    const fullPath = buildFullPath(config.baseURL, config.url);
+    const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
     const parsed = new URL(fullPath, platform.hasBrowserEnv ? platform.origin : undefined);
     const protocol = parsed.protocol || supportedProtocols[0];
 
@@ -39872,7 +41215,7 @@ const resolveConfig = (config) => {
 
   newConfig.headers = headers = AxiosHeaders$1.from(headers);
 
-  newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url), config.params, config.paramsSerializer);
+  newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url, newConfig.allowAbsoluteUrls), config.params, config.paramsSerializer);
 
   // HTTP basic authentication
   if (auth) {
@@ -40780,6 +42123,13 @@ class Axios {
       }
     }
 
+    // Set config.allowAbsoluteUrls
+    if (config.allowAbsoluteUrls !== undefined) ; else if (this.defaults.allowAbsoluteUrls !== undefined) {
+      config.allowAbsoluteUrls = this.defaults.allowAbsoluteUrls;
+    } else {
+      config.allowAbsoluteUrls = true;
+    }
+
     validator.assertOptions(config, {
       baseUrl: validators.spelling('baseURL'),
       withXsrfToken: validators.spelling('withXSRFToken')
@@ -40875,7 +42225,7 @@ class Axios {
 
   getUri(config) {
     config = mergeConfig(this.defaults, config);
-    const fullPath = buildFullPath(config.baseURL, config.url);
+    const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
     return buildURL(fullPath, config.params, config.paramsSerializer);
   }
 }
