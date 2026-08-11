@@ -1,0 +1,42 @@
+# Example: ServiceNow DevOps Test Report with HTTPS Proxy Support
+#
+# This workflow demonstrates how to route the ServiceNow DevOps Test Report
+# action through a corporate HTTPS proxy. The action reads the HTTPS_PROXY
+# environment variable and tunnels all requests via HTTP CONNECT.
+#
+# Required secrets:
+#   HTTPS_PROXY_URL           - Proxy URL, e.g. http://<host>:<port> or http://user:pass@<host>:<port>
+#   SN_INSTANCE_URL           - ServiceNow instance URL
+#   SN_DEVOPS_INTEGRATION_TOKEN - DevOps integration token
+#   SN_ORCHESTRATION_TOOL_ID  - Orchestration tool sys_id
+
+name: Proxy Test - DevOps Test Report
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  testReport:
+    name: ServiceNow Test Report
+    runs-on: ubuntu-latest
+
+    # Set HTTPS_PROXY so the action routes traffic through your proxy
+    env:
+      HTTPS_PROXY: ${{ secrets.HTTPS_PROXY_URL }}
+
+    steps:
+      # Checkout repo to access test result files
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: ServiceNow Test Report
+        uses: ServiceNow/servicenow-devops-test-report@feature/https-proxy-agent
+        with:
+          devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'ServiceNow Test Report'
+          # Path to your JUnit XML report file
+          xml-report-filename: test-results/results.xml
